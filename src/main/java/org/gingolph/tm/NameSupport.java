@@ -7,21 +7,21 @@ import org.tmapi.core.Variant;
 
 public interface NameSupport extends ConstructSupport, ScopedSupport, TypedSupport {
 
-    Topic getReifier();
+  Topic getReifier();
 
-    void setReifier(TopicImpl reifier);
-    
-    Topic getType();
+  void setReifier(TopicImpl reifier);
 
-    void setType(Topic type);
-    
-    String getValue();
+  Topic getType();
 
-    void setValue(String value);
-    
-    Set<Variant> getVariants();
+  void setType(Topic type);
 
-    void addVariant(Variant variant);
+  String getValue();
 
-    void removeVariant(Variant variant);
+  void setValue(String value);
+
+  Set<Variant> getVariants();
+
+  void addVariant(Variant variant);
+
+  void removeVariant(Variant variant);
 }

@@ -26,288 +26,297 @@ import org.tmapi.index.Index;
 
 public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implements TopicMap {
 
-    transient Collection<TopicMapEventListener> listeners = new ArrayList();
-    
-    TopicMapSystemImpl topicMapSystem;
-    private final boolean autoMerge;
-    private String id;
-    private final ConstructSupportFactory supportFactory;
-    
-    public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge, ConstructSupportFactory supportFactory) {
-        super();
-        this.topicMapSystem = topicMapSystem;
-        this.autoMerge = autoMerge;
-        this.supportFactory = supportFactory;
-    }
+  transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
-    @Override 
-    public Construct getParent() {
-        return null;
-    }
-    
-    @Override
-    public TopicMapImpl getTopicMap() {
-        return this;
-    }
+  TopicMapSystemImpl topicMapSystem;
+  private final boolean autoMerge;
+  private String id;
+  private final ConstructSupportFactory supportFactory;
 
-    @Override
-    public String getId() {
-        if (id == null) {
-            this.id = generateId(this);
-        }
-        return id;
-    }
+  public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
+      ConstructSupportFactory supportFactory) {
+    super();
+    this.topicMapSystem = topicMapSystem;
+    this.autoMerge = autoMerge;
+    this.supportFactory = supportFactory;
+  }
 
-    @Override
-    public Set<Topic> getTopics() {
-        return Collections.unmodifiableSet(support.getTopics());
-    }
+  @Override
+  public Construct getParent() {
+    return null;
+  }
 
-    @Override
-    public Locator getLocator() {
-        return support.getBaseLocator();
-    }
-    
-    void setLocator(Locator locator) {
-        support.setBaseLocator(locator);
-    }
-    
-    @Override
-    public Locator createLocator(String value) throws MalformedIRIException {
-        return support.createLocator(value);
-    }
+  @Override
+  public TopicMapImpl getTopicMap() {
+    return this;
+  }
 
-    IdentifierIndex getIdentifierIndex() {
-        return getIndex(IdentifierIndex.class);
+  @Override
+  public String getId() {
+    if (id == null) {
+      this.id = generateId(this);
     }
-        
-    @Override
-    public Construct getConstructByItemIdentifier(Locator itemIdentifier) {
-        return getIdentifierIndex().getConstructByItemIdentifier(itemIdentifier);
-    }
+    return id;
+  }
 
-    public <T extends Construct> T getConstructByItemIdentifier(Locator itemIdentifier, Class<T> clazz) {
-        Construct construct = getConstructByItemIdentifier(itemIdentifier);
-        return clazz.isAssignableFrom(construct.getClass())?(T)construct:null;
-    }
-    
-    @Override
-    public Construct getConstructById(String id) {
-        return getIdentifierIndex().getConstructById(id);
-    }
+  @Override
+  public Set<Topic> getTopics() {
+    return Collections.unmodifiableSet(support.getTopics());
+  }
 
-    @Override
-    public Topic getTopicBySubjectIdentifier(Locator subjectIdentifier) {
-        return getIdentifierIndex().getTopicBySubjectIdentifier(subjectIdentifier);
-    }
+  @Override
+  public Locator getLocator() {
+    return support.getBaseLocator();
+  }
 
-    @Override
-    public Topic createTopicBySubjectIdentifier(Locator subjectIdentifier) throws ModelConstraintException {
-        Topic topic = getTopicBySubjectIdentifier(subjectIdentifier);
-        if (topic != null) {
-            return topic;
-        }
-        Construct construct = getConstructByItemIdentifier(subjectIdentifier);
-        Topic newTopic = construct instanceof TopicImpl?(TopicImpl)construct:createTopicInstance();
-        newTopic.addSubjectIdentifier(subjectIdentifier);
-        notifyListeners(listener->listener.onSubjectIdentifierAdded(newTopic, subjectIdentifier));
-        return newTopic;
-    }
+  void setLocator(Locator locator) {
+    support.setBaseLocator(locator);
+  }
 
-    @Override
-    public Topic getTopicBySubjectLocator(Locator subjectLocator) {
-       return getIdentifierIndex().getTopicBySubjectLocator(subjectLocator);
-    }
-    
-    @Override
-    public Topic createTopicBySubjectLocator(Locator subjectLocator) throws ModelConstraintException {
-        Topic topic = getTopicBySubjectLocator(subjectLocator);
-        if (topic != null) {
-            return topic;
-        }
-        Topic newTopic = createTopicInstance();
-        newTopic.addSubjectLocator(subjectLocator);
-        notifyListeners(listener->listener.onSubjectLocatorAdded(newTopic, subjectLocator));
-        return newTopic;
-    }
+  @Override
+  public Locator createLocator(String value) throws MalformedIRIException {
+    return support.createLocator(value);
+  }
 
-    @Override
-    public Topic createTopicByItemIdentifier(Locator itemIdentifier) throws IdentityConstraintException, ModelConstraintException {
-        Construct construct = getConstructByItemIdentifier(itemIdentifier);
-        if (construct instanceof Topic) {
-            return (Topic)construct;
-        }
-        if (construct != null) {
-            throw new IdentityConstraintException(this, construct, itemIdentifier, "A construct with the specified item indetifier exists but is not a Topic");
-        }
-        Topic topic = getTopicBySubjectIdentifier(itemIdentifier);
-        if (topic == null) {
-            topic = createTopicInstance();
-        }
-        topic.addItemIdentifier(itemIdentifier);
-        return topic;
-    }
+  IdentifierIndex getIdentifierIndex() {
+    return getIndex(IdentifierIndex.class);
+  }
 
-    @Override
-    public Topic createTopic() {
-        Topic topic = createTopicInstance();
-        topic.addItemIdentifier(createLocator("internal-"+topic.getId()));
-        return topic;
-    }
-   
-    private Topic createTopicInstance() {
-        TopicImpl topic = new TopicImpl(this);
-        topic.setSupport(createTopicSupport(topic));
-        support.addTopic(topic);
-        notifyListeners(listener->listener.onConstructCreated(topic));
-        return topic;
-    }
-    
-    void removeTopic(Topic topic) {
-        support.removeTopic(topic);
-    }
-    
-    @Override
-    protected void customRemove() {        
-        for (Association association: getAssociations()) {
-            association.remove();
-        }
-        for (Topic topic: getTopics()) {
-            ((TopicImpl)topic).doRemove();
-        }
-        topicMapSystem.removeTopicMap(this);
-    }
-    
-    @Override
-    public Set<Association> getAssociations() {
-        return Collections.unmodifiableSet(support.getAssociations());
-    }
+  @Override
+  public Construct getConstructByItemIdentifier(Locator itemIdentifier) {
+    return getIdentifierIndex().getConstructByItemIdentifier(itemIdentifier);
+  }
 
-    @Override
-    public AssociationImpl createAssociation(Topic type, Topic... scope) throws ModelConstraintException {
-        return createAssociation(type, scope == null?null:Arrays.asList(scope));
-    }
+  public <T extends Construct> T getConstructByItemIdentifier(Locator itemIdentifier,
+      Class<T> clazz) {
+    Construct construct = getConstructByItemIdentifier(itemIdentifier);
+    return clazz.isAssignableFrom(construct.getClass()) ? (T) construct : null;
+  }
 
-    @Override
-    public AssociationImpl createAssociation(Topic type, Collection<Topic> scope) throws ModelConstraintException {
-        if (type == null) {
-            throw new ModelConstraintException(this, "Null type is not allowed");
-        }
-        if (scope == null) {
-            throw new ModelConstraintException(this, "Null scope is not allowed");
-        }
-        AssociationImpl association = new AssociationImpl(this);
-        association.setSupport(createAssociationSupport(association));
-        support.addAssociation(association);
-        association.setType(type);
-        association.setScope(scope);
-        notifyListeners(listener->listener.onConstructCreated(association));
-        return association;
-    }
+  @Override
+  public Construct getConstructById(String id) {
+    return getIdentifierIndex().getConstructById(id);
+  }
 
-    void removeAssociation(AssociationImpl association) {
-        support.removeAssociation(association);
-    }
-    
-    @Override
-    public void close() {
-        topicMapSystem.closeTopicMap(this);
-    }
+  @Override
+  public Topic getTopicBySubjectIdentifier(Locator subjectIdentifier) {
+    return getIdentifierIndex().getTopicBySubjectIdentifier(subjectIdentifier);
+  }
 
-    @Override
-    public void mergeIn(TopicMap other) throws ModelConstraintException {
-        if (other == null) {
-            throw new ModelConstraintException(this, "Null topic map not allowed");
-        }
-        if (other == this) {
-            return;
-        }
-        final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
-        otherTopics.stream().forEach(otherTopic-> {
-            Optional<Topic> sameTopic = getTopics().stream().filter(topic-> topic.equals(otherTopic)).findFirst();
-            TopicImpl mergee = (TopicImpl)(sameTopic.isPresent()?sameTopic.get():createTopicInstance());
-            mergee.importIn(otherTopic, false);
-        });
+  @Override
+  public Topic createTopicBySubjectIdentifier(Locator subjectIdentifier)
+      throws ModelConstraintException {
+    Topic topic = getTopicBySubjectIdentifier(subjectIdentifier);
+    if (topic != null) {
+      return topic;
+    }
+    Construct construct = getConstructByItemIdentifier(subjectIdentifier);
+    Topic newTopic = construct instanceof TopicImpl ? (TopicImpl) construct : createTopicInstance();
+    newTopic.addSubjectIdentifier(subjectIdentifier);
+    notifyListeners(listener -> listener.onSubjectIdentifierAdded(newTopic, subjectIdentifier));
+    return newTopic;
+  }
 
-    }
+  @Override
+  public Topic getTopicBySubjectLocator(Locator subjectLocator) {
+    return getIdentifierIndex().getTopicBySubjectLocator(subjectLocator);
+  }
 
-    @Override
-    public <I extends Index> I getIndex(Class<I> type) {
-        return support.getIndex(type);
+  @Override
+  public Topic createTopicBySubjectLocator(Locator subjectLocator) throws ModelConstraintException {
+    Topic topic = getTopicBySubjectLocator(subjectLocator);
+    if (topic != null) {
+      return topic;
     }
+    Topic newTopic = createTopicInstance();
+    newTopic.addSubjectLocator(subjectLocator);
+    notifyListeners(listener -> listener.onSubjectLocatorAdded(newTopic, subjectLocator));
+    return newTopic;
+  }
 
-    @Override
-    public Topic getReifier() {
-        return support.getReifier();
+  @Override
+  public Topic createTopicByItemIdentifier(Locator itemIdentifier)
+      throws IdentityConstraintException, ModelConstraintException {
+    Construct construct = getConstructByItemIdentifier(itemIdentifier);
+    if (construct instanceof Topic) {
+      return (Topic) construct;
     }
-    
-    @Override
-    public void setReifier(Topic reifier) throws ModelConstraintException {
-        ReifierHelper.setReifier(this, reifier, this::doSetReifier);
+    if (construct != null) {
+      throw new IdentityConstraintException(this, construct, itemIdentifier,
+          "A construct with the specified item identifier exists but is not a Topic");
     }
-    
-    protected void doSetReifier(Topic reifier) {
-        support.setReifier(reifier);
-    }    
-    
-    protected final String generateId(IdentifiedConstruct construct) {
-        return support.generateId(construct);
+    Topic topic = getTopicBySubjectIdentifier(itemIdentifier);
+    if (topic == null) {
+      topic = createTopicInstance();
     }
-    
-    boolean isAutoMerge() {
-        return autoMerge;
-    }
-    
-    public void notifyListeners(Consumer<? super TopicMapEventListener> action) {
-        listeners.forEach(action);
-    }
+    topic.addItemIdentifier(itemIdentifier);
+    return topic;
+  }
 
-    public <T extends TopicMapEventListener> T registerListener(T listener) {
-        listeners.add(listener);
-        return listener;
-    }
-    
-    public NameImpl createName(TopicImpl topic, String value) {
-        NameImpl name = new NameImpl(this, topic);
-        name.setSupport(createNameSupport(name));
-        name.setValue(value);
-        return name;
-    }
+  @Override
+  public Topic createTopic() {
+    Topic topic = createTopicInstance();
+    topic.addItemIdentifier(createLocator("internal-" + topic.getId()));
+    return topic;
+  }
 
-    public OccurrenceImpl createOccurrence(TopicImpl topic) {
-        OccurrenceImpl occurrence = new OccurrenceImpl(this, topic);
-        occurrence.setSupport(createOccurrenceSupport(occurrence));
-        return occurrence;
-    }
-    
-    public VariantImpl createVariant(NameImpl name, Locator datatype, Object value) {
-        VariantImpl variant = new VariantImpl(this, name);
-        variant.setSupport(createVariantSupport(variant));
-        variant.setValue(datatype, value);
-        return variant;
-    }    
+  private Topic createTopicInstance() {
+    TopicImpl topic = new TopicImpl(this);
+    topic.setSupport(createTopicSupport(topic));
+    support.addTopic(topic);
+    notifyListeners(listener -> listener.onConstructCreated(topic));
+    return topic;
+  }
 
-    AssociationSupport createAssociationSupport(Association association) {
-        return supportFactory.createAssociationSupport(association);
+  void removeTopic(Topic topic) {
+    support.removeTopic(topic);
+  }
+
+  @Override
+  protected void customRemove() {
+    for (Association association : getAssociations()) {
+      association.remove();
     }
-    
-    RoleSupport createRoleSupport(Role role) {
-        return supportFactory.createRoleSupport(role);
+    for (Topic topic : getTopics()) {
+      ((TopicImpl) topic).doRemove();
     }
-    
-    NameSupport createNameSupport(Name name) {
-        return supportFactory.createNameSupport(name);
+    topicMapSystem.removeTopicMap(this);
+  }
+
+  @Override
+  public Set<Association> getAssociations() {
+    return Collections.unmodifiableSet(support.getAssociations());
+  }
+
+  @Override
+  public AssociationImpl createAssociation(Topic type, Topic... scope)
+      throws ModelConstraintException {
+    return createAssociation(type, scope == null ? null : Arrays.asList(scope));
+  }
+
+  @Override
+  public AssociationImpl createAssociation(Topic type, Collection<Topic> scope)
+      throws ModelConstraintException {
+    if (type == null) {
+      throw new ModelConstraintException(this, "Null type is not allowed");
     }
-    
-    OccurrenceSupport createOccurrenceSupport(Occurrence occurrence) {
-        return supportFactory.createOccurrenceSupport(occurrence);
+    if (scope == null) {
+      throw new ModelConstraintException(this, "Null scope is not allowed");
     }
-    
-    TopicSupport createTopicSupport(TopicImpl topic) {
-        return supportFactory.createTopicSupport(topic);
+    AssociationImpl association = new AssociationImpl(this);
+    association.setSupport(createAssociationSupport(association));
+    support.addAssociation(association);
+    association.setType(type);
+    association.setScope(scope);
+    notifyListeners(listener -> listener.onConstructCreated(association));
+    return association;
+  }
+
+  void removeAssociation(AssociationImpl association) {
+    support.removeAssociation(association);
+  }
+
+  @Override
+  public void close() {
+    topicMapSystem.closeTopicMap(this);
+  }
+
+  @Override
+  public void mergeIn(TopicMap other) throws ModelConstraintException {
+    if (other == null) {
+      throw new ModelConstraintException(this, "Null topic map not allowed");
     }
-    
-    VariantSupport createVariantSupport(Variant variant) {
-        return supportFactory.createVariantSupport(variant);
+    if (other == this) {
+      return;
     }
+    final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
+    otherTopics.stream().forEach(otherTopic -> {
+      Optional<Topic> sameTopic =
+          getTopics().stream().filter(topic -> topic.equals(otherTopic)).findFirst();
+      TopicImpl mergee =
+          (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : createTopicInstance());
+      mergee.importIn(otherTopic, false);
+    });
+
+  }
+
+  @Override
+  public <I extends Index> I getIndex(Class<I> type) {
+    return support.getIndex(type);
+  }
+
+  @Override
+  public Topic getReifier() {
+    return support.getReifier();
+  }
+
+  @Override
+  public void setReifier(Topic reifier) throws ModelConstraintException {
+    ReifierHelper.setReifier(this, reifier, this::doSetReifier);
+  }
+
+  protected void doSetReifier(Topic reifier) {
+    support.setReifier(reifier);
+  }
+
+  protected final String generateId(IdentifiedConstruct construct) {
+    return support.generateId(construct);
+  }
+
+  boolean isAutoMerge() {
+    return autoMerge;
+  }
+
+  public void notifyListeners(Consumer<? super TopicMapEventListener> action) {
+    listeners.forEach(action);
+  }
+
+  public <T extends TopicMapEventListener> T registerListener(T listener) {
+    listeners.add(listener);
+    return listener;
+  }
+
+  public NameImpl createName(TopicImpl topic, String value) {
+    NameImpl name = new NameImpl(this, topic);
+    name.setSupport(createNameSupport(name));
+    name.setValue(value);
+    return name;
+  }
+
+  public OccurrenceImpl createOccurrence(TopicImpl topic) {
+    OccurrenceImpl occurrence = new OccurrenceImpl(this, topic);
+    occurrence.setSupport(createOccurrenceSupport(occurrence));
+    return occurrence;
+  }
+
+  public VariantImpl createVariant(NameImpl name, Locator datatype, Object value) {
+    VariantImpl variant = new VariantImpl(this, name);
+    variant.setSupport(createVariantSupport(variant));
+    variant.setValue(datatype, value);
+    return variant;
+  }
+
+  AssociationSupport createAssociationSupport(Association association) {
+    return supportFactory.createAssociationSupport(association);
+  }
+
+  RoleSupport createRoleSupport(Role role) {
+    return supportFactory.createRoleSupport(role);
+  }
+
+  NameSupport createNameSupport(Name name) {
+    return supportFactory.createNameSupport(name);
+  }
+
+  OccurrenceSupport createOccurrenceSupport(Occurrence occurrence) {
+    return supportFactory.createOccurrenceSupport(occurrence);
+  }
+
+  TopicSupport createTopicSupport(TopicImpl topic) {
+    return supportFactory.createTopicSupport(topic);
+  }
+
+  VariantSupport createVariantSupport(Variant variant) {
+    return supportFactory.createVariantSupport(variant);
+  }
 }

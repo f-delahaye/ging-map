@@ -7,48 +7,48 @@ import org.tmapi.core.Topic;
 
 
 public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSupport {
-    private Topic type;
-    private Topic reifier;
-    private String value;
-    private Locator datatype;
-    
-    @Override
-    public Topic getType() {
-        return type;
-    }
+  private Topic type;
+  private Topic reifier;
+  private String value;
+  private Locator datatype;
 
-    @Override
-    public void setType(Topic type) {
-        this.type = type;
-    }
+  @Override
+  public Topic getType() {
+    return type;
+  }
 
-    @Override
-    public Topic getReifier() {
-        return reifier;
-    }
+  @Override
+  public void setType(Topic type) {
+    this.type = type;
+  }
 
-    @Override
-    public void setReifier(Topic reifier) {
-        this.reifier = reifier;
-    }
-    
-   @Override
-    public String getValue() {
-        return value;
-    }
+  @Override
+  public Topic getReifier() {
+    return reifier;
+  }
 
-    @Override
-    public void setValue(String value) {
-        this.value = value;
-    }
+  @Override
+  public void setReifier(Topic reifier) {
+    this.reifier = reifier;
+  }
 
-    @Override
-    public Locator getDatatype() {
-        return datatype;
-    }
+  @Override
+  public String getValue() {
+    return value;
+  }
 
-    @Override
-    public void setDatatype(Locator datatype) {
-        this.datatype = datatype;
-    }    
+  @Override
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  @Override
+  public Locator getDatatype() {
+    return datatype;
+  }
+
+  @Override
+  public void setDatatype(Locator datatype) {
+    this.datatype = datatype;
+  }
 }

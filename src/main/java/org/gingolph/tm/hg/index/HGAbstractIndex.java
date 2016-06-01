@@ -18,75 +18,80 @@ import org.tmapi.index.Index;
 
 public abstract class HGAbstractIndex implements Index {
 
-    protected static class LinkTargetSubsumed implements HGAtomPredicate, HGQueryCondition {
+  protected static class LinkTargetSubsumed implements HGAtomPredicate, HGQueryCondition {
 
-        int targetIdx;
-        Class<?> expectedClass;
+    int targetIdx;
+    Class<?> expectedClass;
 
-        private LinkTargetSubsumed(int targetIdx, Class<?> expectedClass) {
-            this.targetIdx = targetIdx;
-            this.expectedClass = expectedClass;
-        }
-        
-        @Override
-        public boolean satisfies(HyperGraph graph, HGHandle handle) {
-            Object atom = graph.get(handle);
-            return atom instanceof HGLink && expectedClass.isAssignableFrom(graph.get(((HGLink)atom).getTargetAt(targetIdx)).getClass());
-        }
-    }
-
-    protected static LinkTargetSubsumed linkTargetSubsumed(final int targetIdx, final Class<?> expectedClass) {
-        return new LinkTargetSubsumed(targetIdx, expectedClass);
-    }
-    
-    protected static <T extends Construct> Mapping<HGHandle, T> supportHandleToOwnerMapping(final HyperGraph graph, Class<? extends HGConstructSupport<T>> supportClass) {
-        return (HGHandle x) -> supportClass.cast(graph.get(x)).getOwner();
-    }
-    
-    boolean open = false;
-    List<HGIndex> indexes = new ArrayList<>();
-    final transient HyperGraph graph;
-    
-    HGAbstractIndex(HyperGraph graph) {
-        this.graph = graph;
-    }
-
-    protected <C extends Construct> Collection<C> getIndexResults(Iterable<? extends HGConstructSupport<C>> supports) {
-        List<C> target = new ArrayList<>();
-        supports.forEach(support -> target.add(support.getOwner()));
-        return target;
-    }
-    
-    protected <C extends Construct> Collection<C> getIndexResults(Iterator<? extends HGHandle> supports) {
-        List<C> target = new ArrayList<>();
-        supports.forEachRemaining(handle -> target.add(graph.<HGConstructSupport<C>>get(handle).getOwner()));
-        return target;
+    private LinkTargetSubsumed(int targetIdx, Class<?> expectedClass) {
+      this.targetIdx = targetIdx;
+      this.expectedClass = expectedClass;
     }
 
     @Override
-    public void open() {
-        indexes.forEach(index -> index.open());
-        open = true;
+    public boolean satisfies(HyperGraph graph, HGHandle handle) {
+      Object atom = graph.get(handle);
+      return atom instanceof HGLink && expectedClass
+          .isAssignableFrom(graph.get(((HGLink) atom).getTargetAt(targetIdx)).getClass());
     }
+  }
 
-    @Override
-    public void close() {
-        indexes.forEach(index -> index.close());        
-        open = false;
-    }
+  protected static LinkTargetSubsumed linkTargetSubsumed(final int targetIdx,
+      final Class<?> expectedClass) {
+    return new LinkTargetSubsumed(targetIdx, expectedClass);
+  }
 
-    @Override
-    public boolean isOpen() {
-        return open;
-    }
+  protected static <T extends Construct> Mapping<HGHandle, T> supportHandleToOwnerMapping(
+      final HyperGraph graph, Class<? extends HGConstructSupport<T>> supportClass) {
+    return (HGHandle x) -> supportClass.cast(graph.get(x)).getOwner();
+  }
 
-    @Override
-    public boolean isAutoUpdated() {
-        return true;
-    }
+  boolean open = false;
+  List<HGIndex> indexes = new ArrayList<>();
+  final transient HyperGraph graph;
 
-    @Override
-    public void reindex() {
-    }
+  HGAbstractIndex(HyperGraph graph) {
+    this.graph = graph;
+  }
+
+  protected <C extends Construct> Collection<C> getIndexResults(
+      Iterable<? extends HGConstructSupport<C>> supports) {
+    List<C> target = new ArrayList<>();
+    supports.forEach(support -> target.add(support.getOwner()));
+    return target;
+  }
+
+  protected <C extends Construct> Collection<C> getIndexResults(
+      Iterator<? extends HGHandle> supports) {
+    List<C> target = new ArrayList<>();
+    supports.forEachRemaining(
+        handle -> target.add(graph.<HGConstructSupport<C>>get(handle).getOwner()));
+    return target;
+  }
+
+  @Override
+  public void open() {
+    indexes.forEach(index -> index.open());
+    open = true;
+  }
+
+  @Override
+  public void close() {
+    indexes.forEach(index -> index.close());
+    open = false;
+  }
+
+  @Override
+  public boolean isOpen() {
+    return open;
+  }
+
+  @Override
+  public boolean isAutoUpdated() {
+    return true;
+  }
+
+  @Override
+  public void reindex() {}
 
 }

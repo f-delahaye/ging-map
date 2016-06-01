@@ -11,50 +11,50 @@ import org.tmapi.core.Topic;
 
 public interface TopicSupport extends ConstructSupport {
 
-    void addSubjectIdentifier(Locator identifier);
+  void addSubjectIdentifier(Locator identifier);
 
-    Set<Locator> getSubjectIdentifiers();
-    
-    void removeSubjectIdentifier(Locator identifier);
-    
-    
-    void addSubjectLocator(Locator locator);
+  Set<Locator> getSubjectIdentifiers();
 
-    Set<Locator> getSubjectLocators();
+  void removeSubjectIdentifier(Locator identifier);
 
-    void removeSubjectLocator(Locator locator);
 
-    
-    void addName(NameImpl name);
-    
-    Set<NameImpl> getNames();
-    
-    void removeName(NameImpl name);
-    
-    
-    void addOccurrence(Occurrence occurrence);
-    
-    Set<Occurrence> getOccurrences();
+  void addSubjectLocator(Locator locator);
 
-    void removeOccurrence(Occurrence occurrence);
-    
-    
-    void addRolePlayed(Role role);
-            
-    Set<Role> getRolesPlayed();
+  Set<Locator> getSubjectLocators();
 
-    void removeRolePlayed(Role role);
-    
+  void removeSubjectLocator(Locator locator);
 
-    void addType(Topic type);
-    
-    Set<Topic> getTypes();
 
-    boolean removeType(Topic type);
-    
-    
-    Reifiable getReified();
+  void addName(NameImpl name);
 
-    void setReified(Reifiable reified);
-    
+  Set<NameImpl> getNames();
+
+  void removeName(NameImpl name);
+
+
+  void addOccurrence(Occurrence occurrence);
+
+  Set<Occurrence> getOccurrences();
+
+  void removeOccurrence(Occurrence occurrence);
+
+
+  void addRolePlayed(Role role);
+
+  Set<Role> getRolesPlayed();
+
+  void removeRolePlayed(Role role);
+
+
+  void addType(Topic type);
+
+  Set<Topic> getTypes();
+
+  boolean removeType(Topic type);
+
+
+  Reifiable getReified();
+
+  void setReified(Reifiable reified);
+
 }

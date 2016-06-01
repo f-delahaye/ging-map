@@ -16,107 +16,111 @@ import org.tmapi.core.Association;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
 
-public class HGAssociationSupport extends HGScopedSupport<Association> implements AssociationSupport, HGLink {
+public class HGAssociationSupport extends HGScopedSupport<Association>
+    implements AssociationSupport, HGLink {
 
-    transient List<HGHandle> roles;
-    Topic type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for topics which have roles.
-    // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
-    // TODO fix this
-    public HGAssociationSupport(Association association) {
-        super(association);
-        roles = new ArrayList<>();
-    }
-    
-    protected HGAssociationSupport(HGHandle[] handles) {
-        this.roles = Arrays.asList(handles);
-    }
-    
-    public HGTopicMapSupport getTopicMapSupport() {
-        return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
-    }
-        
-    @Override
-    public void addRole(Role role) {
-        final HyperGraph graph = getGraph();
-        RoleSupport support = ((RoleImpl)role).getSupport();
-        roles.add(add(graph, support));
-        graph.update(this);
-    }
+  transient List<HGHandle> roles;
+  Topic type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
+              // topics which have roles.
+  // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
+  // TODO fix this
 
-    @Override
-    public void removeRole(Role role) {
-        HyperGraph graph = getGraph();
-        final HGHandle roleHandle = getHandle(graph, role);
-        if (roleHandle != null) {
-            roles.remove(roleHandle);
-            graph.update(this);
-            graph.remove(roleHandle, true);
-        }
-    }
+  public HGAssociationSupport(Association association) {
+    super(association);
+    roles = new ArrayList<>();
+  }
 
-    @Override
-    public Set<Role> getRoles() {
-        return new RoleSet(getGraph(), this);
-    }
+  protected HGAssociationSupport(HGHandle[] handles) {
+    this.roles = Arrays.asList(handles);
+  }
 
-    @HGIgnore
-    @Override
-    public Topic getReifier() {
-        final HyperGraph graph = getGraph();
-        HGHandle h = HGTMUtil.getReifierOf(graph, getHandle(graph, this));
-        return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
-    }
+  public HGTopicMapSupport getTopicMapSupport() {
+    return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
+  }
 
-    @HGIgnore
-    @Override
-    public void setReifier(Topic topic) {
-        final HyperGraph graph = getGraph();
-        HGTMUtil.setReifierOf(graph, getHandle(graph, this), topic == null?null:getHandle(graph, topic));
-    }
+  @Override
+  public void addRole(Role role) {
+    final HyperGraph graph = getGraph();
+    RoleSupport support = ((RoleImpl) role).getSupport();
+    roles.add(add(graph, support));
+    graph.update(this);
+  }
 
-    @HGIgnore
-    @Override
-    public Topic getType() {
-        if (type == null) {
-            final HGHandle thisHandle = getHandle(hyperGraph, this);
-            HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
-            type = h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
-        }
-        return type;
+  @Override
+  public void removeRole(Role role) {
+    HyperGraph graph = getGraph();
+    final HGHandle roleHandle = getHandle(graph, role);
+    if (roleHandle != null) {
+      roles.remove(roleHandle);
+      graph.update(this);
+      graph.remove(roleHandle, true);
     }
+  }
 
-    @HGIgnore
-    @Override
-    public void setType(Topic type) {
-        this.type = type;
-        HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
-    }
-    
+  @Override
+  public Set<Role> getRoles() {
+    return new RoleSet(getGraph(), this);
+  }
 
-    @Override
-    public int getArity() {
-        return roles.size();
-    }
+  @HGIgnore
+  @Override
+  public Topic getReifier() {
+    final HyperGraph graph = getGraph();
+    HGHandle h = HGTMUtil.getReifierOf(graph, getHandle(graph, this));
+    return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
+  }
 
-    @Override
-    public HGHandle getTargetAt(int i) {
-        return roles.get(i);
-    }
+  @HGIgnore
+  @Override
+  public void setReifier(Topic topic) {
+    final HyperGraph graph = getGraph();
+    HGTMUtil.setReifierOf(graph, getHandle(graph, this),
+        topic == null ? null : getHandle(graph, topic));
+  }
 
-    @Override
-    public void notifyTargetHandleUpdate(int i, HGHandle handle) {
-        roles.set(i, handle);
+  @HGIgnore
+  @Override
+  public Topic getType() {
+    if (type == null) {
+      final HGHandle thisHandle = getHandle(hyperGraph, this);
+      HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
+      type = h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
     }
+    return type;
+  }
 
-    @Override
-    public void notifyTargetRemoved(int i) {
-        roles.remove(i);
-    }
+  @HGIgnore
+  @Override
+  public void setType(Topic type) {
+    this.type = type;
+    HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
+  }
 
-    @Override
-    protected Association createOwner() {
-        final AssociationImpl association = new AssociationImpl(getTopicMapSupport().getOwner());
-        association.setSupport(this);
-        return association;
-    }
+
+  @Override
+  public int getArity() {
+    return roles.size();
+  }
+
+  @Override
+  public HGHandle getTargetAt(int i) {
+    return roles.get(i);
+  }
+
+  @Override
+  public void notifyTargetHandleUpdate(int i, HGHandle handle) {
+    roles.set(i, handle);
+  }
+
+  @Override
+  public void notifyTargetRemoved(int i) {
+    roles.remove(i);
+  }
+
+  @Override
+  protected Association createOwner() {
+    final AssociationImpl association = new AssociationImpl(getTopicMapSupport().getOwner());
+    association.setSupport(this);
+    return association;
+  }
 }

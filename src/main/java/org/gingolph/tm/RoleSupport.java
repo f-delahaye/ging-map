@@ -3,17 +3,17 @@ package org.gingolph.tm;
 import org.tmapi.core.Topic;
 
 
-public interface RoleSupport extends ConstructSupport, TypedSupport  {
+public interface RoleSupport extends ConstructSupport, TypedSupport {
 
-    Topic getPlayer();
+  Topic getPlayer();
 
-    Topic getReifier();
+  Topic getReifier();
 
-    Topic getType();
+  Topic getType();
 
-    void setPlayer(TopicImpl player);
+  void setPlayer(TopicImpl player);
 
-    void setReifier(Topic reifier);
+  void setReifier(Topic reifier);
 
-    void setType(Topic type);
+  void setType(Topic type);
 }

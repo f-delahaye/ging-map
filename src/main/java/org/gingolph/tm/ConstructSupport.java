@@ -5,9 +5,9 @@ import org.tmapi.core.Locator;
 
 public interface ConstructSupport {
 
-    void addItemIdentifier(Locator identifier);
+  void addItemIdentifier(Locator identifier);
 
-    Set<Locator> getItemIdentifiers();
+  Set<Locator> getItemIdentifiers();
 
-    void removeItemIdentifier(Locator identifier);
+  void removeItemIdentifier(Locator identifier);
 }

@@ -10,17 +10,17 @@ import org.tmapi.core.Variant;
 
 public interface ConstructSupportFactory {
 
-    AssociationSupport createAssociationSupport(Association association);
+  AssociationSupport createAssociationSupport(Association association);
 
-    NameSupport createNameSupport(Name name);
+  NameSupport createNameSupport(Name name);
 
-    OccurrenceSupport createOccurrenceSupport(Occurrence occurrence);
+  OccurrenceSupport createOccurrenceSupport(Occurrence occurrence);
 
-    RoleSupport createRoleSupport(Role role);
+  RoleSupport createRoleSupport(Role role);
 
-    VariantSupport createVariantSupport(Variant variant);
+  VariantSupport createVariantSupport(Variant variant);
 
-    TopicMapSupport createTopicMapSupport(TopicMap topicMap);
-    
-    TopicSupport createTopicSupport(TopicImpl topic);
+  TopicMapSupport createTopicMapSupport(TopicMap topicMap);
+
+  TopicSupport createTopicSupport(TopicImpl topic);
 }

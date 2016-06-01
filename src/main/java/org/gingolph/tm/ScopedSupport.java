@@ -6,10 +6,10 @@ import org.tmapi.core.Topic;
 
 public interface ScopedSupport {
 
-    void addTheme(Topic t);
+  void addTheme(Topic t);
 
-    Set<Topic> getScope();
+  Set<Topic> getScope();
 
-    void removeTheme(Topic t);
+  void removeTheme(Topic t);
 
 }

@@ -23,118 +23,124 @@ import org.tmapi.index.LiteralIndex;
 
 public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
 
-    public HGLiteralIndex(HyperGraph graph) {
-        super(graph);
-        
-        List<HGIndexer<?,?>> indexers = new ArrayList<>();
+  public HGLiteralIndex(HyperGraph graph) {
+    super(graph);
 
-        HGHandle nameType = graph.getTypeSystem().getTypeHandle(HGNameSupport.class);
-        indexers.addAll(graph.getIndexManager().getIndexersForType(nameType));
-        
-        HGHandle occurrenceType = graph.getTypeSystem().getTypeHandle(HGOccurrenceSupport.class);
-        indexers.addAll(graph.getIndexManager().getIndexersForType(occurrenceType));
-        
-        HGHandle variantType = graph.getTypeSystem().getTypeHandle(HGVariantSupport.class);
-        indexers.addAll(graph.getIndexManager().getIndexersForType(variantType));
-        
-        indexers.forEach(indexer-> indexes.add(graph.getIndexManager().getIndex(indexer)));
-    }
+    List<HGIndexer<?, ?>> indexers = new ArrayList<>();
 
-    @Override
-    public Collection<Occurrence> getOccurrences(String value) {
-        return getOccurrences(value, LocatorImpl.XSD_STRING);
-    }
+    HGHandle nameType = graph.getTypeSystem().getTypeHandle(HGNameSupport.class);
+    indexers.addAll(graph.getIndexManager().getIndexersForType(nameType));
 
-    @Override
-    public Collection<Occurrence> getOccurrences(Locator value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null value not supported");
-        }
-        return getOccurrences(value.getReference(), LocatorImpl.XSD_ANY_URI);
-    }
+    HGHandle occurrenceType = graph.getTypeSystem().getTypeHandle(HGOccurrenceSupport.class);
+    indexers.addAll(graph.getIndexManager().getIndexersForType(occurrenceType));
 
-    @Override
-    public Collection<Occurrence> getOccurrences(String value, Locator datatype) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null value not supported");
-        }
-        if (datatype == null) {
-            throw new IllegalArgumentException("Null datatype not supported");
-        }
-        List<HGOccurrenceSupport> occurrenceSupports = hg.getAll(graph, hg.and(hg.type(HGOccurrenceSupport.class), hg.eq("value", value), hg.eq("datatype", datatype)));        
-        return getIndexResults(occurrenceSupports);
-    }
+    HGHandle variantType = graph.getTypeSystem().getTypeHandle(HGVariantSupport.class);
+    indexers.addAll(graph.getIndexManager().getIndexersForType(variantType));
 
-    @Override
-    public Collection<Variant> getVariants(String value) {
-        return getVariants(value, LocatorImpl.XSD_STRING);
-    }
+    indexers.forEach(indexer -> indexes.add(graph.getIndexManager().getIndex(indexer)));
+  }
 
-    @Override
-    public Collection<Variant> getVariants(Locator value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null value not supported");
-        }        
-        return getVariants(value.getReference(), LocatorImpl.XSD_ANY_URI);
-    }
+  @Override
+  public Collection<Occurrence> getOccurrences(String value) {
+    return getOccurrences(value, LocatorImpl.XSD_STRING);
+  }
 
-    @Override
-    public Collection<Variant> getVariants(String value, Locator datatype) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null value not supported");
-        }
-        if (datatype == null) {
-            throw new IllegalArgumentException("Null datatype not supported");
-        }
-        List<HGVariantSupport> variantSupports = hg.getAll(graph, hg.and(hg.type(HGVariantSupport.class), hg.eq("value", value), hg.eq("datatype", datatype)));        
-        return getIndexResults(variantSupports);
+  @Override
+  public Collection<Occurrence> getOccurrences(Locator value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
     }
+    return getOccurrences(value.getReference(), LocatorImpl.XSD_ANY_URI);
+  }
 
-    @Override
-    public Collection<Name> getNames(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null value not supported");
-        }
-        List<HGNameSupport> nameSupports = hg.getAll(graph, hg.and(hg.type(HGNameSupport.class), hg.eq("value", value)));
-        return getIndexResults(nameSupports);
+  @Override
+  public Collection<Occurrence> getOccurrences(String value, Locator datatype) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
     }
+    if (datatype == null) {
+      throw new IllegalArgumentException("Null datatype not supported");
+    }
+    List<HGOccurrenceSupport> occurrenceSupports =
+        hg.getAll(graph, hg.and(hg.type(HGOccurrenceSupport.class), hg.eq("value", value),
+            hg.eq("datatype", datatype)));
+    return getIndexResults(occurrenceSupports);
+  }
 
-    protected <C extends Construct> Collection<C> getIndexResults(Iterable<? extends HGConstructSupport<C>> supports) {
-        List<C> target = new ArrayList<>();
-        supports.forEach(support -> target.add(support.getOwner()));
-        return target;
-    }
-    
-    protected <C extends Construct> Collection<C> getIndexResults(Iterator<? extends HGHandle> supports) {
-        List<C> target = new ArrayList<>();
-        supports.forEachRemaining(handle -> target.add(graph.<HGConstructSupport<C>>get(handle).getOwner()));
-        return target;
-    }
+  @Override
+  public Collection<Variant> getVariants(String value) {
+    return getVariants(value, LocatorImpl.XSD_STRING);
+  }
 
-    @Override
-    public void open() {
-        indexes.forEach(index -> index.open());
-        open = true;
+  @Override
+  public Collection<Variant> getVariants(Locator value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
     }
+    return getVariants(value.getReference(), LocatorImpl.XSD_ANY_URI);
+  }
 
-    @Override
-    public void close() {
-        indexes.forEach(index -> index.close());        
-        open = false;
+  @Override
+  public Collection<Variant> getVariants(String value, Locator datatype) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
     }
+    if (datatype == null) {
+      throw new IllegalArgumentException("Null datatype not supported");
+    }
+    List<HGVariantSupport> variantSupports = hg.getAll(graph, hg
+        .and(hg.type(HGVariantSupport.class), hg.eq("value", value), hg.eq("datatype", datatype)));
+    return getIndexResults(variantSupports);
+  }
 
-    @Override
-    public boolean isOpen() {
-        return open;
+  @Override
+  public Collection<Name> getNames(String value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
     }
+    List<HGNameSupport> nameSupports =
+        hg.getAll(graph, hg.and(hg.type(HGNameSupport.class), hg.eq("value", value)));
+    return getIndexResults(nameSupports);
+  }
 
-    @Override
-    public boolean isAutoUpdated() {
-        return true;
-    }
+  protected <C extends Construct> Collection<C> getIndexResults(
+      Iterable<? extends HGConstructSupport<C>> supports) {
+    List<C> target = new ArrayList<>();
+    supports.forEach(support -> target.add(support.getOwner()));
+    return target;
+  }
 
-    @Override
-    public void reindex() {
-    }
+  protected <C extends Construct> Collection<C> getIndexResults(
+      Iterator<? extends HGHandle> supports) {
+    List<C> target = new ArrayList<>();
+    supports.forEachRemaining(
+        handle -> target.add(graph.<HGConstructSupport<C>>get(handle).getOwner()));
+    return target;
+  }
+
+  @Override
+  public void open() {
+    indexes.forEach(index -> index.open());
+    open = true;
+  }
+
+  @Override
+  public void close() {
+    indexes.forEach(index -> index.close());
+    open = false;
+  }
+
+  @Override
+  public boolean isOpen() {
+    return open;
+  }
+
+  @Override
+  public boolean isAutoUpdated() {
+    return true;
+  }
+
+  @Override
+  public void reindex() {}
 
 }

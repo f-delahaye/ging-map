@@ -7,18 +7,18 @@ import org.tmapi.core.Topic;
 
 public interface AssociationSupport extends ConstructSupport, ScopedSupport, TypedSupport {
 
-    Topic getReifier();
+  Topic getReifier();
 
-    Set<Role> getRoles();
+  Set<Role> getRoles();
 
-    Topic getType();
+  Topic getType();
 
-    void setReifier(Topic reifier);
+  void setReifier(Topic reifier);
 
-    void addRole(Role role);
+  void addRole(Role role);
 
-    void removeRole(Role role);
-    
-    void setType(Topic type);
+  void removeRole(Role role);
+
+  void setType(Topic type);
 
 }

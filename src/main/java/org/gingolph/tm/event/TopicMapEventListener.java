@@ -9,19 +9,25 @@ import org.tmapi.core.Topic;
 
 
 public interface TopicMapEventListener {
-    public void onConstructCreated(Construct construct);
-    public void onConstructRemoved(Construct construct);
+  public void onConstructCreated(Construct construct);
 
-    public void onSubjectIdentifierAdded(Topic topic, Locator subjectIdentifier);
-    public void onSubjectIdentifierRemoved(Locator subjectIdentifier);
-    
-    public void onSubjectLocatorAdded(Topic topic, Locator subjectLocator);
-    public void onSubjectLocatorRemoved(Locator subjectLocator);
-    
-    public void onItemIdentifierAdded(Construct construct, Locator itemIdentifier);
-    public void onItemIdentifierRemoved(Locator itemIdentifier);
+  public void onConstructRemoved(Construct construct);
 
-    public void onThemeChanged(Scoped scoped, Topic themeAdded, Topic themeRemoved);
-    public void onTypeChanged(TypedConstruct typed, Topic typeAdded, Topic typeRemoved);
-    public void onValueChanged(Valued valued, String valueSet, String valueRemoved);
+  public void onSubjectIdentifierAdded(Topic topic, Locator subjectIdentifier);
+
+  public void onSubjectIdentifierRemoved(Locator subjectIdentifier);
+
+  public void onSubjectLocatorAdded(Topic topic, Locator subjectLocator);
+
+  public void onSubjectLocatorRemoved(Locator subjectLocator);
+
+  public void onItemIdentifierAdded(Construct construct, Locator itemIdentifier);
+
+  public void onItemIdentifierRemoved(Locator itemIdentifier);
+
+  public void onThemeChanged(Scoped scoped, Topic themeAdded, Topic themeRemoved);
+
+  public void onTypeChanged(TypedConstruct typed, Topic typeAdded, Topic typeRemoved);
+
+  public void onValueChanged(Valued valued, String valueSet, String valueRemoved);
 }

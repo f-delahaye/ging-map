@@ -5,7 +5,7 @@ import org.tmapi.core.Topic;
 
 public interface VariantSupport extends ConstructSupport, ScopedSupport, DatatypeAwareSupport {
 
-    Topic getReifier();
+  Topic getReifier();
 
-    void setReifier(Topic reifier);
+  void setReifier(Topic reifier);
 }

@@ -24,100 +24,102 @@ import org.tmapi.index.TypeInstanceIndex;
 
 
 public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSupport {
-    Set<Topic> topics = new HashSet<>();
-    Set<Association> associations = new HashSet<>();
-    Topic reifier;
-    TopicMapImpl topicMap;
-    Locator baseLocator;
-    
-    static AtomicLong counter = new AtomicLong();
-    Map<Class<?>, Index> indexes = new LinkedHashMap<>();
+  Set<Topic> topics = new HashSet<>();
+  Set<Association> associations = new HashSet<>();
+  Topic reifier;
+  TopicMapImpl topicMap;
+  Locator baseLocator;
 
-    IMTopicMapSupport(TopicMap topicMap) {
-        setTopicMap(topicMap);
-    }
+  static AtomicLong counter = new AtomicLong();
+  Map<Class<?>, Index> indexes = new LinkedHashMap<>();
 
-    public final void setTopicMap(TopicMap topicMap) {
-        this.topicMap = (TopicMapImpl) topicMap;
-    }
-    
-    @Override
-    public Set<Topic> getTopics() {
-        return topics;
-    }
+  IMTopicMapSupport(TopicMap topicMap) {
+    setTopicMap(topicMap);
+  }
 
-    @Override
-    public void addTopic(Topic topic) {
-        topics.add(topic);
-    }
-    
-    @Override
-    public void removeTopic(Topic topic) {
-        topics.remove(topic);
-    }
-    
-    @Override
-    public Set<Association> getAssociations() {
-        return associations;
-    }
+  public final void setTopicMap(TopicMap topicMap) {
+    this.topicMap = (TopicMapImpl) topicMap;
+  }
 
-    @Override
-    public void addAssociation(Association association) {
-        associations.add(association);
-    }
-    
-    @Override
-    public void removeAssociation(Association association) {
-        associations.remove(association);
-    }
-    
-    @Override
-    public Topic getReifier() {
-        return reifier;
-    }
+  @Override
+  public Set<Topic> getTopics() {
+    return topics;
+  }
 
-    @Override
-    public void setReifier(Topic reifier) {
-        this.reifier = reifier;
-    }
+  @Override
+  public void addTopic(Topic topic) {
+    topics.add(topic);
+  }
 
-    @Override
-    public <I extends Index> I getIndex(Class<I> type) {
-        Index index = indexes.get(type);
-        if (index == null) {
-            if (LiteralIndex.class.isAssignableFrom(type)) {
-                index = topicMap.registerListener(new LiteralIndexImpl());
-            } else if (IdentifierIndex.class.isAssignableFrom(type)) {
-                index = topicMap.registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
-            } else if (ScopedIndex.class.isAssignableFrom(type)) {
-                index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
-            } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-                index = topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
-            } else {
-                throw new UnsupportedOperationException("Unknown index "+type);
-            }
-            indexes.put(type, index);
-        }    
-        return (I)index;
-    }
-    
-    @Override
-    public String generateId(IdentifiedConstruct construct) {
-        return String.valueOf(counter.getAndIncrement());
-    }
+  @Override
+  public void removeTopic(Topic topic) {
+    topics.remove(topic);
+  }
 
-    @Override
-    public Locator createLocator(String value) {
-        return new LocatorImpl(value);
-    }
+  @Override
+  public Set<Association> getAssociations() {
+    return associations;
+  }
 
-    @Override
-    public Locator getBaseLocator() {
-        return baseLocator;
-    }
+  @Override
+  public void addAssociation(Association association) {
+    associations.add(association);
+  }
 
-    @Override
-    public void setBaseLocator(Locator baseLocator) {
-        this.baseLocator = baseLocator;
+  @Override
+  public void removeAssociation(Association association) {
+    associations.remove(association);
+  }
+
+  @Override
+  public Topic getReifier() {
+    return reifier;
+  }
+
+  @Override
+  public void setReifier(Topic reifier) {
+    this.reifier = reifier;
+  }
+
+  @Override
+  public <I extends Index> I getIndex(Class<I> type) {
+    Index index = indexes.get(type);
+    if (index == null) {
+      if (LiteralIndex.class.isAssignableFrom(type)) {
+        index = topicMap.registerListener(new LiteralIndexImpl());
+      } else if (IdentifierIndex.class.isAssignableFrom(type)) {
+        index = topicMap
+            .registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
+      } else if (ScopedIndex.class.isAssignableFrom(type)) {
+        index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
+      } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
+        index =
+            topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
+      } else {
+        throw new UnsupportedOperationException("Unknown index " + type);
+      }
+      indexes.put(type, index);
     }
+    return (I) index;
+  }
+
+  @Override
+  public String generateId(IdentifiedConstruct construct) {
+    return String.valueOf(counter.getAndIncrement());
+  }
+
+  @Override
+  public Locator createLocator(String value) {
+    return new LocatorImpl(value);
+  }
+
+  @Override
+  public Locator getBaseLocator() {
+    return baseLocator;
+  }
+
+  @Override
+  public void setBaseLocator(Locator baseLocator) {
+    this.baseLocator = baseLocator;
+  }
 }

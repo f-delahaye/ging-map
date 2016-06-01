@@ -6,39 +6,39 @@ import org.tmapi.core.Topic;
 
 
 public class IMVariantSupport extends IMScopedSupport implements VariantSupport {
-    private Topic reifier;
-    private String value;
-    private Locator datatype;
-    
-    @Override
-    public Topic getReifier() {
-        return reifier;
-    }
+  private Topic reifier;
+  private String value;
+  private Locator datatype;
 
-    @Override
-    public void setReifier(Topic reifier) {
-        this.reifier = reifier;
-    }
+  @Override
+  public Topic getReifier() {
+    return reifier;
+  }
 
-    @Override
-    public String getValue() {
-        return value;
-    }
+  @Override
+  public void setReifier(Topic reifier) {
+    this.reifier = reifier;
+  }
 
-    @Override
-    public void setValue(String value) {
-        this.value = value;
-    }
+  @Override
+  public String getValue() {
+    return value;
+  }
 
-    @Override
-    public Locator getDatatype() {
-        return datatype;
-    }
+  @Override
+  public void setValue(String value) {
+    this.value = value;
+  }
 
-    @Override
-    public void setDatatype(Locator datatype) {
-        this.datatype = datatype;
-    }
+  @Override
+  public Locator getDatatype() {
+    return datatype;
+  }
 
-    
+  @Override
+  public void setDatatype(Locator datatype) {
+    this.datatype = datatype;
+  }
+
+
 }

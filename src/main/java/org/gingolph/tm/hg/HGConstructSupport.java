@@ -15,95 +15,98 @@ import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 
 
-public abstract class HGConstructSupport<T extends Construct> implements ConstructSupport, HGGraphHolder, Serializable {
-    
-    private static final long serialVersionUID = 1L;
+public abstract class HGConstructSupport<T extends Construct>
+    implements ConstructSupport, HGGraphHolder, Serializable {
 
-    @HGIgnore
-    T owner;
-    
-    @HGIgnore
-    transient HyperGraph hyperGraph;
+  private static final long serialVersionUID = 1L;
 
-    protected HGConstructSupport(T owner) {
-        this.owner = owner;
-    }
-    
-    protected HGConstructSupport() {
-    }
+  @HGIgnore
+  T owner;
 
-    protected abstract T createOwner();
-    
-    public T getOwner() {
-        if (owner == null) {
-            owner = createOwner();
-        }
-        return owner;
-    }
-    
-    protected void addItemIdentifier(HGHandle locator) throws ModelConstraintException {
-        HyperGraph graph = getGraph();
-        graph.add(new HGRel(HGTM.ItemIdentifier, new HGHandle[] { locator, graph.getHandle(this)} ),
-                        HGTM.hItemIdentifier);
-//        }
-    }
+  @HGIgnore
+  transient HyperGraph hyperGraph;
 
-    @Override
-    public void addItemIdentifier(Locator l) throws ModelConstraintException {
-        HyperGraph graph = getGraph();
-        HGHandle lh = HGTMUtil.ensureLocatorHandle(graph, l);
-        addItemIdentifier(lh);
-    }
+  protected HGConstructSupport(T owner) {
+    this.owner = owner;
+  }
 
-    @Override
-    public Set<Locator> getItemIdentifiers() {
-            HyperGraph graph = getGraph();
-            final HGHandle handle = graph.getHandle(this);
-            return handle == null ? null : HGTMUtil.getRelatedObjects(graph, HGTM.hItemIdentifier, null, handle);
-    }
+  protected HGConstructSupport() {}
 
-    @Override
-    public void removeItemIdentifier(Locator l) {
-        HGHandle lh = HGTMUtil.findLocatorHandle(getGraph(), l);
-        if (lh != null) {
-            HyperGraph graph = getGraph();
-            HGHandle rel = hg.findOne(graph, hg.and(hg.type(HGTM.hItemIdentifier), 
-                                     hg.orderedLink(lh, graph.getHandle(this))));
-            if (rel != null) {
-                graph.remove(rel);
-            }
-            // If this locator is not used in anything else, we may remove it.
-            if (graph.getIncidenceSet(lh).size() == 0) {
-                graph.remove(lh, false);		
-            }
-        }
-    }
+  protected abstract T createOwner();
 
-    public HyperGraph getGraph() {
-//        if (hyperGraph == null) {
-//            hyperGraph = ((HGTopicMapSupport)((TopicMapImpl)owner.getTopicMap()).getSupport()).getGraph();
-//        }
-        return hyperGraph;
+  public T getOwner() {
+    if (owner == null) {
+      owner = createOwner();
     }
+    return owner;
+  }
 
-    @Override
-    public void setHyperGraph(HyperGraph graph) {
-        this.hyperGraph = graph;
+  protected void addItemIdentifier(HGHandle locator) throws ModelConstraintException {
+    HyperGraph graph = getGraph();
+    graph.add(new HGRel(HGTM.ItemIdentifier, new HGHandle[] {locator, graph.getHandle(this)}),
+        HGTM.hItemIdentifier);
+    // }
+  }
+
+  @Override
+  public void addItemIdentifier(Locator l) throws ModelConstraintException {
+    HyperGraph graph = getGraph();
+    HGHandle lh = HGTMUtil.ensureLocatorHandle(graph, l);
+    addItemIdentifier(lh);
+  }
+
+  @Override
+  public Set<Locator> getItemIdentifiers() {
+    HyperGraph graph = getGraph();
+    final HGHandle handle = graph.getHandle(this);
+    return handle == null ? null
+        : HGTMUtil.getRelatedObjects(graph, HGTM.hItemIdentifier, null, handle);
+  }
+
+  @Override
+  public void removeItemIdentifier(Locator l) {
+    HGHandle lh = HGTMUtil.findLocatorHandle(getGraph(), l);
+    if (lh != null) {
+      HyperGraph graph = getGraph();
+      HGHandle rel = hg.findOne(graph,
+          hg.and(hg.type(HGTM.hItemIdentifier), hg.orderedLink(lh, graph.getHandle(this))));
+      if (rel != null) {
+        graph.remove(rel);
+      }
+      // If this locator is not used in anything else, we may remove it.
+      if (graph.getIncidenceSet(lh).size() == 0) {
+        graph.remove(lh, false);
+      }
     }
-    
-    public static HGHandle getHandle(HyperGraph graph, Construct construct) {
-        return construct == null?null:graph.getHandle(((IdentifiedConstruct)construct).getSupport());
-    }
-    
-    public static HGHandle getHandle(HyperGraph graph, ConstructSupport support) {
-        return graph.getHandle(support);
-    }
-    
-    public static HGHandle add(HyperGraph graph, Construct construct) {
-        return add(graph, ((IdentifiedConstruct)construct).getSupport());
-    }
-    
-    public static HGHandle add(HyperGraph graph, ConstructSupport support) {
-        return graph.add(support);
-    }
+  }
+
+  public HyperGraph getGraph() {
+    // if (hyperGraph == null) {
+    // hyperGraph =
+    // ((HGTopicMapSupport)((TopicMapImpl)owner.getTopicMap()).getSupport()).getGraph();
+    // }
+    return hyperGraph;
+  }
+
+  @Override
+  public void setHyperGraph(HyperGraph graph) {
+    this.hyperGraph = graph;
+  }
+
+  public static HGHandle getHandle(HyperGraph graph, Construct construct) {
+    return construct == null ? null
+        : graph.getHandle(((IdentifiedConstruct) construct).getSupport());
+  }
+
+  public static HGHandle getHandle(HyperGraph graph, ConstructSupport support) {
+    return graph.getHandle(support);
+  }
+
+  public static HGHandle add(HyperGraph graph, Construct construct) {
+    return add(graph, ((IdentifiedConstruct) construct).getSupport());
+  }
+
+  public static HGHandle add(HyperGraph graph, ConstructSupport support) {
+    return graph.add(support);
+  }
 }

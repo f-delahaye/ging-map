@@ -8,34 +8,34 @@ import org.tmapi.index.Index;
 
 
 public interface TopicMapSupport extends ConstructSupport {
-    Set<Topic> getTopics();
-    
-    void addTopic(Topic topic);
-    
-    void removeTopic(Topic topic);
-    
-    Set<Association> getAssociations();
+  Set<Topic> getTopics();
 
-    void addAssociation(Association association);
-    
-    void removeAssociation(Association association);
-    
-    <I extends Index> I getIndex(Class<I> type);
+  void addTopic(Topic topic);
 
-    Topic getReifier();
+  void removeTopic(Topic topic);
 
-    void setReifier(Topic reifier);
+  Set<Association> getAssociations();
 
-    public String generateId(IdentifiedConstruct construct);
-    
-    Locator createLocator(String value);
+  void addAssociation(Association association);
 
-    /**
-     * Returns the topicmap's base locator
-     * 
-     * @return 
-     */
-    public Locator getBaseLocator();
+  void removeAssociation(Association association);
 
-    public void setBaseLocator(Locator locator);
+  <I extends Index> I getIndex(Class<I> type);
+
+  Topic getReifier();
+
+  void setReifier(Topic reifier);
+
+  public String generateId(IdentifiedConstruct construct);
+
+  Locator createLocator(String value);
+
+  /**
+   * Returns the topicmap's base locator
+   * 
+   * @return
+   */
+  public Locator getBaseLocator();
+
+  public void setBaseLocator(Locator locator);
 }
