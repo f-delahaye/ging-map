@@ -168,16 +168,27 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
     support.setReifier(reifier);
   }
 
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+  @Override
+  public int hashCode() {
+    return 31 * getValue().hashCode();
+  }
+  
   @Override
   public boolean equals(Object other) {
     return other instanceof Name && equals((Name) other);
   }
 
   protected boolean equals(Name other) {
-    return getValue().equals(other.getValue()) && getType().equals(other.getType())
-        && getParent().equals(other.getParent()) && getScope().equals(other.getScope());
+    return equalsNoParent(other) && getParent().equals(other.getParent());
   }
 
+  // specific method to be called when we know for sure (or don't care that) other.parent = this.parent
+  protected boolean equalsNoParent(Name other) {
+    return getValue().equals(other.getValue()) && getType().equals(other.getType())
+        && getScope().equals(other.getScope());    
+  }
+  
   void importIn(Name otherName, boolean merge) {
     Collection<Variant> otherVariants = otherName.getVariants();
     otherVariants.forEach(otherVariant -> createVariant(otherVariant.getValue(),

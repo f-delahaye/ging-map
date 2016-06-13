@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.tmapi.core.Association;
+
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -108,11 +108,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     Set<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
     if (subjectIdentifiers != null) {
-      subjectIdentifiers.forEach(identifier -> removeSubjectIdentifier(identifier));
+      new ArrayList<>(subjectIdentifiers).forEach(identifier -> removeSubjectIdentifier(identifier));
     }
     Set<Locator> subjectLocators = support.getSubjectLocators();
     if (subjectLocators != null) {
-      subjectLocators.forEach(locator -> removeSubjectLocator(locator));
+      new ArrayList<>(subjectLocators).forEach(locator -> removeSubjectLocator(locator));
     }
     if (getReified() != null) {
       getReified().setReifier(null);
@@ -140,7 +140,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (identifier == null) {
       throw new ModelConstraintException(this, "Null identifier not allowed");
     }
-    Topic existingTopic = topicMap.getTopicBySubjectIdentifier(identifier);
+    TopicImpl existingTopic = (TopicImpl) topicMap.getTopicBySubjectIdentifier(identifier);
 
     if (existingTopic != null) {
       if (!existingTopic.equals(this)) {
@@ -154,12 +154,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
       }
     }
 
-    Construct existingItemIdentifier = topicMap.getConstructByItemIdentifier(identifier);
+    TopicMapItem<?,?> existingItemIdentifier = (TopicMapItem<?, ?>) topicMap.getConstructByItemIdentifier(identifier);
     if (existingItemIdentifier == null || this.equals(existingItemIdentifier)) {
       importSubjectIdentifier(identifier);
-    } else if (existingItemIdentifier instanceof Topic) {
+    } else if (existingItemIdentifier instanceof TopicImpl) {
       if (isAutoMerge(topicMap)) {
-        this.mergeIn((Topic) existingItemIdentifier);
+        this.mergeIn((TopicImpl) existingItemIdentifier);
       } else {
         throw new IdentityConstraintException(this, existingItemIdentifier, identifier,
             "Identifier is already used as an item identifier");
@@ -427,9 +427,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (getTopicMap() != other.getTopicMap()) {
       throw new ModelConstraintException(this, "Different topic maps not allowed");
     }
-    if (getReified() != null && other.getReified() != null
-        && !getReified().equals(other.getReified())) {
-      throw new ModelConstraintException(this, "Different reified not allowed");
+    if (getReified() != null && other.getReified() != null && getReified().equals(other.getReified())) {
+        throw new ModelConstraintException(this, "Different reified not allowed");
     }
     if (!this.equals(other)) {
       importIn(other, true);
@@ -454,56 +453,61 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     final Collection<Role> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
     // and work off otherTopic's actual data to do the actual merging.
-    otherNames.forEach(otherName -> {
-      Optional<Name> sameName =
-          getNames().stream().filter(name -> name.equals(otherName)).findFirst();
-      NameImpl mergee = (NameImpl) (sameName.isPresent() ? sameName.get()
-          : createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
-      mergee.importIn(otherName, merge);
+    otherNames.stream().forEach(otherName -> {
+      Optional<Name> equivalentName = 
+          getNames().stream().filter(name -> name.equals(otherName)).findAny();
+      Name mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
+      ((NameImpl)mergee).importIn(otherName, merge);
     });
-    otherOccurrences.forEach(otherOccurrence -> {
-      Optional<Occurrence> sameOccurrence = getOccurrences().stream()
-          .filter(occurrence -> occurrence.equals(otherOccurrence)).findFirst();
-      OccurrenceImpl mergee = (OccurrenceImpl) (sameOccurrence.isPresent() ? sameOccurrence.get()
-          : createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),
-              otherOccurrence.getScope()));
-      mergee.importIn(otherOccurrence, merge);
+    otherOccurrences.stream().forEach(otherOccurrence -> {
+      Optional<Occurrence> equivalentOccurrence = getOccurrences().stream().filter(occurrence -> occurrence.equals(otherOccurrence)).findAny();
+      Occurrence mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
+      ((OccurrenceImpl) mergee).importIn(otherOccurrence, merge);
     });
 
 
     if (merge) {
-      // Change otherTopic's data so from now on it will be the same as topic ...
-      // (e.g. 2 names whose types are resp. this and other will be deemed identical which is what
-      // we want)
+// Change otherTopic's data so from now on it will be the same as topic ...
+// (e.g. 2 names whose types are resp. this and other will be deemed identical which is what we want)
       otherTopic.doRemove();
       otherTopic.support = this.support;
     }
 
     if (otherRolesPlayed != null) {
-      otherRolesPlayed.stream().map(role -> role.getParent()).forEach(otherAssociation -> {
-        Optional<Association> sameAssociation =
-            getRolesPlayed().stream().map(role -> role.getParent())
+      otherRolesPlayed.stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association).forEach(otherAssociation -> {
+        Optional<AssociationImpl> equivalentAssociation =
+            getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
                 .filter(association -> association.equals(otherAssociation)).findFirst();
-        AssociationImpl mergee =
-            (AssociationImpl) (sameAssociation.isPresent() ? sameAssociation.get()
-                : getParent().createAssociation(otherAssociation.getType(),
-                    otherAssociation.getScope()));
-        mergee.importIn((AssociationImpl) otherAssociation, merge);
+        AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
+        mergee.importIn(otherAssociation, merge);
       });
     }
   }
 
   @Override
-  public int hashCode() {
-    return getId().hashCode();
+  public String toString() {
+    return "topic id "+getId();
   }
 
   @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean deepEquals(Topic otherTopic) {
+    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators()) && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences()) && getTypes().equals(otherTopic.getTypes());
+  }
+  
+  @Override
   public boolean equals(Object other) {
-    if (!(other instanceof Topic)) {
+    return other instanceof TopicImpl && equals((TopicImpl)other);
+  }
+    
+  protected boolean equals(Topic otherItem) {
+    if (!(otherItem instanceof TopicImpl)) {
       return false;
     }
-    Topic otherTopic = (Topic) other;
+    TopicImpl otherTopic = (TopicImpl) otherItem;
     if (otherTopic.getId().equals(this.getId())) {
       return true;
     }
@@ -531,6 +535,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
                 .anyMatch(identifier -> itemIdentifiers.contains(identifier)));
   }
 
+  public boolean matches(TopicImpl otherTopic) {
+    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())
+        && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences());
+  }
+
+  
   @Override
   public Reifiable getReified() {
     return support.getReified();

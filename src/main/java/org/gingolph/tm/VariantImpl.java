@@ -3,6 +3,7 @@ package org.gingolph.tm;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
@@ -56,4 +57,19 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   protected void doSetReifier(Topic reifier) {
     support.setReifier(reifier);
   }
+  
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Variant && equals((Variant) other);
+  }
+
+  protected boolean equals(Variant other) {
+    return equalsNoParent(other) && getParent().equals(other.getParent());
+  }
+  
+  protected boolean equalsNoParent(Variant other) {
+    return getValue().equals(other.getValue()) && getDatatype().equals(other.getDatatype())
+        && getScope().equals(other.getScope());
+  }
+  
 }

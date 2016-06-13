@@ -90,7 +90,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
   public <T extends Construct> T getConstructByItemIdentifier(Locator itemIdentifier,
       Class<T> clazz) {
     Construct construct = getConstructByItemIdentifier(itemIdentifier);
-    return clazz.isAssignableFrom(construct.getClass()) ? (T) construct : null;
+    return clazz.isAssignableFrom(construct.getClass()) ? clazz.cast(construct) : null;
   }
 
   @Override
@@ -174,11 +174,13 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
 
   @Override
   protected void customRemove() {
-    for (Association association : getAssociations()) {
+    Collection<Association> associations = new ArrayList<>(getAssociations());
+    for (Association association : associations) {
       association.remove();
     }
-    for (Topic topic : getTopics()) {
-      ((TopicImpl) topic).doRemove();
+    Collection<Topic> topics = new ArrayList<>(getTopics());
+    for (Topic topic : topics) {
+      ((TopicImpl)topic).doRemove();
     }
     topicMapSystem.removeTopicMap(this);
   }
@@ -232,7 +234,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
     otherTopics.stream().forEach(otherTopic -> {
       Optional<Topic> sameTopic =
-          getTopics().stream().filter(topic -> topic.equals(otherTopic)).findFirst();
+          getTopics().stream().filter(topic -> topic.equals(otherTopic)).findAny();
       TopicImpl mergee =
           (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : createTopicInstance());
       mergee.importIn(otherTopic, false);
@@ -259,7 +261,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     support.setReifier(reifier);
   }
 
-  protected final String generateId(IdentifiedConstruct construct) {
+  protected final String generateId(IdentifiedConstruct<?> construct) {
     return support.generateId(construct);
   }
 

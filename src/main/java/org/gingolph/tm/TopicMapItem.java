@@ -33,5 +33,4 @@ public abstract class TopicMapItem<P extends Construct, S extends ConstructSuppo
     }
     return id;
   }
-
 }

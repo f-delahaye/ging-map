@@ -1,10 +1,12 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.IdentifiedConstruct;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -24,8 +26,8 @@ import org.tmapi.index.TypeInstanceIndex;
 
 
 public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSupport {
-  Set<Topic> topics = new HashSet<>();
-  Set<Association> associations = new HashSet<>();
+  Set<Topic> topics = new ArraySet<>(Objects::equals);
+  Set<Association> associations = new ArraySet<>(Objects::equals);
   Topic reifier;
   TopicMapImpl topicMap;
   Locator baseLocator;

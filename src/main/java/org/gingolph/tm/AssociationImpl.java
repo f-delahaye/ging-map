@@ -27,7 +27,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   protected void customRemove() {
-    support.getRoles().forEach(role -> ((RoleImpl) role).doRemove());
+    new ArrayList<>(support.getRoles()).forEach(role -> ((RoleImpl) role).doRemove());
     getParent().removeAssociation(this);
   }
 
@@ -119,21 +119,21 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     support.setReifier(reifier);
   }
 
+  // Consistent with equals and not too much overhead calculating lots of hashCodes ... but probably has poor distribution
+  // TODO: should all the roles' hashcodes be included as well?
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(getType());
+  }
+  
   @Override
   public boolean equals(Object other) {
-    return other instanceof Association && equals((Association) other);
+    return other instanceof AssociationImpl && equals((AssociationImpl)other); 
   }
-
-  protected boolean equals(Association other) {
-    return getType().equals(other.getType()) && getScope().equals(other.getScope())
-        && equals(getRoles(), other.getRoles());
+  
+  public boolean equals(AssociationImpl otherAssociation) {
+    return getType().equals(otherAssociation.getType()) && getScope().equals(otherAssociation.getScope()) && getRoles().equals(otherAssociation.getRoles()); 
   }
-
-  protected boolean equals(Collection<Role> roles, Collection<Role> otherRoles) {
-    return roles.stream().noneMatch(
-        (role) -> (!otherRoles.stream().anyMatch((otherRole) -> equals(role, otherRole))));
-  }
-
 
   void importIn(AssociationImpl otherAssociation, boolean merge) {
     final Collection<Role> otherRoles = new ArrayList<>(otherAssociation.getRoles());
@@ -150,10 +150,5 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     } else if (otherReifier != null) {
       getReifier().mergeIn(otherReifier);
     }
-  }
-
-  private boolean equals(Role role, Role otherRole) {
-    return role.getType().equals(otherRole.getType())
-        && role.getPlayer().equals(otherRole.getPlayer());
   }
 }
