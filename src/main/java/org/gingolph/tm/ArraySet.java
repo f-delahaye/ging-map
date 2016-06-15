@@ -1,7 +1,8 @@
 package org.gingolph.tm;
 
-import java.util.AbstractCollection;
+import java.util.AbstractSet;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,20 +23,21 @@ import java.util.function.BiPredicate;
  * Since ArraySet doesn't use hash or comparator, contains() will have to iterate through all the elements. However, it is possible that the overhead is not as bad as it may seem: 
  * because ArrayList uses contiguous memory, all items may fit in the cache and iterating may be super fast. 
  * 
- * Moreover, GTM is making the assumption that it is not possible to add duplicates in an array list:
+ * Moreover, GTM is making the assumption that in many cases it is not possible to add duplicates in an array list:
  * - TopicMap.createTopic will auto merge, or throw an exception, in case of duplicates and will never create a topic if it already exists.
  * - TMAPI don't specify what it means for 2 associations (resp. roles) to be equals. If 2 associations are of the same type and contain the same role, 
  *  then the *merging* operation will deem them equals, but they still can be added both into the TopicMap. In fact, an association is created with just a type, and then gets added in the topic map. 
  *  If more roles are added to it that makes it a duplicate of an existing association, should it just stop from being returned by TopicMap.getAssociations()?    
  *  
- * Given the above, ArraySet doesn't check for duplicates, so add() doesn't need to call contains(). It still *IS* a Set, which by virtue of the TMP APIs guarantees that no duplicate topics will exist, and no duplicate associations will exist after a merge.
+ * Given the above, ArraySet by default doesn't check for duplicates, so add() doesn't need to call contains(). It still *IS* a Set, which by virtue of the TMP APIs guarantees that no duplicate topics will exist, and no duplicate associations will exist after a merge.
  * remove() always calls contains() though.
- * 
+ * This behavior may be changed by passing a true check parameter in the constructor.
  */
-public class ArraySet<E> extends AbstractCollection<E> implements Set<E> {
+public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
 
   final List<E> delegate;
   final BiPredicate<E, E> equals;
+  final boolean check;
 
   /**
    * Allows to specify the list that will be used to store elements.
@@ -44,17 +46,26 @@ public class ArraySet<E> extends AbstractCollection<E> implements Set<E> {
    * 
    * @param equals
    */
-  public ArraySet(List<E> c, BiPredicate<E, E> equals) {
-    this.delegate = c;
-    this.equals = equals;
+  public ArraySet(Collection<E> c, BiPredicate<E, E> equals, boolean check) {
+    this.check = check;
+    this.delegate = c instanceof List?(List<E>)c:new ArrayList<E>(c);
+    this.equals = equals;    
   }
 
+  public ArraySet(Collection<E> c, BiPredicate<E, E> equals) {
+    this(c, equals, false);
+  }
+  
   /**
    * Creates an array set using an ArrayList as the actual storage.
    * @param equalizer
    */
   public ArraySet(BiPredicate<E, E> equalizer) {
     this(new ArrayList<>(), equalizer);
+  }
+
+  public ArraySet(BiPredicate<E, E> equalizer, boolean check) {
+    this(new ArrayList<>(), equalizer, check);
   }
   
   @Override
@@ -90,6 +101,9 @@ public class ArraySet<E> extends AbstractCollection<E> implements Set<E> {
 
   @Override
   public boolean add(E e) {
+    if (check && contains(e)) {
+      return false;
+    }
     return delegate.add(e);
   }
   

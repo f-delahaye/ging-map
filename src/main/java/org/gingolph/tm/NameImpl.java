@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -171,7 +172,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
   @Override
   public int hashCode() {
-    return 31 * getValue().hashCode();
+    return Objects.hashCode(getValue());
   }
   
   @Override

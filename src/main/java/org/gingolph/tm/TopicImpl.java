@@ -427,7 +427,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (getTopicMap() != other.getTopicMap()) {
       throw new ModelConstraintException(this, "Different topic maps not allowed");
     }
-    if (getReified() != null && other.getReified() != null && getReified().equals(other.getReified())) {
+    if (getReified() != null && other.getReified() != null && !getReified().equals(other.getReified())) {
         throw new ModelConstraintException(this, "Different reified not allowed");
     }
     if (!this.equals(other)) {
@@ -475,18 +475,28 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     if (otherRolesPlayed != null) {
       otherRolesPlayed.stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association).forEach(otherAssociation -> {
-        Optional<AssociationImpl> equivalentAssociation =
-            getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
-                .filter(association -> association.equals(otherAssociation)).findFirst();
+        Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation);
         AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
         mergee.importIn(otherAssociation, merge);
       });
     }
   }
 
+  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association) {
+//    getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
+//    .filter(association -> association.equals(otherAssociation)).findAny();
+    for (Role role: rolesPlayed) {
+      AssociationImpl candidate = (AssociationImpl) role.getParent();
+      if (candidate.equals(association)) {
+        return Optional.of(candidate);
+      }
+    }
+    return Optional.empty();
+  }
+
   @Override
   public String toString() {
-    return "topic id "+getId();
+    return "id "+getId();
   }
 
   @Override

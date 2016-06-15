@@ -73,10 +73,10 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
     support.setReifier(reifier);
   }
 
-  @Override
-  public int hashCode() {
-      return 31 * System.identityHashCode(getPlayer()) + System.identityHashCode(getType());
-  }
+//  @Override
+//  public int hashCode() {
+//      return 31 * getPlayer().getId().hashCode() + getType().getId().hashCode();
+//  }
 
   @Override
   public boolean equals(Object other) {
@@ -85,14 +85,19 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   
   protected boolean equals(Role otherRole) {
 //    return this == otherRole || getId().equals(otherRole.getId());
-    return getParent().equals(otherRole.getParent()) && equalsNoParent(otherRole);
+    return getParent().equals(otherRole.getParent()) && equalsNoParent(this, otherRole);
   }
 
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
-  protected boolean equalsNoParent(Role otherRole) {
-    return getPlayer().equals(otherRole.getPlayer()) && getType().equals(otherRole.getType());
+  public static boolean equalsNoParent(Role role, Role otherRole) {
+    return role.getPlayer().equals(otherRole.getPlayer()) && role.getType().equals(otherRole.getType());    
   }
 
+  @Override
+  public String toString() {
+    return "[type="+getType()+", player="+getPlayer()+"]";
+  }
+  
   protected void importIn(Role otherRole, boolean merge) {
     this.id = otherRole.getId();
     otherRole.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));

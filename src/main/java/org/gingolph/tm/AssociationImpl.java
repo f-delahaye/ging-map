@@ -3,9 +3,10 @@ package org.gingolph.tm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -47,7 +48,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   public Set<Topic> getRoleTypes() {
-    Set<Topic> roleTypes = new HashSet<>();
+    Set<Topic> roleTypes = new ArraySet<>(Objects::equals, true);
     support.getRoles().forEach((role) -> {
       roleTypes.add(role.getType());
     });
@@ -121,10 +122,10 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   // Consistent with equals and not too much overhead calculating lots of hashCodes ... but probably has poor distribution
   // TODO: should all the roles' hashcodes be included as well?
-  @Override
-  public int hashCode() {
-    return System.identityHashCode(getType());
-  }
+//  @Override
+//  public int hashCode() {
+//    return getType().getId().hashCode();
+//  }
   
   @Override
   public boolean equals(Object other) {
@@ -135,6 +136,10 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     return getType().equals(otherAssociation.getType()) && getScope().equals(otherAssociation.getScope()) && getRoles().equals(otherAssociation.getRoles()); 
   }
 
+  public String toString() {
+    return "[type="+getType()+", roles="+getRoles()+"]";
+  }
+  
   void importIn(AssociationImpl otherAssociation, boolean merge) {
     final Collection<Role> otherRoles = new ArrayList<>(otherAssociation.getRoles());
     final Set<Locator> itemIdentifiers = otherAssociation.getItemIdentifiers();

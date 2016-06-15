@@ -1,7 +1,7 @@
 package org.gingolph.tm;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.tmapi.core.ModelConstraintException;
@@ -23,7 +23,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    HashSet<Topic> scope = new HashSet<>();
+    Set<Topic> scope = new ArraySet<>(Objects::equals, true);
     scope.addAll(ScopedHelper.getScope(getParent().getScope()));
     scope.addAll(ScopedHelper.getScope(support.getScope()));
     return scope;
@@ -56,6 +56,12 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   protected void doSetReifier(Topic reifier) {
     support.setReifier(reifier);
+  }
+  
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getValue());
   }
   
   @Override
