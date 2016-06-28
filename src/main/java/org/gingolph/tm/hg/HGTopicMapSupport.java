@@ -1,10 +1,12 @@
 package org.gingolph.tm.hg;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.IdentifiedConstruct;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -15,10 +17,9 @@ import org.gingolph.tm.hg.index.HGLiteralIndex;
 import org.gingolph.tm.hg.index.HGScopedIndex;
 import org.gingolph.tm.hg.index.HGTypeInstanceIndex;
 import org.gingolph.tm.index.IdentifierIndex;
-
-import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
+import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Association;
 import org.tmapi.core.FeatureNotRecognizedException;
 import org.tmapi.core.Locator;
@@ -93,15 +94,13 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   @Override
   public Set<Association> getAssociations() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections.unmodifiableSet(
-        HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle));
+    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle), Objects::equals);
   }
 
   @Override
   public Set<Topic> getTopics() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections
-        .unmodifiableSet(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle));
+    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle), Objects::equals);
   }
 
   @HGIgnore

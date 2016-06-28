@@ -1,15 +1,16 @@
 package org.gingolph.tm.hg;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.gingolph.tm.LocatorImpl;
 import static org.gingolph.tm.hg.HGConstructSupport.getHandle;
 
-import org.hypergraphdb.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.gingolph.tm.LocatorImpl;
+import org.hypergraphdb.HGHandle;
+import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HGQuery.hg;
+import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.atom.HGRel;
 import org.hypergraphdb.query.HGQueryCondition;
 import org.tmapi.core.Construct;
@@ -29,7 +30,7 @@ class HGTMUtil {
     if (rel == null) {
       return null;
     } else {
-      return (HGTopicMapSupport) ((HGLink) graph.get(rel)).getTargetAt(1);
+      return (HGTopicMapSupport) graph.get(((HGLink) graph.get(rel)).getTargetAt(1));
     }
   }
 
@@ -40,7 +41,7 @@ class HGTMUtil {
         HGTM.hMapMember);
   }
 
-  static <C extends Construct, T extends HGConstructSupport<C>> Set<C> findTopicMapItems(
+  static <C extends Construct, T extends HGConstructSupport<C>> List<C> findTopicMapItems(
       HyperGraph graph, Class<T> topicMapItemClass, HGHandle topicMapHandle) {
     // Stated in English, the query finds all atoms of type HGAssociation
     // that are the 1st element of a link of type HGTM.hMapMember which
@@ -49,7 +50,7 @@ class HGTMUtil {
         hg.linkProjection(0),
         hg.apply(hg.deref(graph), hg.and(hg.type(HGTM.hMapMember), hg.incident(topicMapHandle))))));
     return handles.stream().map(handle -> graph.<T>get(handle)).map(support -> support.getOwner())
-        .collect(Collectors.toSet());
+        .collect(Collectors.toList());
   }
 
   private static HGHandle findLocatorHandle(HyperGraph graph, String uri) {
@@ -117,18 +118,18 @@ class HGTMUtil {
     }
   }
 
-  static <C extends Construct> Set<C> getRelatedObjects(HGConstructSupport support,
+  static <C extends Construct> List<C> getRelatedObjects(HGConstructSupport<?> support,
       HGHandle relType, boolean supportAsFirstArgument) {
     HyperGraph graph = support.getGraph();
     HGHandle supportHandle = getHandle(graph, support);
     if (supportHandle == null) {
       return null;
     }
-    Set<HGConstructSupport<C>> relatedSupports =
+    List<HGConstructSupport<C>> relatedSupports =
         HGTMUtil.getRelatedObjects(graph, relType, supportAsFirstArgument ? supportHandle : null,
             supportAsFirstArgument ? null : supportHandle);
     return relatedSupports.stream().map(relatedSupport -> relatedSupport.getOwner())
-        .collect(Collectors.toSet());
+        .collect(Collectors.toList());
   }
 
   /**
@@ -136,17 +137,14 @@ class HGTMUtil {
    * related to a given 'first' in an ordered link. Whether first or second is required is indicated
    * by putting null in the corresponding parameter.
    */
-  static <T> Set<T> getRelatedObjects(HyperGraph graph, HGHandle relType, HGHandle first,
+  static <T> List<T> getRelatedObjects(HyperGraph graph, HGHandle relType, HGHandle first,
       HGHandle second) {
-    HashSet<T> result = new HashSet<T>();
     HGQueryCondition relQuery = hg.and(hg.type(relType),
         hg.incident(first == null ? second : first), hg.orderedLink(new HGHandle[] {
             first == null ? hg.anyHandle() : first, second == null ? hg.anyHandle() : second}));
     int idx = (first == null ? 0 : 1);
-    List<T> L = hg.findAll(graph, hg.apply(hg.deref(graph),
+    return hg.findAll(graph, hg.apply(hg.deref(graph),
         hg.apply(hg.linkProjection(idx), hg.apply(hg.deref(graph), relQuery))));
-    result.addAll(L);
-    return result;
   }
 
   static void removeRelations(HyperGraph graph, HGHandle relType, HGHandle first, HGHandle second) {

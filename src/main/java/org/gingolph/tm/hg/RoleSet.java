@@ -3,9 +3,9 @@ package org.gingolph.tm.hg;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
-import org.hypergraphdb.HGHandle;
+
+import org.gingolph.tm.RoleImpl;
 import org.hypergraphdb.HyperGraph;
-import org.hypergraphdb.util.HGUtils;
 import org.tmapi.core.Role;
 import org.tmapi.core.TMAPIRuntimeException;
 
@@ -30,16 +30,19 @@ class RoleSet extends AbstractSet<Role> {
 
   }
 
-  Role get(int i) {
-    Role r = ((HGRoleSupport) graph.get(ass.roles.get(i))).owner;
+  RoleImpl get(int i) {
+    RoleImpl r = (RoleImpl)((HGRoleSupport) graph.get(ass.roles.get(i))).getOwner();
     return r;
   }
 
   @Override
-  public boolean contains(Object o) {
-    for (int i = 0; i < size(); i++) {
-      if (HGUtils.eq(o, get(i))) {
-        return true;
+  public boolean contains(Object other) {
+    if (other instanceof RoleImpl) {
+      RoleImpl otherRole = (RoleImpl)other;
+      for (int i = 0; i < size(); i++) {
+        if (RoleImpl.equalsNoParent(get(i), otherRole)) {
+          return true;
+        }
       }
     }
     return false;

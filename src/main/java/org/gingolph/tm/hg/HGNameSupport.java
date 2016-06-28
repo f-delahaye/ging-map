@@ -1,11 +1,13 @@
 package org.gingolph.tm.hg;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
-
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
@@ -15,6 +17,8 @@ import org.tmapi.core.Variant;
 
 public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport {
 
+  private static final long serialVersionUID = 1L;
+  
   String value;
 
   // For compliance with Javabeans standard (which allows NameSupport to be persisted as a
@@ -68,8 +72,8 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   public Set<Variant> getVariants() {
     final HGHandle handle = getHandle(hyperGraph, this);
     return handle == null ? null
-        : HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
-            .stream().map(support -> support.getOwner()).collect(Collectors.toSet());
+        : new ArraySet<>(HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
+            .stream().map(support -> support.getOwner()).collect(Collectors.toList()), Objects::equals);
   }
 
   @HGIgnore

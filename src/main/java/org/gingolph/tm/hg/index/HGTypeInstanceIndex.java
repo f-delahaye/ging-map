@@ -3,10 +3,12 @@ package org.gingolph.tm.hg.index;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.TypedSupport;
@@ -82,7 +84,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     typedConstructs =
         hg.findAll(graph, hg.apply(supportHandleToOwnerMapping(graph, instanceSupportClass),
             hg.apply(hg.linkProjection(1), hg.apply(hg.deref(graph), relQuery))));
-    return matchAll ? filterMatchAll(typedConstructs, types) : new HashSet<>(typedConstructs);
+    return matchAll ? filterMatchAll(typedConstructs, types) : new ArraySet<>(typedConstructs, Objects::equals);
   }
 
   protected <T extends Construct> Set<T> filterMatchAll(Collection<T> typedConstructs,
@@ -95,8 +97,8 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     // TODO: try another solution that does not rely on comparing count with themes.length ... not
     // very reliable as it depends on whether we use a set or not, or whether a given contrutct may
     // have multiple times the same theme.
-    return scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
-        .map(entry -> entry.getKey()).collect(Collectors.toSet());
+    return new ArraySet<>(scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
+        .map(entry -> entry.getKey()).collect(Collectors.toList()), Objects::equals);
   }
 
   protected Collection<Topic> getTypes(

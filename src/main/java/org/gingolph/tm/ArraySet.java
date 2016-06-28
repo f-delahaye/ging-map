@@ -46,13 +46,13 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
    * 
    * @param equals
    */
-  public ArraySet(Collection<E> c, BiPredicate<E, E> equals, boolean check) {
+  public ArraySet(Collection<? extends E> c, BiPredicate<E, E> equals, boolean check) {
     this.check = check;
     this.delegate = c instanceof List?(List<E>)c:new ArrayList<E>(c);
     this.equals = equals;    
   }
 
-  public ArraySet(Collection<E> c, BiPredicate<E, E> equals) {
+  public ArraySet(Collection<? extends E> c, BiPredicate<E, E> equals) {
     this(c, equals, false);
   }
   
