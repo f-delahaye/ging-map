@@ -149,7 +149,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
           return;
         } else {
           throw new IdentityConstraintException(this, existingTopic, identifier,
-              "Duplicate item identifiers not allowed");
+              "Duplicate subject identifiers not allowed:"+identifier);
         }
       }
     }
@@ -496,16 +496,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public String toString() {
-    return "id "+getId();
+    return "[identifiers="+getItemIdentifiers()+"]";
   }
 
   @Override
   public int hashCode() {
     throw new UnsupportedOperationException();
-  }
-
-  public boolean deepEquals(Topic otherTopic) {
-    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators()) && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences()) && getTypes().equals(otherTopic.getTypes());
   }
   
   @Override

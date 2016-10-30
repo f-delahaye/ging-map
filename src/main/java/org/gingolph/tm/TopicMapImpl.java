@@ -111,7 +111,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
       return topic;
     }
     Construct construct = getConstructByItemIdentifier(subjectIdentifier);
-    Topic newTopic = construct instanceof TopicImpl ? (TopicImpl) construct : createTopicInstance();
+    Topic newTopic = construct instanceof TopicImpl ? (TopicImpl) construct : doCreateTopic(null);
     newTopic.addSubjectIdentifier(subjectIdentifier);
     notifyListeners(listener -> listener.onSubjectIdentifierAdded(newTopic, subjectIdentifier));
     return newTopic;
@@ -128,7 +128,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     if (topic != null) {
       return topic;
     }
-    Topic newTopic = createTopicInstance();
+    Topic newTopic = doCreateTopic(null);
     newTopic.addSubjectLocator(subjectLocator);
     notifyListeners(listener -> listener.onSubjectLocatorAdded(newTopic, subjectLocator));
     return newTopic;
@@ -147,7 +147,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     }
     Topic topic = getTopicBySubjectIdentifier(itemIdentifier);
     if (topic == null) {
-      topic = createTopicInstance();
+      topic = doCreateTopic(null);
     }
     topic.addItemIdentifier(itemIdentifier);
     return topic;
@@ -155,14 +155,18 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
 
   @Override
   public Topic createTopic() {
-    Topic topic = createTopicInstance();
+    Topic topic = doCreateTopic(null);
     topic.addItemIdentifier(createLocator("internal-" + topic.getId()));
     return topic;
   }
 
-  private Topic createTopicInstance() {
+  public Topic doCreateTopic(TopicSupport topicSupport) {
     TopicImpl topic = new TopicImpl(this);
-    topic.setSupport(createTopicSupport(topic));
+    if (topicSupport == null) {
+      // Most of the time, topicSupport will be null. The ability to pass an externally created support should be used with caution.
+      topicSupport = createTopicSupport(topic);      
+    }
+    topic.setSupport(topicSupport);
     support.addTopic(topic);
     notifyListeners(listener -> listener.onConstructCreated(topic));
     return topic;
@@ -236,7 +240,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
       Optional<Topic> sameTopic =
           getTopics().stream().filter(topic -> topic.equals(otherTopic)).findAny();
       TopicImpl mergee =
-          (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : createTopicInstance());
+          (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : doCreateTopic(null));
       mergee.importIn(otherTopic, false);
     });
 

@@ -1,9 +1,10 @@
 package org.gingolph.tm;
 
 import java.util.Set;
+
 import org.tmapi.core.Locator;
 
-public interface ConstructSupport {
+public interface ConstructSupport{
 
   void addItemIdentifier(Locator identifier);
 

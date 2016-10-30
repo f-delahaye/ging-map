@@ -204,4 +204,9 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
       otherName.remove();
     }
   }
+  
+  @Override
+  public String toString() {
+    return "[value="+getValue()+"], [variants="+getVariants()+"], type="+getType();
+  }
 }

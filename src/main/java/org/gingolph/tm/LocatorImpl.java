@@ -12,11 +12,12 @@ import org.tmapi.core.TMAPIRuntimeException;
 
 public class LocatorImpl implements Locator, Serializable {
 
+  private static final long serialVersionUID = 1L;
+  
   public static final String XSD_BASE_URL = "http://www.w3.org/2001/XMLSchema#";
   public static final String TOPIC_MAP_BASE_URL = "http://psi.topicmaps.org/iso13250/model/";
 
-  public static final Locator DEFAULT_NAME_TYPE =
-      new LocatorImpl(TOPIC_MAP_BASE_URL + "topic-name");
+  public static final Locator DEFAULT_NAME_TYPE = new LocatorImpl(TOPIC_MAP_BASE_URL + "topic-name");
 
   public static final Locator XSD_STRING = new LocatorImpl(XSD_BASE_URL + "string");
   public static Locator XSD_ANY_URI = new LocatorImpl(XSD_BASE_URL + "anyURI");
