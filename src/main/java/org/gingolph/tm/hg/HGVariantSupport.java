@@ -4,13 +4,11 @@ import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
 import org.gingolph.tm.VariantSupport;
-import static org.gingolph.tm.hg.HGConstructSupport.getHandle;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.AtomReference;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Name;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
@@ -22,14 +20,15 @@ public class HGVariantSupport extends HGScopedSupport<Variant> implements Varian
 
   protected HGVariantSupport() {}
 
-  public HGVariantSupport(Variant variant) {
-    super(variant);
-  }
-
   protected HGNameSupport getParent() {
     return HGTMUtil.getOneRelated(hyperGraph, HGTM.hVariantOf, hyperGraph.getHandle(this), null);
   }
 
+  @Override
+  public void setOwner(VariantImpl owner) {
+      this.owner = owner;
+  }
+  
   @Override
   protected Variant createOwner() {
     HGNameSupport parent = getParent();

@@ -1,24 +1,18 @@
 package org.gingolph.tm;
 
-import org.tmapi.core.Name;
-import org.tmapi.core.Occurrence;
-import org.tmapi.core.Role;
-import org.tmapi.core.Variant;
-
-
 public interface ConstructSupportFactory {
 
-  AssociationSupport createAssociationSupport(AssociationImpl association);
+  AssociationSupport createAssociationSupport();
 
-  NameSupport createNameSupport(Name name);
+  NameSupport createNameSupport();
 
-  OccurrenceSupport createOccurrenceSupport(Occurrence occurrence);
+  OccurrenceSupport createOccurrenceSupport();
 
-  RoleSupport createRoleSupport(Role role);
+  RoleSupport createRoleSupport();
 
-  VariantSupport createVariantSupport(Variant variant);
+  VariantSupport createVariantSupport();
 
-  TopicMapSupport createTopicMapSupport(TopicMapImpl topicMap);
+  TopicMapSupport createTopicMapSupport();
 
-  TopicSupport createTopicSupport(TopicImpl topic);
+  TopicSupport createTopicSupport();
 }

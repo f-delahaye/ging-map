@@ -26,8 +26,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
   // TODO fix this
 
-  public HGAssociationSupport(Association association) {
-    super(association);
+  public HGAssociationSupport() {
     roles = new ArrayList<>();
   }
 
@@ -124,4 +123,10 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
     association.setSupport(this);
     return association;
   }
+  
+  @Override
+  public void setOwner(AssociationImpl owner) {
+      this.owner = owner;
+  }
+    
 }

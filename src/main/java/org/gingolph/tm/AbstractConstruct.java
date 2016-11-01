@@ -4,17 +4,30 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.gingolph.tm.event.TopicMapEventListener;
+import org.gingolph.tm.event.TopicMapEventListenerSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 
 
-public abstract class IdentifiedConstruct<S extends ConstructSupport>
-    extends SupportedConstruct<S> {
+public abstract class AbstractConstruct<S extends ConstructSupport> extends TopicMapEventListenerSupport implements Construct {
 
-  protected IdentifiedConstruct() {}
+  S support;
 
+  protected AbstractConstruct() {}
+
+  public S getSupport() {
+    return support;
+  }
+
+  public void setSupport(S support) {
+    this.support = support;
+    notifyOwner();
+  }
+  
+  protected abstract void notifyOwner();
+  
   @Override
   public abstract TopicMapImpl getTopicMap();
 

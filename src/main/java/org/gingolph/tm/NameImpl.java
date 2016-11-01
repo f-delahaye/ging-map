@@ -18,6 +18,11 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   public NameImpl(TopicMapImpl topicMap, TopicImpl parent) {
     super(topicMap, parent);
   }
+  
+  @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
 
   @Override
   public String getValue() {

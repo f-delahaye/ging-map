@@ -29,6 +29,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
+  
+  @Override
   public void addItemIdentifier(Locator identifier) throws IdentityConstraintException {
     Topic existingTopic = null;
     try {

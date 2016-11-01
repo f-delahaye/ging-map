@@ -5,8 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import org.gingolph.tm.IdentifiedConstruct;
+import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.LocatorImpl;
+import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
@@ -33,12 +34,7 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   static AtomicLong counter = new AtomicLong();
   Map<Class<?>, Index> indexes = new LinkedHashMap<>();
 
-  IMTopicMapSupport(TopicMap topicMap) {
-    setTopicMap(topicMap);
-  }
-
-  public final void setTopicMap(TopicMap topicMap) {
-    this.topicMap = (TopicMapImpl) topicMap;
+  IMTopicMapSupport() {
   }
 
   @Override
@@ -104,7 +100,7 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public String generateId(IdentifiedConstruct construct) {
+  public String generateId(AbstractConstruct construct) {
     return String.valueOf(counter.getAndIncrement());
   }
 
@@ -112,4 +108,9 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   public Locator createLocator(String value) {
     return new LocatorImpl(value);
   }
+
+  @Override
+  public void setOwner(TopicMapImpl owner) {
+    this.topicMap = owner;
+  }  
 }

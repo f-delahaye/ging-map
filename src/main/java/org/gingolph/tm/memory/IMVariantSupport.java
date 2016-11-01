@@ -1,6 +1,7 @@
 package org.gingolph.tm.memory;
 
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.VariantImpl;
 import org.gingolph.tm.VariantSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
@@ -41,5 +42,9 @@ public class IMVariantSupport extends IMScopedSupport implements VariantSupport 
     this.datatype = datatype;
   }
 
+  @Override
+  public void setOwner(VariantImpl owner) {
+ // Noop - not needed by the in memory implementation    
+  }
 
 }

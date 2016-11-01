@@ -13,9 +13,10 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
     super(topicMap, parent);
   }
 
-  // @Override
-  // public void customDetach() {
-  // }
+  @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
 
   @Override
   public void customRemove() {

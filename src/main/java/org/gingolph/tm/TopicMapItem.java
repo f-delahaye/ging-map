@@ -3,7 +3,7 @@ package org.gingolph.tm;
 import org.tmapi.core.Construct;
 
 public abstract class TopicMapItem<P extends Construct, S extends ConstructSupport>
-    extends IdentifiedConstruct<S> {
+    extends AbstractConstruct<S> {
   TopicMapImpl topicMap;
   P parent;
   String id;

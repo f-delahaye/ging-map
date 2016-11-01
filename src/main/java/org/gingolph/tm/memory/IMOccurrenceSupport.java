@@ -1,5 +1,6 @@
 package org.gingolph.tm.memory;
 
+import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.OccurrenceSupport;
 import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Locator;
@@ -50,5 +51,10 @@ public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSu
   @Override
   public void setDatatype(Locator datatype) {
     this.datatype = datatype;
+  }
+
+  @Override
+  public void setOwner(OccurrenceImpl owner) {
+ // Noop - not needed by the in memory implementation    
   }
 }

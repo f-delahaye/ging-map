@@ -3,7 +3,7 @@ package org.gingolph.tm.hg;
 import java.io.Serializable;
 import java.util.Set;
 import org.gingolph.tm.ConstructSupport;
-import org.gingolph.tm.IdentifiedConstruct;
+import org.gingolph.tm.AbstractConstruct;
 import org.hypergraphdb.HGGraphHolder;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
@@ -20,15 +20,13 @@ public abstract class HGConstructSupport<T extends Construct>
 
   private static final long serialVersionUID = 1L;
 
+  // Owner used to be passed in the constructor.
+  // Its now set directly by Topic/association/role support when their callback method setOwner is invoked
   @HGIgnore
   T owner;
 
   @HGIgnore
   transient HyperGraph hyperGraph;
-
-  protected HGConstructSupport(T owner) {
-    this.owner = owner;
-  }
 
   protected HGConstructSupport() {}
 
@@ -95,7 +93,7 @@ public abstract class HGConstructSupport<T extends Construct>
 
   public static HGHandle getHandle(HyperGraph graph, Construct construct) {
     return construct == null ? null
-        : graph.getHandle(((IdentifiedConstruct) construct).getSupport());
+        : graph.getHandle(((AbstractConstruct) construct).getSupport());
   }
 
   public static HGHandle getHandle(HyperGraph graph, ConstructSupport support) {
@@ -103,7 +101,7 @@ public abstract class HGConstructSupport<T extends Construct>
   }
 
   public static HGHandle add(HyperGraph graph, Construct construct) {
-    return add(graph, ((IdentifiedConstruct) construct).getSupport());
+    return add(graph, ((AbstractConstruct) construct).getSupport());
   }
 
   public static HGHandle add(HyperGraph graph, ConstructSupport support) {

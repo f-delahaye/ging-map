@@ -2,10 +2,12 @@ package org.gingolph.tm.memory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.gingolph.tm.TopicSupport;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.TopicSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -172,4 +174,9 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   public void setReified(Reifiable reified) {
     this.reified = reified;
   }
+
+  @Override
+  public void setOwner(TopicImpl owner) {
+ // Noop - not needed by the in memory implementation    
+  }  
 }

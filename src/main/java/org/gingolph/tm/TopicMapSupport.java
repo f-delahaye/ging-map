@@ -8,6 +8,18 @@ import org.tmapi.index.Index;
 
 
 public interface TopicMapSupport extends ConstructSupport {
+
+  /**
+   * Callback method invoked by TopicMapImpl.setSupport.
+   * This is the reverse relationship.
+   * A topic map NEEDS a support as most of its operations are delegated to the support.
+   * Conversely, in certain implementations, a support MAY need its topic map.
+   * 
+   * Implementations are not required to store the supplied reference if they don't need it.
+   * @param owner
+   */  
+  void setOwner(TopicMapImpl owner);
+  
   Set<Topic> getTopics();
 
   void addTopic(Topic topic);
@@ -26,7 +38,7 @@ public interface TopicMapSupport extends ConstructSupport {
 
   void setReifier(TopicImpl reifier);
 
-  public String generateId(IdentifiedConstruct construct);
+  public String generateId(AbstractConstruct construct);
 
   Locator createLocator(String value);
 }

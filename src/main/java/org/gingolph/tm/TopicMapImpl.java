@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
@@ -15,16 +16,12 @@ import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
 import org.tmapi.core.MalformedIRIException;
 import org.tmapi.core.ModelConstraintException;
-import org.tmapi.core.Name;
-import org.tmapi.core.Occurrence;
-import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
 import org.tmapi.core.TopicMap;
-import org.tmapi.core.Variant;
 import org.tmapi.index.Index;
 
 
-public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implements TopicMap {
+public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
 
   transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
@@ -43,6 +40,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     this.supportFactory = supportFactory;
   }
 
+  
   @Override
   public Construct getParent() {
     return null;
@@ -61,6 +59,11 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     return id;
   }
 
+  @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
+  
   @Override
   public Set<Topic> getTopics() {
     return Collections.unmodifiableSet(support.getTopics());
@@ -96,6 +99,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
   }
 
   @Override
+  
   public Construct getConstructById(String id) {
     return getIdentifierIndex().getConstructById(id);
   }
@@ -164,7 +168,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
 
   private Topic createTopicInstance() {
     TopicImpl topic = new TopicImpl(this);
-    topic.setSupport(createTopicSupport(topic));
+    topic.setSupport(createTopicSupport());
     support.addTopic(topic);
     notifyListeners(listener -> listener.onConstructCreated(topic));
     return topic;
@@ -206,7 +210,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
       throw new ModelConstraintException(this, "Null scope is not allowed");
     }
     AssociationImpl association = new AssociationImpl(this);
-    association.setSupport(createAssociationSupport(association));
+    association.setSupport(createAssociationSupport());
     support.addAssociation(association);
     association.setType(type);
     association.setScope(scope);
@@ -261,7 +265,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     support.setReifier(reifier);
   }
 
-  protected final String generateId(IdentifiedConstruct construct) {
+  protected final String generateId(AbstractConstruct construct) {
     return support.generateId(construct);
   }
 
@@ -280,45 +284,45 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
 
   public NameImpl createName(TopicImpl topic, String value) {
     NameImpl name = new NameImpl(this, topic);
-    name.setSupport(createNameSupport(name));
+    name.setSupport(createNameSupport());
     name.setValue(value);
     return name;
   }
 
   public OccurrenceImpl createOccurrence(TopicImpl topic) {
     OccurrenceImpl occurrence = new OccurrenceImpl(this, topic);
-    occurrence.setSupport(createOccurrenceSupport(occurrence));
+    occurrence.setSupport(createOccurrenceSupport());
     return occurrence;
   }
 
   public VariantImpl createVariant(NameImpl name, Locator datatype, Object value) {
     VariantImpl variant = new VariantImpl(this, name);
-    variant.setSupport(createVariantSupport(variant));
+    variant.setSupport(createVariantSupport());
     variant.setValue(datatype, value);
     return variant;
   }
 
-  AssociationSupport createAssociationSupport(AssociationImpl association) {
-    return supportFactory.createAssociationSupport(association);
+  AssociationSupport createAssociationSupport() {
+    return supportFactory.createAssociationSupport();
   }
 
-  RoleSupport createRoleSupport(Role role) {
-    return supportFactory.createRoleSupport(role);
+  RoleSupport createRoleSupport() {
+    return supportFactory.createRoleSupport();
   }
 
-  NameSupport createNameSupport(Name name) {
-    return supportFactory.createNameSupport(name);
+  NameSupport createNameSupport() {
+    return supportFactory.createNameSupport();
   }
 
-  OccurrenceSupport createOccurrenceSupport(Occurrence occurrence) {
-    return supportFactory.createOccurrenceSupport(occurrence);
+  OccurrenceSupport createOccurrenceSupport() {
+    return supportFactory.createOccurrenceSupport();
   }
 
-  TopicSupport createTopicSupport(TopicImpl topic) {
-    return supportFactory.createTopicSupport(topic);
+  TopicSupport createTopicSupport() {
+    return supportFactory.createTopicSupport();
   }
 
-  VariantSupport createVariantSupport(Variant variant) {
-    return supportFactory.createVariantSupport(variant);
+  VariantSupport createVariantSupport() {
+    return supportFactory.createVariantSupport();
   }
 }

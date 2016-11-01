@@ -5,14 +5,11 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
-import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.OccurrenceSupport;
 import org.gingolph.tm.RoleSupport;
-import org.gingolph.tm.TopicImpl;
-import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
 import org.gingolph.tm.TopicMapSystemSupport;
 import org.gingolph.tm.TopicSupport;
@@ -25,11 +22,8 @@ import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.atom.HGRelType;
 import org.hypergraphdb.indexing.ByPartIndexer;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Name;
 import org.tmapi.core.Occurrence;
-import org.tmapi.core.Role;
 import org.tmapi.core.TopicMap;
-import org.tmapi.core.Variant;
 
 
 public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
@@ -59,40 +53,40 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public NameSupport createNameSupport(Name name) {
-    return new HGNameSupport(name);
+  public NameSupport createNameSupport() {
+    return new HGNameSupport();
   }
 
   @Override
-  public AssociationSupport createAssociationSupport(AssociationImpl association) {
-    return new HGAssociationSupport(association);
+  public AssociationSupport createAssociationSupport() {
+    return new HGAssociationSupport();
   }
 
   @Override
-  public OccurrenceSupport createOccurrenceSupport(Occurrence occurrence) {
-    return new HGOccurrenceSupport(occurrence);
+  public OccurrenceSupport createOccurrenceSupport() {
+    return new HGOccurrenceSupport();
   }
 
   @Override
-  public VariantSupport createVariantSupport(Variant variant) {
-    return new HGVariantSupport(variant);
+  public VariantSupport createVariantSupport() {
+    return new HGVariantSupport();
   }
 
   @Override
-  public RoleSupport createRoleSupport(Role role) {
-    return new HGRoleSupport(role);
+  public RoleSupport createRoleSupport() {
+    return new HGRoleSupport();
   }
 
   @Override
-  public TopicSupport createTopicSupport(TopicImpl topic) {
-    return new HGTopicSupport(topic);
+  public TopicSupport createTopicSupport() {
+    return new HGTopicSupport();
   }
 
   @Override
-  public TopicMapSupport createTopicMapSupport(TopicMapImpl topicMap) {
+  public TopicMapSupport createTopicMapSupport() {
     HyperGraph graph = getHypergraphInstance();
     final HGTopicMapSupport topicMapSupport =
-        new HGTopicMapSupport((TopicMapImpl) topicMap, graph, this);
+        new HGTopicMapSupport(graph, this);
     graph.add(topicMapSupport);
     return topicMapSupport;
   }

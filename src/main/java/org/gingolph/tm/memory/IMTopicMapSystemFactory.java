@@ -2,21 +2,14 @@ package org.gingolph.tm.memory;
 
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
-import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.OccurrenceSupport;
 import org.gingolph.tm.RoleSupport;
-import org.gingolph.tm.TopicImpl;
-import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
 import org.gingolph.tm.TopicMapSystemSupport;
 import org.gingolph.tm.VariantSupport;
-import org.tmapi.core.Name;
-import org.tmapi.core.Occurrence;
-import org.tmapi.core.Role;
 import org.tmapi.core.TopicMap;
-import org.tmapi.core.Variant;
 
 public class IMTopicMapSystemFactory extends AbstractTopicMapSystemFactory
     implements TopicMapSystemSupport {
@@ -31,37 +24,37 @@ public class IMTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public NameSupport createNameSupport(Name name) {
+  public NameSupport createNameSupport() {
     return new IMNameSupport();
   }
 
   @Override
-  public AssociationSupport createAssociationSupport(AssociationImpl association) {
+  public AssociationSupport createAssociationSupport() {
     return new IMAssociationSupport();
   }
 
   @Override
-  public OccurrenceSupport createOccurrenceSupport(Occurrence occurrence) {
+  public OccurrenceSupport createOccurrenceSupport() {
     return new IMOccurrenceSupport();
   }
 
   @Override
-  public VariantSupport createVariantSupport(Variant variant) {
+  public VariantSupport createVariantSupport() {
     return new IMVariantSupport();
   }
 
   @Override
-  public RoleSupport createRoleSupport(Role role) {
+  public RoleSupport createRoleSupport() {
     return new IMRoleSupport();
   }
 
   @Override
-  public TopicMapSupport createTopicMapSupport(TopicMapImpl topicMap) {
-    return new IMTopicMapSupport(topicMap);
+  public TopicMapSupport createTopicMapSupport() {
+    return new IMTopicMapSupport();
   }
 
   @Override
-  public TopicSupport createTopicSupport(TopicImpl topic) {
+  public TopicSupport createTopicSupport() {
     return new IMTopicSupport();
   }
 

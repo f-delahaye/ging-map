@@ -16,6 +16,11 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   }
 
   @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
+  
+  @Override
   public void customRemove() {
     getParent().removeVariant(this);
   }

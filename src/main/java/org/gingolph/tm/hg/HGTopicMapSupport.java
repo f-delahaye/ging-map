@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
-import org.gingolph.tm.IdentifiedConstruct;
+import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -37,12 +38,16 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   public HGTopicMapSupport() {}
 
-  public HGTopicMapSupport(TopicMapImpl topicMap, HyperGraph graph, TopicMapSystemSupport parent) {
-    super(topicMap);
+  public HGTopicMapSupport(HyperGraph graph, TopicMapSystemSupport parent) {
     this.graph = graph;
     this.parent = parent;
   }
 
+  @Override
+  public void setOwner(TopicMapImpl owner) {
+      this.owner = owner;
+  }
+  
   @Override
   protected TopicMapImpl createOwner() {
     boolean autoMerge;
@@ -108,7 +113,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public String generateId(IdentifiedConstruct construct) {
+  public String generateId(AbstractConstruct construct) {
     HGHandle handle = graph.getHandle(construct.getSupport());
     return handle == null ? null : graph.getPersistentHandle(handle).toString();
   }

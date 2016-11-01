@@ -2,10 +2,10 @@ package org.gingolph.tm.hg;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
-
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
@@ -17,13 +17,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   String value;
 
-  // For compliance with Javabeans standard (which allows NameSupport to be persisted as a
-  // JavabeansType)
   protected HGNameSupport() {}
-
-  public HGNameSupport(Name name) {
-    super(name);
-  }
 
   @Override
   public void addVariant(Variant v) {
@@ -100,4 +94,9 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
     name.setSupport(this);
     return name;
   }
+  
+  @Override
+  public void setOwner(NameImpl owner) {
+      this.owner = owner;
+  }  
 }

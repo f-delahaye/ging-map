@@ -24,14 +24,19 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   // Set<Occurrence> occurrences = null;
   // Set<NameImpl> names = null;
 
-  public HGTopicSupport(TopicImpl topic) {
-    super(topic);
+  public HGTopicSupport() {
+    super();
   }
 
   public HGTopicMapSupport getTopicMapSupport() {
     return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
   }
 
+  @Override
+  public void setOwner(TopicImpl owner) {
+      this.owner = owner;
+  }
+  
   @Override
   protected TopicImpl createOwner() {
     TopicImpl topic = new TopicImpl(getTopicMapSupport().getOwner());

@@ -21,6 +21,11 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
+  
+  @Override
   protected void customRemove() {
     support.getRoles().forEach(role -> ((RoleImpl) role).doRemove());
     getParent().removeAssociation(this);
@@ -55,7 +60,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
       throw new ModelConstraintException(this, "Null player not allowed");
     }
     RoleImpl role = new RoleImpl(topicMap, this);
-    role.setSupport(getTopicMap().createRoleSupport(role));
+    role.setSupport(getTopicMap().createRoleSupport());
     role.setPlayer(player);
     role.setType(type);
     support.addRole(role);

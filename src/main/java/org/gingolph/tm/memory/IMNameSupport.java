@@ -2,6 +2,8 @@ package org.gingolph.tm.memory;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Topic;
@@ -62,5 +64,10 @@ public class IMNameSupport extends IMScopedSupport implements NameSupport {
   @Override
   public void setType(Topic type) {
     this.type = type;
+  }
+
+  @Override
+  public void setOwner(NameImpl owner) {
+ // Noop - not needed by the in memory implementation    
   }
 }

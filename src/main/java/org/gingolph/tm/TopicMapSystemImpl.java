@@ -56,7 +56,7 @@ public class TopicMapSystemImpl implements TopicMapSystem {
 
   public TopicMapImpl createTopicMap() {
     TopicMapImpl topicMap = new TopicMapImpl(this, isAutoMerge(), support);
-    topicMap.setSupport(support.createTopicMapSupport(topicMap));
+    topicMap.setSupport(support.createTopicMapSupport());
     return topicMap;
   }
 

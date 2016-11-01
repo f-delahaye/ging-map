@@ -25,12 +25,11 @@ import org.tmapi.core.Topic;
 public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSupport, HGLink {
   private transient final HGHandle[] targetSet;
 
-  public HGRoleSupport(Role owner) {
-    this(owner, new HGHandle[3]);
+  public HGRoleSupport() {
+    this(new HGHandle[3]);
   }
 
-  private HGRoleSupport(Role owner, HGHandle[] targetSet) {
-    super(owner);
+  private HGRoleSupport(HGHandle[] targetSet) {
     this.targetSet = targetSet;
     // HGRoleSupport does not have the same needs as other constructs:
     // usually graph is injected to Constructs when they get persisted (by virtue of them
@@ -42,6 +41,11 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
     targetSet[2] = getHandle(getGraph(), owner.getParent());
   }
 
+  @Override
+  public void setOwner(RoleImpl owner) {
+      this.owner = owner;
+  }
+    
   @Override
   protected Role createOwner() {
     HGAssociationSupport parent = hyperGraph.get(targetSet[2]);

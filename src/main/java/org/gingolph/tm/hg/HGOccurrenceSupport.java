@@ -16,15 +16,16 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   protected HGOccurrenceSupport() {}
 
-  public HGOccurrenceSupport(Occurrence occurrence) {
-    super(occurrence);
-  }
-
   protected HGTopicSupport getParent() {
     return HGTMUtil.getOneRelated(hyperGraph, HGTM.hOccurrenceOf, getHandle(hyperGraph, this),
         null);
   }
 
+  @Override
+  public void setOwner(OccurrenceImpl owner) {
+      this.owner = owner;
+  }
+  
   @Override
   protected Occurrence createOwner() {
     HGTopicSupport parent = getParent();

@@ -13,6 +13,11 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   public OccurrenceImpl(TopicMapImpl topicMap, TopicImpl parent) {
     super(topicMap, parent);
   }
+  
+  @Override
+  protected void notifyOwner() {
+    support.setOwner(this);
+  }
 
   @Override
   public void customRemove() {
