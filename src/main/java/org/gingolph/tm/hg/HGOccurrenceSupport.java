@@ -2,7 +2,7 @@ package org.gingolph.tm.hg;
 
 import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.OccurrenceSupport;
-
+import org.gingolph.tm.TopicImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
@@ -36,7 +36,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     HyperGraph graph = getGraph();
     HGHandle h = HGTMUtil.getReifierOf(graph, getHandle(graph, this));
     return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
@@ -44,7 +44,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public void setReifier(Topic topic) {
+  public void setReifier(TopicImpl topic) {
     HyperGraph graph = getGraph();
     HGTMUtil.setReifierOf(graph, getHandle(graph, this), getHandle(graph, topic));
   }

@@ -2,15 +2,16 @@ package org.gingolph.tm.memory;
 
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.OccurrenceSupport;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
 import org.gingolph.tm.TopicMapSystemSupport;
 import org.gingolph.tm.VariantSupport;
-import org.tmapi.core.Association;
 import org.tmapi.core.Name;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Role;
@@ -35,7 +36,7 @@ public class IMTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public AssociationSupport createAssociationSupport(Association association) {
+  public AssociationSupport createAssociationSupport(AssociationImpl association) {
     return new IMAssociationSupport();
   }
 
@@ -55,7 +56,7 @@ public class IMTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public TopicMapSupport createTopicMapSupport(TopicMap topicMap) {
+  public TopicMapSupport createTopicMapSupport(TopicMapImpl topicMap) {
     return new IMTopicMapSupport(topicMap);
   }
 

@@ -7,7 +7,7 @@ import org.tmapi.core.Variant;
 
 public interface NameSupport extends ConstructSupport, ScopedSupport, TypedSupport {
 
-  Topic getReifier();
+  TopicImpl getReifier();
 
   void setReifier(TopicImpl reifier);
 

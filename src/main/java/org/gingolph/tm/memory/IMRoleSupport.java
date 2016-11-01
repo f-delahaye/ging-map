@@ -7,7 +7,7 @@ import org.tmapi.core.Topic;
 
 public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
   Topic type;
-  Topic reifier;
+  TopicImpl reifier;
   TopicImpl player;
 
   @Override
@@ -21,12 +21,12 @@ public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
   }
 
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     return reifier;
   }
 
   @Override
-  public void setReifier(Topic reifier) {
+  public void setReifier(TopicImpl reifier) {
     this.reifier = reifier;
   }
 

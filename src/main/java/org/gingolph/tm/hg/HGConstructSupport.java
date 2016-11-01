@@ -41,7 +41,7 @@ public abstract class HGConstructSupport<T extends Construct>
     return owner;
   }
 
-  protected void addItemIdentifier(HGHandle locator) throws ModelConstraintException {
+  protected final void addItemIdentifier(HGHandle locator) throws ModelConstraintException {
     HyperGraph graph = getGraph();
     graph.add(new HGRel(HGTM.ItemIdentifier, new HGHandle[] {locator, graph.getHandle(this)}),
         HGTM.hItemIdentifier);
@@ -49,14 +49,14 @@ public abstract class HGConstructSupport<T extends Construct>
   }
 
   @Override
-  public void addItemIdentifier(Locator l) throws ModelConstraintException {
+  public final void addItemIdentifier(Locator l) throws ModelConstraintException {
     HyperGraph graph = getGraph();
     HGHandle lh = HGTMUtil.ensureLocatorHandle(graph, l);
     addItemIdentifier(lh);
   }
 
   @Override
-  public Set<Locator> getItemIdentifiers() {
+  public final Set<Locator> getItemIdentifiers() {
     HyperGraph graph = getGraph();
     final HGHandle handle = graph.getHandle(this);
     return handle == null ? null
@@ -64,7 +64,7 @@ public abstract class HGConstructSupport<T extends Construct>
   }
 
   @Override
-  public void removeItemIdentifier(Locator l) {
+  public final void removeItemIdentifier(Locator l) {
     HGHandle lh = HGTMUtil.findLocatorHandle(getGraph(), l);
     if (lh != null) {
       HyperGraph graph = getGraph();

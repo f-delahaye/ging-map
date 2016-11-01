@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import org.gingolph.tm.IdentifiedConstruct;
 import org.gingolph.tm.LocatorImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
 import org.gingolph.tm.index.IdentifierIndex;
@@ -26,9 +27,8 @@ import org.tmapi.index.TypeInstanceIndex;
 public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSupport {
   Set<Topic> topics = new HashSet<>();
   Set<Association> associations = new HashSet<>();
-  Topic reifier;
+  TopicImpl reifier;
   TopicMapImpl topicMap;
-  Locator baseLocator;
 
   static AtomicLong counter = new AtomicLong();
   Map<Class<?>, Index> indexes = new LinkedHashMap<>();
@@ -72,12 +72,12 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     return reifier;
   }
 
   @Override
-  public void setReifier(Topic reifier) {
+  public void setReifier(TopicImpl reifier) {
     this.reifier = reifier;
   }
 
@@ -111,15 +111,5 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   @Override
   public Locator createLocator(String value) {
     return new LocatorImpl(value);
-  }
-
-  @Override
-  public Locator getBaseLocator() {
-    return baseLocator;
-  }
-
-  @Override
-  public void setBaseLocator(Locator baseLocator) {
-    this.baseLocator = baseLocator;
   }
 }

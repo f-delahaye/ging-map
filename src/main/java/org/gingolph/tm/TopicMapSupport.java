@@ -22,20 +22,11 @@ public interface TopicMapSupport extends ConstructSupport {
 
   <I extends Index> I getIndex(Class<I> type);
 
-  Topic getReifier();
+  TopicImpl getReifier();
 
-  void setReifier(Topic reifier);
+  void setReifier(TopicImpl reifier);
 
   public String generateId(IdentifiedConstruct construct);
 
   Locator createLocator(String value);
-
-  /**
-   * Returns the topicmap's base locator
-   * 
-   * @return
-   */
-  public Locator getBaseLocator();
-
-  public void setBaseLocator(Locator locator);
 }

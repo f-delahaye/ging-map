@@ -20,11 +20,6 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     super(topicMap, topicMap);
   }
 
-  // @Override
-  // protected void customDetach(){
-  // support.getRoles().forEach(role->((RoleImpl)role).detach());
-  // }
-
   @Override
   protected void customRemove() {
     support.getRoles().forEach(role -> ((RoleImpl) role).doRemove());
@@ -115,7 +110,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     ReifierHelper.setReifier(this, reifier, this::doSetReifier);
   }
 
-  protected void doSetReifier(Topic reifier) {
+  protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
 

@@ -7,13 +7,13 @@ public interface RoleSupport extends ConstructSupport, TypedSupport {
 
   Topic getPlayer();
 
-  Topic getReifier();
+  TopicImpl getReifier();
 
   Topic getType();
 
   void setPlayer(TopicImpl player);
 
-  void setReifier(Topic reifier);
+  void setReifier(TopicImpl reifier);
 
   void setType(Topic type);
 }

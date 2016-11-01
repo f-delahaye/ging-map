@@ -1,14 +1,14 @@
 package org.gingolph.tm.memory;
 
-import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.OccurrenceSupport;
+import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
 
 
 public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSupport {
   private Topic type;
-  private Topic reifier;
+  private TopicImpl reifier;
   private String value;
   private Locator datatype;
 
@@ -23,12 +23,12 @@ public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSu
   }
 
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     return reifier;
   }
 
   @Override
-  public void setReifier(Topic reifier) {
+  public void setReifier(TopicImpl reifier) {
     this.reifier = reifier;
   }
 

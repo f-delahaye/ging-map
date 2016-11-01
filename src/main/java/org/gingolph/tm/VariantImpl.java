@@ -53,7 +53,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
     ReifierHelper.setReifier(this, reifier, this::doSetReifier);
   }
 
-  protected void doSetReifier(Topic reifier) {
+  protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
 }

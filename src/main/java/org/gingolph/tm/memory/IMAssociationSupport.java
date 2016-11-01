@@ -11,7 +11,7 @@ import org.tmapi.core.Topic;
 public class IMAssociationSupport extends IMScopedSupport implements AssociationSupport {
   private Topic type;
   private final Set<Role> roles = new HashSet<>();
-  private Topic reifier;
+  private TopicImpl reifier;
 
   @Override
   public Topic getType() {
@@ -39,12 +39,12 @@ public class IMAssociationSupport extends IMScopedSupport implements Association
   }
 
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     return reifier;
   }
 
   @Override
-  public void setReifier(Topic reifier) {
+  public void setReifier(TopicImpl reifier) {
     this.reifier = reifier;
   }
 

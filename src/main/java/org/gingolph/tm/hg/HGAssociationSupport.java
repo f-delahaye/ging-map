@@ -8,6 +8,7 @@ import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
+import org.gingolph.tm.TopicImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
@@ -64,7 +65,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     final HyperGraph graph = getGraph();
     HGHandle h = HGTMUtil.getReifierOf(graph, getHandle(graph, this));
     return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
@@ -72,7 +73,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public void setReifier(Topic topic) {
+  public void setReifier(TopicImpl topic) {
     final HyperGraph graph = getGraph();
     HGTMUtil.setReifierOf(graph, getHandle(graph, this),
         topic == null ? null : getHandle(graph, topic));

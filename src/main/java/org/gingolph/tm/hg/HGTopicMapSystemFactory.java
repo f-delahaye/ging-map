@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.NameSupport;
@@ -23,7 +24,6 @@ import org.hypergraphdb.HGTypeSystem;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.atom.HGRelType;
 import org.hypergraphdb.indexing.ByPartIndexer;
-import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Name;
 import org.tmapi.core.Occurrence;
@@ -64,7 +64,7 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public AssociationSupport createAssociationSupport(Association association) {
+  public AssociationSupport createAssociationSupport(AssociationImpl association) {
     return new HGAssociationSupport(association);
   }
 
@@ -89,7 +89,7 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   }
 
   @Override
-  public TopicMapSupport createTopicMapSupport(TopicMap topicMap) {
+  public TopicMapSupport createTopicMapSupport(TopicMapImpl topicMap) {
     HyperGraph graph = getHypergraphInstance();
     final HGTopicMapSupport topicMapSupport =
         new HGTopicMapSupport((TopicMapImpl) topicMap, graph, this);

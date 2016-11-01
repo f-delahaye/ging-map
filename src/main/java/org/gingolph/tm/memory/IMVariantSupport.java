@@ -1,5 +1,6 @@
 package org.gingolph.tm.memory;
 
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
@@ -16,7 +17,7 @@ public class IMVariantSupport extends IMScopedSupport implements VariantSupport 
   }
 
   @Override
-  public void setReifier(Topic reifier) {
+  public void setReifier(TopicImpl reifier) {
     this.reifier = reifier;
   }
 

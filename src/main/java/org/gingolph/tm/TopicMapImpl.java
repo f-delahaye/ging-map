@@ -33,6 +33,8 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
   private String id;
   private final ConstructSupportFactory supportFactory;
 
+  private Locator baseLocator;
+
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
     super();
@@ -66,11 +68,11 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
 
   @Override
   public Locator getLocator() {
-    return support.getBaseLocator();
+    return baseLocator;
   }
 
   void setLocator(Locator locator) {
-    support.setBaseLocator(locator);
+    this.baseLocator = locator;
   }
 
   @Override
@@ -255,7 +257,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     ReifierHelper.setReifier(this, reifier, this::doSetReifier);
   }
 
-  protected void doSetReifier(Topic reifier) {
+  protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
 
@@ -296,7 +298,7 @@ public class TopicMapImpl extends IdentifiedConstruct<TopicMapSupport> implement
     return variant;
   }
 
-  AssociationSupport createAssociationSupport(Association association) {
+  AssociationSupport createAssociationSupport(AssociationImpl association) {
     return supportFactory.createAssociationSupport(association);
   }
 

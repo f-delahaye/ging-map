@@ -74,7 +74,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     final HyperGraph graph = getGraph();
     HGHandle h = HGTMUtil.getReifierOf(graph, getHandle(graph, this));
     return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
@@ -82,7 +82,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public void setReifier(Topic t) {
+  public void setReifier(TopicImpl t) {
     final HyperGraph graph = getGraph();
     HGTMUtil.setReifierOf(graph, getHandle(graph, this), getHandle(graph, t));
   }

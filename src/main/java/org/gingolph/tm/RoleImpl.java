@@ -69,7 +69,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
     ReifierHelper.setReifier(this, reifier, this::doSetReifier);
   }
 
-  protected void doSetReifier(Topic reifier) {
+  protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
 

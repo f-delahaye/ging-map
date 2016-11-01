@@ -39,7 +39,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     final HGHandle handle = getHandle(hyperGraph, this);
     HGHandle h = HGTMUtil.getReifierOf(hyperGraph, handle);
     return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;

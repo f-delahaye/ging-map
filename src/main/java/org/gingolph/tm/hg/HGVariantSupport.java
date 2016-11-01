@@ -1,6 +1,7 @@
 package org.gingolph.tm.hg;
 
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
 import org.gingolph.tm.VariantSupport;
 import static org.gingolph.tm.hg.HGConstructSupport.getHandle;
@@ -50,7 +51,7 @@ public class HGVariantSupport extends HGScopedSupport<Variant> implements Varian
 
   @HGIgnore
   @Override
-  public void setReifier(Topic topic) {
+  public void setReifier(TopicImpl topic) {
     HyperGraph graph = getGraph();
     HGTMUtil.setReifierOf(graph, getHandle(graph, this), getHandle(graph, topic));
   }

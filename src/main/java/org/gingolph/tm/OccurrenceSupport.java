@@ -6,11 +6,11 @@ import org.tmapi.core.Topic;
 public interface OccurrenceSupport
     extends ConstructSupport, ScopedSupport, TypedSupport, DatatypeAwareSupport {
 
-  Topic getReifier();
+  TopicImpl getReifier();
 
   Topic getType();
 
-  void setReifier(Topic reifier);
+  void setReifier(TopicImpl reifier);
 
   void setType(Topic type);
 

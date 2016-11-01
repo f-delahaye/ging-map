@@ -10,12 +10,12 @@ public class IMConstructSupport implements ConstructSupport {
   private Set<Locator> itemIdentifiers;
 
   @Override
-  public Set<Locator> getItemIdentifiers() {
+  public final Set<Locator> getItemIdentifiers() {
     return itemIdentifiers;
   }
 
   @Override
-  public void addItemIdentifier(Locator identifier) {
+  public final void addItemIdentifier(Locator identifier) {
     if (itemIdentifiers == null) {
       itemIdentifiers = new HashSet<>();
     }
@@ -23,7 +23,7 @@ public class IMConstructSupport implements ConstructSupport {
   }
 
   @Override
-  public void removeItemIdentifier(Locator identifier) {
+  public final void removeItemIdentifier(Locator identifier) {
     if (itemIdentifiers != null) {
       itemIdentifiers.remove(identifier);
     }

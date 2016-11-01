@@ -22,7 +22,7 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
   }
 
   @Override
-  public void addTheme(Topic theme) {
+  public final void addTheme(Topic theme) {
     HyperGraph graph = getGraph();
     final HGHandle scopedHandle = getHandle(graph, this);
     final HGHandle themeHandle = getHandle(graph, theme);
@@ -35,7 +35,7 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
 
   @HGIgnore
   @Override
-  public Set<Topic> getScope() {
+  public final Set<Topic> getScope() {
     HyperGraph graph = getGraph();
     final HGHandle handle = getHandle(graph, this);
     return handle == null ? null
@@ -44,7 +44,7 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
   }
 
   @Override
-  public void removeTheme(Topic theme) {
+  public final void removeTheme(Topic theme) {
     HyperGraph graph = getGraph();
     HGHandle rel = hg.findOne(graph, hg.and(hg.type(HGTM.hScopeOf),
         hg.orderedLink(getHandle(graph, this), getHandle(graph, theme))));
