@@ -32,10 +32,8 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   TopicMapImpl topicMap;
 
   static AtomicLong counter = new AtomicLong();
-  Map<Class<?>, Index> indexes = new LinkedHashMap<>();
 
-  IMTopicMapSupport() {
-  }
+  IMTopicMapSupport() {}
 
   @Override
   public Set<Topic> getTopics() {
@@ -79,22 +77,18 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
 
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
-    Index index = indexes.get(type);
-    if (index == null) {
-      if (LiteralIndex.class.isAssignableFrom(type)) {
-        index = topicMap.registerListener(new LiteralIndexImpl());
-      } else if (IdentifierIndex.class.isAssignableFrom(type)) {
-        index = topicMap
-            .registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
-      } else if (ScopedIndex.class.isAssignableFrom(type)) {
-        index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
-      } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-        index =
-            topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
-      } else {
-        throw new UnsupportedOperationException("Unknown index " + type);
-      }
-      indexes.put(type, index);
+    Index index;
+    if (LiteralIndex.class.isAssignableFrom(type)) {
+      index = topicMap.registerListener(new LiteralIndexImpl());
+    } else if (IdentifierIndex.class.isAssignableFrom(type)) {
+      index =
+          topicMap.registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
+    } else if (ScopedIndex.class.isAssignableFrom(type)) {
+      index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
+    } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
+      index = topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
+    } else {
+      throw new UnsupportedOperationException("Unknown index " + type);
     }
     return (I) index;
   }
@@ -112,5 +106,5 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   @Override
   public void setOwner(TopicMapImpl owner) {
     this.topicMap = owner;
-  }  
+  }
 }

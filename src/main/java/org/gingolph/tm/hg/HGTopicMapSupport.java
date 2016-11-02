@@ -34,7 +34,6 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   private TopicMapSystemSupport parent;
   private transient HyperGraph graph;
-  private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();
 
   public HGTopicMapSupport() {}
 
@@ -45,9 +44,9 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   @Override
   public void setOwner(TopicMapImpl owner) {
-      this.owner = owner;
+    this.owner = owner;
   }
-  
+
   @Override
   protected TopicMapImpl createOwner() {
     boolean autoMerge;
@@ -136,21 +135,18 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
-    Index index = indexes.get(type);
-    if (index == null) {
-      if (LiteralIndex.class.isAssignableFrom(type)) {
-        index = new HGLiteralIndex(graph);
-      } else if (IdentifierIndex.class.isAssignableFrom(type)) {
-        index = ((TopicMapImpl) owner)
-            .registerListener(new IdentifierIndex(getOwner(), getTopics(), getAssociations()));
-      } else if (ScopedIndex.class.isAssignableFrom(type)) {
-        index = new HGScopedIndex(graph);
-      } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-        index = new HGTypeInstanceIndex(graph);
-      } else {
-        throw new UnsupportedOperationException("Unknown index " + type);
-      }
-      indexes.put(type, index);
+    Index index;
+    if (LiteralIndex.class.isAssignableFrom(type)) {
+      index = new HGLiteralIndex(graph);
+    } else if (IdentifierIndex.class.isAssignableFrom(type)) {
+      index = ((TopicMapImpl) owner)
+          .registerListener(new IdentifierIndex(getOwner(), getTopics(), getAssociations()));
+    } else if (ScopedIndex.class.isAssignableFrom(type)) {
+      index = new HGScopedIndex(graph);
+    } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
+      index = new HGTypeInstanceIndex(graph);
+    } else {
+      throw new UnsupportedOperationException("Unknown index " + type);
     }
     return (I) index;
   }

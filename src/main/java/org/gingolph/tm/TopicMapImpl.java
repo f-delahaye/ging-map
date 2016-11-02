@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import org.gingolph.tm.event.TopicMapEventListener;
+import org.gingolph.tm.hg.index.HGLiteralIndex;
+import org.gingolph.tm.hg.index.HGScopedIndex;
+import org.gingolph.tm.hg.index.HGTypeInstanceIndex;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
@@ -19,6 +24,9 @@ import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.TopicMap;
 import org.tmapi.index.Index;
+import org.tmapi.index.LiteralIndex;
+import org.tmapi.index.ScopedIndex;
+import org.tmapi.index.TypeInstanceIndex;
 
 
 public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
@@ -29,6 +37,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private final boolean autoMerge;
   private String id;
   private final ConstructSupportFactory supportFactory;
+  private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
 
   private Locator baseLocator;
 
@@ -248,7 +257,12 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
-    return support.getIndex(type);
+    I index = (I) indexes.get(type);
+    if (index == null) {
+      index = support.getIndex(type);
+      indexes.put(type, index);
+    }
+    return index;
   }
 
   @Override

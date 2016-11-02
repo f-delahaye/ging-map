@@ -73,8 +73,8 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
   }
 
   protected final void doRemove() {
-    getTopicMap().notifyListeners(listener -> listener.onConstructRemoved(this));
     getItemIdentifiers().forEach(identifier -> removeItemIdentifier(identifier));
+    getTopicMap().notifyListeners(listener -> listener.onConstructRemoved(this));
     customRemove();
   }
 
