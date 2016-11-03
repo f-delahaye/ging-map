@@ -477,10 +477,10 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
 
     if (merge) {
+      getParent().removeTopic(otherTopic);
       // Change otherTopic's data so from now on it will be the same as topic ...
       // (e.g. 2 names whose types are resp. this and other will be deemed identical which is what
       // we want)
-      otherTopic.doRemove();
       otherTopic.support = this.support;
     }
 

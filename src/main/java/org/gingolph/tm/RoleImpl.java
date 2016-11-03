@@ -20,7 +20,8 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
 
   @Override
   public void customRemove() {
-    ((TopicImpl) getPlayer()).getSupport().removeRolePlayed(this);
+    TopicImpl player = (TopicImpl) getPlayer();
+    player.getSupport().removeRolePlayed(this);
     getParent().removeRole(this);
   }
 
