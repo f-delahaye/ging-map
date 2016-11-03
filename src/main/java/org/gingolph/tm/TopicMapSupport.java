@@ -41,4 +41,13 @@ public interface TopicMapSupport extends ConstructSupport {
   public String generateId(AbstractConstruct construct);
 
   Locator createLocator(String value);
+  
+  /**
+   * Returns the topicmap's base locator
+   * 
+   * @return
+   */
+  public Locator getBaseLocator();
+
+  public void setBaseLocator(Locator locator);  
 }

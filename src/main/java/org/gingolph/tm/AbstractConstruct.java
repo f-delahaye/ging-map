@@ -74,8 +74,8 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
   }
 
   protected final void doRemove() {
-    new ArrayList<>(getItemIdentifiers()).forEach(identifier -> removeItemIdentifier(identifier));
     getTopicMap().notifyListeners(listener -> listener.onConstructRemoved(this));
+    new ArrayList<>(getItemIdentifiers()).forEach(identifier -> removeItemIdentifier(identifier));
     customRemove();
   }
 
@@ -92,6 +92,5 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
   }
   
   protected abstract boolean equalTo(Object otherObjectOfSameClass);
-  
   
 }

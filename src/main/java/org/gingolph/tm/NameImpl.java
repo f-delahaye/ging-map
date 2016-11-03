@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -178,6 +179,27 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
     return getTopicMap().getEquality().equals(this, (NameImpl)otherObjectOfSameClass);
   }
 
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getValue());
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Name && equals((Name) other);
+  }
+
+  protected boolean equals(Name other) {
+    return equalsNoParent(other) && getParent().equals(other.getParent());
+  }
+
+  // specific method to be called when we know for sure (or don't care that) other.parent = this.parent
+  protected boolean equalsNoParent(Name other) {
+    return getValue().equals(other.getValue()) && getType().equals(other.getType())
+        && getScope().equals(other.getScope());    
+  }
+  
   void importIn(Name otherName, boolean merge) {
     Collection<Variant> otherVariants = otherName.getVariants();
     otherVariants.forEach(otherVariant -> createVariant(otherVariant.getValue(),
@@ -191,5 +213,10 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
     if (merge) {
       otherName.remove();
     }
+  }
+  
+  @Override
+  public String toString() {
+    return "[value="+getValue()+"], [variants="+getVariants()+"], type="+getType();
   }
 }

@@ -1,7 +1,9 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.ScopedSupport;
 import org.tmapi.core.Topic;
 
@@ -12,7 +14,7 @@ public class IMScopedSupport extends IMConstructSupport implements ScopedSupport
 
   protected Set<Topic> nullSafeScope() {
     if (scope == null) {
-      scope = new HashSet<>();
+      scope = new ArraySet<>(Objects::equals);
     }
     return scope;
   }

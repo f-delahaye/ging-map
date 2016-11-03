@@ -2,8 +2,9 @@ package org.gingolph.tm.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
+
 import org.gingolph.tm.TypedConstruct;
 import org.tmapi.core.Association;
 import org.tmapi.core.Name;
@@ -15,11 +16,11 @@ import org.tmapi.index.TypeInstanceIndex;
 
 public final class TypeInstanceIndexImpl extends AbstractIndex implements TypeInstanceIndex {
 
-  Map<Topic, Collection<Topic>> topicsByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Association>> associationsByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Role>> rolesByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Occurrence>> occurrencesByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Name>> namesByTypes = new LinkedHashMap<>();
+  Map<Topic, Collection<Topic>> topicsByTypes = new IdentityHashMap<>();
+  Map<Topic, Collection<Association>> associationsByTypes = new IdentityHashMap<>();
+  Map<Topic, Collection<Role>> rolesByTypes = new IdentityHashMap<>();
+  Map<Topic, Collection<Occurrence>> occurrencesByTypes = new IdentityHashMap<>();
+  Map<Topic, Collection<Name>> namesByTypes = new IdentityHashMap<>();
 
   public TypeInstanceIndexImpl(Collection<Topic> topics, Collection<Association> associations) {
     topics.forEach(topic -> {

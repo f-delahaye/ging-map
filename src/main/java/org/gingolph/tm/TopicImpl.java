@@ -145,7 +145,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (identifier == null) {
       throw new ModelConstraintException(this, "Null identifier not allowed");
     }
-    Topic existingTopic = topicMap.getTopicBySubjectIdentifier(identifier);
+    TopicImpl existingTopic = (TopicImpl) topicMap.getTopicBySubjectIdentifier(identifier);
 
     if (existingTopic != null) {
       if (!existingTopic.equals(this)) {
@@ -154,17 +154,17 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
           return;
         } else {
           throw new IdentityConstraintException(this, existingTopic, identifier,
-              "Duplicate item identifiers not allowed");
+              "Duplicate subject identifiers not allowed:"+identifier);
         }
       }
     }
 
-    Construct existingItemIdentifier = topicMap.getConstructByItemIdentifier(identifier);
+    TopicMapItem<?,?> existingItemIdentifier = (TopicMapItem<?, ?>) topicMap.getConstructByItemIdentifier(identifier);
     if (existingItemIdentifier == null || this.equals(existingItemIdentifier)) {
       importSubjectIdentifier(identifier);
-    } else if (existingItemIdentifier instanceof Topic) {
+    } else if (existingItemIdentifier instanceof TopicImpl) {
       if (isAutoMerge(topicMap)) {
-        this.mergeIn((Topic) existingItemIdentifier);
+        this.mergeIn((TopicImpl) existingItemIdentifier);
       } else {
         throw new IdentityConstraintException(this, existingItemIdentifier, identifier,
             "Identifier is already used as an item identifier");
@@ -432,9 +432,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (getTopicMap() != other.getTopicMap()) {
       throw new ModelConstraintException(this, "Different topic maps not allowed");
     }
-    if (getReified() != null && other.getReified() != null
-        && !getReified().equals(other.getReified())) {
-      throw new ModelConstraintException(this, "Different reified not allowed");
+    if (getReified() != null && other.getReified() != null && !getReified().equals(other.getReified())) {
+        throw new ModelConstraintException(this, "Different reified not allowed");
     }
     if (!this.equals(other)) {
       importIn(other, true);
@@ -459,20 +458,16 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     final Collection<Role> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
     // and work off otherTopic's actual data to do the actual merging.
-    otherNames.forEach(otherName -> {
-      Optional<Name> sameName =
-          getNames().stream().filter(name -> name.equals(otherName)).findFirst();
-      NameImpl mergee = (NameImpl) (sameName.isPresent() ? sameName.get()
-          : createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
-      mergee.importIn(otherName, merge);
+    otherNames.stream().forEach(otherName -> {
+      Optional<Name> equivalentName = 
+          getNames().stream().filter(name -> name.equals(otherName)).findAny();
+      Name mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
+      ((NameImpl)mergee).importIn(otherName, merge);
     });
-    otherOccurrences.forEach(otherOccurrence -> {
-      Optional<Occurrence> sameOccurrence = getOccurrences().stream()
-          .filter(occurrence -> occurrence.equals(otherOccurrence)).findFirst();
-      OccurrenceImpl mergee = (OccurrenceImpl) (sameOccurrence.isPresent() ? sameOccurrence.get()
-          : createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),
-              otherOccurrence.getScope()));
-      mergee.importIn(otherOccurrence, merge);
+    otherOccurrences.stream().forEach(otherOccurrence -> {
+      Optional<Occurrence> equivalentOccurrence = getOccurrences().stream().filter(occurrence -> occurrence.equals(otherOccurrence)).findAny();
+      Occurrence mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
+      ((OccurrenceImpl) mergee).importIn(otherOccurrence, merge);
     });
 
 
@@ -485,28 +480,84 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     }
 
     if (otherRolesPlayed != null) {
-      otherRolesPlayed.stream().map(role -> role.getParent()).forEach(otherAssociation -> {
-        Optional<Association> sameAssociation =
-            getRolesPlayed().stream().map(role -> role.getParent())
-                .filter(association -> association.equals(otherAssociation)).findFirst();
-        AssociationImpl mergee =
-            (AssociationImpl) (sameAssociation.isPresent() ? sameAssociation.get()
-                : getParent().createAssociation(otherAssociation.getType(),
-                    otherAssociation.getScope()));
-        mergee.importIn((AssociationImpl) otherAssociation, merge);
+      otherRolesPlayed.stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association).forEach(otherAssociation -> {
+        Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation);
+        AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
+        mergee.importIn(otherAssociation, merge);
       });
     }
-  }
-
-  @Override
-  public int hashCode() {
-    return getId().hashCode();
   }
 
   @Override
   protected boolean equalTo(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
+  
+  @Override
+  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association) {
+//    getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
+//    .filter(association -> association.equals(otherAssociation)).findAny();
+    for (Role role: rolesPlayed) {
+      AssociationImpl candidate = (AssociationImpl) role.getParent();
+      if (candidate.equals(association)) {
+        return Optional.of(candidate);
+      }
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public String toString() {
+    return "[identifiers="+getItemIdentifiers()+"]";
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException();
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof TopicImpl && equals((TopicImpl)other);
+  }
+    
+  protected boolean equals(Topic otherItem) {
+    if (!(otherItem instanceof TopicImpl)) {
+      return false;
+    }
+    TopicImpl otherTopic = (TopicImpl) otherItem;
+    if (otherTopic.getId().equals(this.getId())) {
+      return true;
+    }
+    // Optimization:
+    // If automerge, 2 topics which are equals would have been merged and the above test would have
+    // returned true
+    // commented out: what if equals is called when trying to merge?? 2 Topics may be equals but may
+    // not have been merged yet ...
+    // if (isAutoMerge(getTopicMap())) {
+    // return false;
+    // }
+    final Collection<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
+    final Collection<Locator> subjectLocators = support.getSubjectLocators();
+    final Collection<Locator> itemIdentifiers = support.getItemIdentifiers();
+
+    return subjectIdentifiers != null
+        && subjectIdentifiers.stream()
+            .anyMatch(identifier -> otherTopic.getSubjectIdentifiers().contains(identifier)
+                || otherTopic.getItemIdentifiers().contains(identifier))
+        || subjectLocators != null && subjectLocators.stream()
+            .anyMatch(identifier -> otherTopic.getSubjectLocators().contains(identifier))
+        || itemIdentifiers != null && (itemIdentifiers.stream()
+            .anyMatch(identifier -> otherTopic.getItemIdentifiers().contains(identifier))
+            || otherTopic.getSubjectIdentifiers().stream()
+                .anyMatch(identifier -> itemIdentifiers.contains(identifier)));
+  }
+
+  public boolean matches(TopicImpl otherTopic) {
+    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())
+        && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences());
+  }
+
   
   @Override
   public Reifiable getReified() {

@@ -1,7 +1,9 @@
 package org.gingolph.tm.hg;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
 import org.gingolph.tm.ConstructSupport;
 import org.gingolph.tm.AbstractConstruct;
 import org.hypergraphdb.HGGraphHolder;
@@ -23,7 +25,7 @@ public abstract class HGConstructSupport<T extends Construct>
   // Owner used to be passed in the constructor.
   // Its now set directly by Topic/association/role support when their callback method setOwner is invoked
   @HGIgnore
-  T owner;
+  transient T owner;
 
   @HGIgnore
   transient HyperGraph hyperGraph;
@@ -58,7 +60,7 @@ public abstract class HGConstructSupport<T extends Construct>
     HyperGraph graph = getGraph();
     final HGHandle handle = graph.getHandle(this);
     return handle == null ? null
-        : HGTMUtil.getRelatedObjects(graph, HGTM.hItemIdentifier, null, handle);
+        : new HashSet<>(HGTMUtil.getRelatedObjects(graph, HGTM.hItemIdentifier, null, handle));
   }
 
   @Override

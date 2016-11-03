@@ -1,13 +1,13 @@
 package org.gingolph.tm.hg;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import org.gingolph.tm.AbstractTopicMapSystemFactory;
-import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AbstractConstruct;
+import org.gingolph.tm.AbstractTopicMapSystemFactory;
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -32,19 +32,16 @@ import org.tmapi.index.TypeInstanceIndex;
 
 public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implements TopicMapSupport {
 
+  private Locator baseLocator;
   private TopicMapSystemSupport parent;
   private transient HyperGraph graph;
 
   public HGTopicMapSupport() {}
 
-  public HGTopicMapSupport(HyperGraph graph, TopicMapSystemSupport parent) {
+  public HGTopicMapSupport(TopicMapImpl topicMap, HyperGraph graph, TopicMapSystemSupport parent) {
+    super(topicMap);
     this.graph = graph;
     this.parent = parent;
-  }
-
-  @Override
-  public void setOwner(TopicMapImpl owner) {
-    this.owner = owner;
   }
 
   @Override
@@ -85,17 +82,25 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
+  public Locator getBaseLocator() {
+    return baseLocator;
+  }
+
+  @Override
+  public void setBaseLocator(Locator locator) {
+    this.baseLocator = locator;
+  }
+
+  @Override
   public Set<Association> getAssociations() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections.unmodifiableSet(
-        HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle));
+    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle), Objects::equals);
   }
 
   @Override
   public Set<Topic> getTopics() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections
-        .unmodifiableSet(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle));
+    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle), Objects::equals);
   }
 
   @HGIgnore
@@ -131,6 +136,11 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
     if (handle != null) {
       graph.remove(handle, false);
     }
+  }
+
+  @Override
+  public void setOwner(TopicMapImpl owner) {
+    this.owner = owner;
   }
 
   @Override

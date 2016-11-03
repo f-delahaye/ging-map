@@ -3,6 +3,8 @@ package org.gingolph.tm;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
+
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
@@ -27,7 +29,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    HashSet<Topic> scope = new HashSet<>();
+    Set<Topic> scope = new ArraySet<>(Objects::equals, true);
     scope.addAll(ScopedHelper.getScope(getParent().getScope()));
     scope.addAll(ScopedHelper.getScope(support.getScope()));
     return scope;
@@ -65,6 +67,26 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   @Override
   protected boolean equalTo(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (VariantImpl)otherObjectOfSameClass);
+  }
+  
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getValue());
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Variant && equals((Variant) other);
+  }
+
+  protected boolean equals(Variant other) {
+    return equalsNoParent(other) && getParent().equals(other.getParent());
+  }
+  
+  protected boolean equalsNoParent(Variant other) {
+    return getValue().equals(other.getValue()) && getDatatype().equals(other.getDatatype())
+        && getScope().equals(other.getScope());
   }
   
 }

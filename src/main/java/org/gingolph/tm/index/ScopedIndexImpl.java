@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Association;
 import org.tmapi.core.Name;
@@ -149,7 +150,7 @@ public final class ScopedIndexImpl extends AbstractIndex
 
   private static class Scope<T extends Scoped> {
     List<T> unscopeds;
-    Map<Topic, Collection<T>> themesToScopeds = new LinkedHashMap<>();
+    Map<Topic, Collection<T>> themesToScopeds = new IdentityHashMap<>();
 
     public void addUnscoped(T unscoped) {
       if (unscopeds == null) {

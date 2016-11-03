@@ -1,10 +1,11 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
+import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
@@ -12,7 +13,7 @@ import org.tmapi.core.Topic;
 
 public class IMAssociationSupport extends IMScopedSupport implements AssociationSupport {
   private Topic type;
-  private final Set<Role> roles = new HashSet<>();
+  private final Set<Role> roles = new ArraySet<>(RoleImpl::equalsNoParent);
   private TopicImpl reifier;
 
   @Override

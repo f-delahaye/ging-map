@@ -3,9 +3,12 @@ package org.gingolph.tm.memory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.tmapi.core.Locator;
@@ -75,7 +78,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   @Override
   public void addName(NameImpl name) {
     if (names == null) {
-      names = new HashSet<>();
+      names = new ArraySet<>(Objects::equals);
     }
     names.add(name);
   }
@@ -95,7 +98,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   @Override
   public void addOccurrence(Occurrence occurrence) {
     if (occurrences == null) {
-      occurrences = new HashSet<>();
+      occurrences = new ArraySet<>(Objects::equals);
     }
     occurrences.add(occurrence);
   }
@@ -140,13 +143,13 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
     // For better performance, we could use Guava's immutable set instead
     // TODO if we create a new HashSet here, we no longer need to wrap result of this method in
     // Collections.unmodifiableSet
-    return roles == null ? null : new HashSet<>(roles);
+    return roles == null ? null : new ArraySet<>(roles, RoleImpl::equalsNoParent);
   }
 
   @Override
   public void addType(Topic type) {
     if (types == null) {
-      types = new HashSet<>();
+      types = new ArraySet<>(Objects::equals);
     }
     types.add(type);
   }

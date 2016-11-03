@@ -1,8 +1,10 @@
 package org.gingolph.tm.hg;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
@@ -15,9 +17,22 @@ import org.tmapi.core.Variant;
 
 public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport {
 
+  private static final long serialVersionUID = 1L;
+  
   String value;
 
+  // For compliance with Javabeans standard (which allows NameSupport to be persisted as a
+  // JavabeansType)
   protected HGNameSupport() {}
+
+  public HGNameSupport(Name name) {
+    super(name);
+  }
+  
+  @Override
+  public void setOwner(NameImpl owner) {
+      this.owner = owner;
+  }
 
   @Override
   public void addVariant(Variant v) {
@@ -33,7 +48,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public TopicImpl getReifier() {
+  public Topic getReifier() {
     final HGHandle handle = getHandle(hyperGraph, this);
     HGHandle h = HGTMUtil.getReifierOf(hyperGraph, handle);
     return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
@@ -62,8 +77,8 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   public Set<Variant> getVariants() {
     final HGHandle handle = getHandle(hyperGraph, this);
     return handle == null ? null
-        : HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
-            .stream().map(support -> support.getOwner()).collect(Collectors.toSet());
+        : new ArraySet<>(HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
+            .stream().map(support -> support.getOwner()).collect(Collectors.toList()), Objects::equals);
   }
 
   @HGIgnore
@@ -94,9 +109,4 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
     name.setSupport(this);
     return name;
   }
-  
-  @Override
-  public void setOwner(NameImpl owner) {
-      this.owner = owner;
-  }  
 }

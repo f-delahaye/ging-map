@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.event.TopicMapEventListenerSupport;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
@@ -70,7 +72,7 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
       return propertiedObjects.stream().filter(propertiedObject -> propertiesSource
           .apply(propertiedObject).containsAll(remainingProperties)).collect(Collectors.toList());
     } else {
-      Set<T> propertiedObjects = new HashSet<>();
+      Set<T> propertiedObjects = new ArraySet<>(Objects::equals);
       for (Topic theme : properties) {
         propertiedObjects.addAll(cache.getOrDefault(theme, Collections.emptyList()));
       }

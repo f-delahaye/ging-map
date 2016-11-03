@@ -20,8 +20,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
 
   @Override
   public void customRemove() {
-    TopicImpl player = (TopicImpl) getPlayer();
-    player.getSupport().removeRolePlayed(this);
+    ((TopicImpl) getPlayer()).getSupport().removeRolePlayed(this);
     getParent().removeRole(this);
   }
 
@@ -76,15 +75,30 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public int hashCode() {
-    return getId().hashCode();
-  }
-
-  @Override
   protected boolean equalTo(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (RoleImpl)otherObjectOfSameClass);
   }
 
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Role && equals((Role) other);
+  }
+  
+  protected boolean equals(Role otherRole) {
+//    return this == otherRole || getId().equals(otherRole.getId());
+    return getParent().equals(otherRole.getParent()) && equalsNoParent(this, otherRole);
+  }
+
+  // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
+  public static boolean equalsNoParent(Role role, Role otherRole) {
+    return role.getPlayer().equals(otherRole.getPlayer()) && role.getType().equals(otherRole.getType());    
+  }
+
+  @Override
+  public String toString() {
+    return "[type="+getType()+", player="+getPlayer()+"]";
+  }
+  
   protected void importIn(Role otherRole, boolean merge) {
     this.id = otherRole.getId();
     otherRole.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));

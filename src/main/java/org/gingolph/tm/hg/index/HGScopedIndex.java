@@ -3,11 +3,13 @@ package org.gingolph.tm.hg.index;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.hg.HGAssociationSupport;
@@ -166,7 +168,7 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     if (theme == null) {
       throw new IllegalArgumentException("Null scope not allowed");
     }
-    Set<Variant> allVariants = new HashSet<>();
+    Set<Variant> allVariants = new ArraySet<>(Objects::equals, true);
     allVariants.addAll(getScoped(theme, HGVariantSupport.class));
     allVariants.addAll(getScoped(theme, HGNameSupport.class).stream()
         .flatMap(name -> name.getVariants().stream()).collect(Collectors.toList()));
@@ -178,13 +180,13 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     Collection<Variant> allVariants = new ArrayList<>();
     allVariants.addAll(getScoped(themes, false, HGVariantSupport.class));
     allVariants.addAll(getScoped(themes, false, HGNameSupport.class).stream()
-        .flatMap(name -> name.getVariants().stream()).collect(Collectors.toSet()));
+        .flatMap(name -> name.getVariants().stream()).collect(Collectors.toList()));
     return matchAll ? filterMatchAll(allVariants, themes) : allVariants;
   }
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    Set<Topic> allThemes = new HashSet<>();
+    Set<Topic> allThemes = new ArraySet<>(Objects::equals, true);
     allThemes.addAll(getScopedThemes(HGVariantSupport.class));
     allThemes.addAll(getScopedThemes(HGNameSupport.class));
     return allThemes;
