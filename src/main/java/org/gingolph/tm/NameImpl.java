@@ -174,13 +174,8 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Name && equals((Name) other);
-  }
-
-  protected boolean equals(Name other) {
-    return getValue().equals(other.getValue()) && getType().equals(other.getType())
-        && getParent().equals(other.getParent()) && getScope().equals(other.getScope());
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (NameImpl)otherObjectOfSameClass);
   }
 
   void importIn(Name otherName, boolean merge) {

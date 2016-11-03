@@ -72,14 +72,8 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Occurrence && equals((Occurrence) other);
-  }
-
-  protected boolean equals(Occurrence other) {
-    return getValue().equals(other.getValue()) && getDatatype().equals(other.getDatatype())
-        && getType().equals(other.getType()) && getParent().equals(other.getParent())
-        && getScope().equals(other.getScope());
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (OccurrenceImpl)otherObjectOfSameClass);
   }
 
   void importIn(Occurrence otherOccurrence, boolean merge) {

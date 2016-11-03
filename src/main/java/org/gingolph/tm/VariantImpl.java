@@ -61,4 +61,10 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
+  
+  @Override
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (VariantImpl)otherObjectOfSameClass);
+  }
+  
 }

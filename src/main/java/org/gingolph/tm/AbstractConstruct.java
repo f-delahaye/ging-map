@@ -80,4 +80,18 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
   }
 
   protected abstract void customRemove();
+  
+  public final boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj.getClass() != getClass()) {
+      return false;
+    }
+    return equalTo(obj);
+  }
+  
+  protected abstract boolean equalTo(Object otherObjectOfSameClass);
+  
+  
 }

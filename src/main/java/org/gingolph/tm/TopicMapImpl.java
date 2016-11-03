@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.gingolph.tm.equality.Equality;
+import org.gingolph.tm.equality.GingolphEquality;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
@@ -32,7 +34,8 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
-
+  private Equality equality = new GingolphEquality();
+  
   private Locator baseLocator;
 
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
@@ -333,4 +336,14 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   VariantSupport createVariantSupport() {
     return supportFactory.createVariantSupport();
   }
+  
+  Equality getEquality() {
+    return equality;
+  }
+  
+  @Override
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return this == otherObjectOfSameClass;
+  }
+  
 }

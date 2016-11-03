@@ -504,38 +504,10 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (!(other instanceof Topic)) {
-      return false;
-    }
-    Topic otherTopic = (Topic) other;
-    if (otherTopic.getId().equals(this.getId())) {
-      return true;
-    }
-    // Optimization:
-    // If automerge, 2 topics which are equals would have been merged and the above test would have
-    // returned true
-    // commented out: what if equals is called when trying to merge?? 2 Topics may be equals but may
-    // not have been merged yet ...
-    // if (isAutoMerge(getTopicMap())) {
-    // return false;
-    // }
-    final Collection<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
-    final Collection<Locator> subjectLocators = support.getSubjectLocators();
-    final Collection<Locator> itemIdentifiers = support.getItemIdentifiers();
-
-    return subjectIdentifiers != null
-        && subjectIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectIdentifiers().contains(identifier)
-                || otherTopic.getItemIdentifiers().contains(identifier))
-        || subjectLocators != null && subjectLocators.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectLocators().contains(identifier))
-        || itemIdentifiers != null && (itemIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getItemIdentifiers().contains(identifier))
-            || otherTopic.getSubjectIdentifiers().stream()
-                .anyMatch(identifier -> itemIdentifiers.contains(identifier)));
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
-
+  
   @Override
   public Reifiable getReified() {
     return support.getReified();

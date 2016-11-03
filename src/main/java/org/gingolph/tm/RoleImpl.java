@@ -81,17 +81,8 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Role && equals((Role) other);
-  }
-
-  // According to the TopicMap specs, roles are deemed equals if they have the same player, type and
-  // parent.
-  // But I can't see how TestTopic.testRoleAssociationFilter can work with that (role1 and role2
-  // have the same player, type and parent so getRolesPlayed(), which returns a set, should haved 1
-  // item, not 2)
-  protected boolean equals(Role otherRole) {
-    return this == otherRole || getId().equals(otherRole.getId());
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (RoleImpl)otherObjectOfSameClass);
   }
 
   protected void importIn(Role otherRole, boolean merge) {

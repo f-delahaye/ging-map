@@ -120,20 +120,9 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Association && equals((Association) other);
+  protected boolean equalTo(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (AssociationImpl)otherObjectOfSameClass);
   }
-
-  protected boolean equals(Association other) {
-    return getType().equals(other.getType()) && getScope().equals(other.getScope())
-        && equals(getRoles(), other.getRoles());
-  }
-
-  protected boolean equals(Collection<Role> roles, Collection<Role> otherRoles) {
-    return roles.stream().noneMatch(
-        (role) -> (!otherRoles.stream().anyMatch((otherRole) -> equals(role, otherRole))));
-  }
-
 
   void importIn(AssociationImpl otherAssociation, boolean merge) {
     final Collection<Role> otherRoles = new ArrayList<>(otherAssociation.getRoles());
@@ -150,10 +139,5 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     } else if (otherReifier != null) {
       getReifier().mergeIn(otherReifier);
     }
-  }
-
-  private boolean equals(Role role, Role otherRole) {
-    return role.getType().equals(otherRole.getType())
-        && role.getPlayer().equals(otherRole.getPlayer());
   }
 }
