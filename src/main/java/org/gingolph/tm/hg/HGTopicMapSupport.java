@@ -38,8 +38,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   public HGTopicMapSupport() {}
 
-  public HGTopicMapSupport(TopicMapImpl topicMap, HyperGraph graph, TopicMapSystemSupport parent) {
-    super(topicMap);
+  public HGTopicMapSupport(HyperGraph graph, TopicMapSystemSupport parent) {
     this.graph = graph;
     this.parent = parent;
   }

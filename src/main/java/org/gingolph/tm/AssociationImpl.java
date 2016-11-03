@@ -133,12 +133,6 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 //    return getType().getId().hashCode();
 //  }
 
-  // TODO: merge conflicts. Check if GingolphEquality uses the same logic, else move below in SAMEquality.
-  @Override
-  public boolean equals(Object other) {
-    return getType().equals(otherAssociation.getType()) && getScope().equals(otherAssociation.getScope()) && getRoles().equals(otherAssociation.getRoles()); 
-  }
-
   public String toString() {
     return "[type="+getType()+", roles="+getRoles()+"]";
   }
@@ -160,4 +154,3 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     }
   }
 }
-s

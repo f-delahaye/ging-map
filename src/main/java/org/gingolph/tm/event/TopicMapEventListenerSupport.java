@@ -7,7 +7,6 @@ import org.tmapi.core.Locator;
 import org.tmapi.core.Scoped;
 import org.tmapi.core.Topic;
 
-
 public class TopicMapEventListenerSupport implements TopicMapEventListener {
 
   @Override

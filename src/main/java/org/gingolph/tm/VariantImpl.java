@@ -74,19 +74,4 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   public int hashCode() {
     return Objects.hashCode(getValue());
   }
-  
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof Variant && equals((Variant) other);
-  }
-
-  protected boolean equals(Variant other) {
-    return equalsNoParent(other) && getParent().equals(other.getParent());
-  }
-  
-  protected boolean equalsNoParent(Variant other) {
-    return getValue().equals(other.getValue()) && getDatatype().equals(other.getDatatype())
-        && getScope().equals(other.getScope());
-  }
-  
 }

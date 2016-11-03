@@ -80,21 +80,6 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Role && equals((Role) other);
-  }
-  
-  protected boolean equals(Role otherRole) {
-//    return this == otherRole || getId().equals(otherRole.getId());
-    return getParent().equals(otherRole.getParent()) && equalsNoParent(this, otherRole);
-  }
-
-  // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
-  public static boolean equalsNoParent(Role role, Role otherRole) {
-    return role.getPlayer().equals(otherRole.getPlayer()) && role.getType().equals(otherRole.getType());    
-  }
-
-  @Override
   public String toString() {
     return "[type="+getType()+", player="+getPlayer()+"]";
   }

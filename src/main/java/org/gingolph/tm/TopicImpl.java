@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.tmapi.core.Association;
+
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -493,7 +493,6 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
   
-  @Override
   private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association) {
 //    getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
 //    .filter(association -> association.equals(otherAssociation)).findAny();
@@ -515,48 +514,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   public int hashCode() {
     throw new UnsupportedOperationException();
   }
-  
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof TopicImpl && equals((TopicImpl)other);
-  }
-    
-  protected boolean equals(Topic otherItem) {
-    if (!(otherItem instanceof TopicImpl)) {
-      return false;
-    }
-    TopicImpl otherTopic = (TopicImpl) otherItem;
-    if (otherTopic.getId().equals(this.getId())) {
-      return true;
-    }
-    // Optimization:
-    // If automerge, 2 topics which are equals would have been merged and the above test would have
-    // returned true
-    // commented out: what if equals is called when trying to merge?? 2 Topics may be equals but may
-    // not have been merged yet ...
-    // if (isAutoMerge(getTopicMap())) {
-    // return false;
-    // }
-    final Collection<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
-    final Collection<Locator> subjectLocators = support.getSubjectLocators();
-    final Collection<Locator> itemIdentifiers = support.getItemIdentifiers();
 
-    return subjectIdentifiers != null
-        && subjectIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectIdentifiers().contains(identifier)
-                || otherTopic.getItemIdentifiers().contains(identifier))
-        || subjectLocators != null && subjectLocators.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectLocators().contains(identifier))
-        || itemIdentifiers != null && (itemIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getItemIdentifiers().contains(identifier))
-            || otherTopic.getSubjectIdentifiers().stream()
-                .anyMatch(identifier -> itemIdentifiers.contains(identifier)));
-  }
-
-  public boolean matches(TopicImpl otherTopic) {
-    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())
-        && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences());
-  }
+//  public boolean matches(TopicImpl otherTopic) {
+//    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())
+//        && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences());
+//  }
 
   
   @Override

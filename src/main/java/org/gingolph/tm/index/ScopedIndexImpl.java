@@ -17,7 +17,6 @@ import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 import org.tmapi.index.ScopedIndex;
 
-
 public final class ScopedIndexImpl extends AbstractIndex
     implements ScopedIndex, TopicMapEventListener {
 

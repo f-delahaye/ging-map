@@ -7,7 +7,6 @@ import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.ScopedSupport;
 import org.tmapi.core.Topic;
 
-
 public class IMScopedSupport extends IMConstructSupport implements ScopedSupport {
 
   private Set<Topic> scope;

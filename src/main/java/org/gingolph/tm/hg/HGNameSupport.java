@@ -24,10 +24,6 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   // For compliance with Javabeans standard (which allows NameSupport to be persisted as a
   // JavabeansType)
   protected HGNameSupport() {}
-
-  public HGNameSupport(Name name) {
-    super(name);
-  }
   
   @Override
   public void setOwner(NameImpl owner) {
@@ -48,7 +44,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     final HGHandle handle = getHandle(hyperGraph, this);
     HGHandle h = HGTMUtil.getReifierOf(hyperGraph, handle);
     return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;

@@ -42,6 +42,7 @@ import mjson.TopicMapJson;
 
 public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport, TopicSupport, AssociationSupport, RoleSupport, NameSupport, OccurrenceSupport, VariantSupport {
 
+  private static final String BASE_LOCATOR_PP = "locator";
   private static final String SCOPE_PP = "scope";
   private static final String TYPES_PP = "types";
   private static final String TYPE_PP = "type";
@@ -549,6 +550,17 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   @Override
   public void setOwner(TopicMapImpl owner) {
     this.owner = owner;
+  }
+
+  @Override
+  public Locator getBaseLocator() {
+    Json baseLocator = at(BASE_LOCATOR_PP);
+    return baseLocator == null ? null : createLocator(baseLocator.asString());
+  }
+
+  @Override
+  public void setBaseLocator(Locator locator) {
+    set(BASE_LOCATOR_PP, locator.getReference());
   }
   
 }

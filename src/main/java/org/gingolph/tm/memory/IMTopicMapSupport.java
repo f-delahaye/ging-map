@@ -1,14 +1,12 @@
 package org.gingolph.tm.memory;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.LocatorImpl;
-import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
@@ -19,7 +17,6 @@ import org.gingolph.tm.index.TypeInstanceIndexImpl;
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
-import org.tmapi.core.TopicMap;
 import org.tmapi.index.Index;
 import org.tmapi.index.LiteralIndex;
 import org.tmapi.index.ScopedIndex;
@@ -31,11 +28,17 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   Set<Association> associations = new ArraySet<>(Objects::equals);
   TopicImpl reifier;
   TopicMapImpl topicMap;
+  private Locator baseLocator;
 
   static AtomicLong counter = new AtomicLong();
 
   IMTopicMapSupport() {}
 
+  @Override
+  public void setOwner(TopicMapImpl owner) {
+    this.topicMap = owner;
+  }
+  
   @Override
   public Set<Topic> getTopics() {
     return topics;
@@ -105,7 +108,13 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public void setOwner(TopicMapImpl owner) {
-    this.topicMap = owner;
+  public Locator getBaseLocator() {
+    return baseLocator;
   }
+
+  @Override
+  public void setBaseLocator(Locator baseLocator) {
+    this.baseLocator = baseLocator;
+  }
+  
 }

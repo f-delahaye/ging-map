@@ -1,10 +1,10 @@
 package org.gingolph.tm;
 
 import java.util.function.Consumer;
+
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Reifiable;
 import org.tmapi.core.Topic;
-
 
 public class ReifierHelper {
 

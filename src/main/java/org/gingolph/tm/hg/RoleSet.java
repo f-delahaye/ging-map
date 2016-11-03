@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.gingolph.tm.RoleImpl;
+import org.gingolph.tm.equality.SAMEquality;
 import org.hypergraphdb.HyperGraph;
 import org.tmapi.core.Role;
 import org.tmapi.core.TMAPIRuntimeException;
@@ -40,7 +41,7 @@ class RoleSet extends AbstractSet<Role> {
     if (other instanceof RoleImpl) {
       RoleImpl otherRole = (RoleImpl)other;
       for (int i = 0; i < size(); i++) {
-        if (RoleImpl.equalsNoParent(get(i), otherRole)) {
+        if (SAMEquality.equalsNoParent(get(i), otherRole)) {
           return true;
         }
       }

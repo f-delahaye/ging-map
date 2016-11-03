@@ -21,10 +21,6 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
 
   protected HGScopedSupport() {}
 
-  public HGScopedSupport(T owner) {
-    super(owner);
-  }
-
   @Override
   public void addTheme(Topic theme) {
     HyperGraph graph = getGraph();

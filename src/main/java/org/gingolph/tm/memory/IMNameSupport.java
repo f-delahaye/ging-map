@@ -9,7 +9,6 @@ import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
-
 public class IMNameSupport extends IMScopedSupport implements NameSupport {
   private TopicImpl reifier;
   private String value;

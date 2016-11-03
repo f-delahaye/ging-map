@@ -8,9 +8,9 @@ import java.util.Set;
 
 import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.NameImpl;
-import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -143,7 +143,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
     // For better performance, we could use Guava's immutable set instead
     // TODO if we create a new HashSet here, we no longer need to wrap result of this method in
     // Collections.unmodifiableSet
-    return roles == null ? null : new ArraySet<>(roles, RoleImpl::equalsNoParent);
+    return roles == null ? null : new ArraySet<>(roles, SAMEquality::equalsNoParent);
   }
 
   @Override

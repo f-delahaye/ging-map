@@ -9,6 +9,7 @@ import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.equality.SAMEquality;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HGSearchResult;
@@ -31,10 +32,6 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
    * 
    */
   private static final long serialVersionUID = 1L;
-
-  public HGTopicSupport(TopicImpl topic) {
-    super(topic);
-  }
 
   public HGTopicMapSupport getTopicMapSupport() {
     return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
@@ -181,7 +178,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
 
   @Override
   public Set<Role> getRolesPlayed() {
-    Set<Role> result = new ArraySet<Role>(RoleImpl::equalsNoParent);
+    Set<Role> result = new ArraySet<Role>(SAMEquality::equalsNoParent);
     HGSearchResult<HGRoleSupport> rs = null;
     try {
       HyperGraph graph = getGraph();
