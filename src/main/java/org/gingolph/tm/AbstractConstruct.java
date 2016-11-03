@@ -1,5 +1,6 @@
 package org.gingolph.tm;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
   }
 
   protected final void doRemove() {
-    getItemIdentifiers().forEach(identifier -> removeItemIdentifier(identifier));
+    new ArrayList<>(getItemIdentifiers()).forEach(identifier -> removeItemIdentifier(identifier));
     getTopicMap().notifyListeners(listener -> listener.onConstructRemoved(this));
     customRemove();
   }

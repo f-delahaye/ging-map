@@ -113,11 +113,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     Set<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
     if (subjectIdentifiers != null) {
-      subjectIdentifiers.forEach(identifier -> removeSubjectIdentifier(identifier));
+      new ArrayList<>(subjectIdentifiers).forEach(identifier -> removeSubjectIdentifier(identifier));
     }
     Set<Locator> subjectLocators = support.getSubjectLocators();
     if (subjectLocators != null) {
-      subjectLocators.forEach(locator -> removeSubjectLocator(locator));
+      new ArrayList<>(subjectLocators).forEach(locator -> removeSubjectLocator(locator));
     }
     if (getReified() != null) {
       getReified().setReifier(null);

@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.gingolph.tm.event.TopicMapEventListener;
-import org.gingolph.tm.hg.index.HGLiteralIndex;
-import org.gingolph.tm.hg.index.HGScopedIndex;
-import org.gingolph.tm.hg.index.HGTypeInstanceIndex;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
@@ -24,9 +21,6 @@ import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.TopicMap;
 import org.tmapi.index.Index;
-import org.tmapi.index.LiteralIndex;
-import org.tmapi.index.ScopedIndex;
-import org.tmapi.index.TypeInstanceIndex;
 
 
 public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
@@ -189,10 +183,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   protected void customRemove() {
-    for (Association association : getAssociations()) {
+    for (Association association : new ArrayList<>(getAssociations())) {
       association.remove();
     }
-    for (Topic topic : getTopics()) {
+    for (Topic topic : new ArrayList<>(getTopics())) {
       ((TopicImpl) topic).doRemove();
     }
     topicMapSystem.removeTopicMap(this);
