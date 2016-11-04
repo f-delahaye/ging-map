@@ -2,7 +2,6 @@ package org.gingolph.tm;
 
 import java.util.Set;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 
 public interface AssociationSupport extends ConstructSupport, ScopedSupport, TypedSupport {
@@ -22,7 +21,7 @@ public interface AssociationSupport extends ConstructSupport, ScopedSupport, Typ
 
   Set<Role> getRoles();
 
-  Topic getType();
+  TopicImpl getType();
 
   void setReifier(TopicImpl reifier);
 
@@ -30,6 +29,6 @@ public interface AssociationSupport extends ConstructSupport, ScopedSupport, Typ
 
   void removeRole(Role role);
 
-  void setType(Topic type);
+  void setType(TopicImpl type);
 
 }

@@ -25,7 +25,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public Topic getPlayer() {
+  public TopicImpl getPlayer() {
     return support.getPlayer();
   }
 
@@ -47,7 +47,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -57,7 +57,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override

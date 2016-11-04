@@ -8,7 +8,6 @@ import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
-import org.tmapi.core.Topic;
 
 public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements OccurrenceSupport {
   private String value;
@@ -52,7 +51,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     HyperGraph graph = getGraph();
     HGHandle type = HGTMUtil.getTypeOf(graph, getHandle(graph, this));
     return type != null ? ((HGTopicSupport) graph.get(type)).getOwner() : null;
@@ -60,7 +59,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
 

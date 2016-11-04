@@ -109,7 +109,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -119,7 +119,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   protected final void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override

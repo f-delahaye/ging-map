@@ -8,18 +8,18 @@ import org.tmapi.core.Topic;
 
 
 public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSupport {
-  private Topic type;
+  private TopicImpl type;
   private TopicImpl reifier;
   private String value;
   private Locator datatype;
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return type;
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
   }
 

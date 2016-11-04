@@ -10,7 +10,6 @@ import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 /**
  * 
@@ -57,7 +56,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public Topic getPlayer() {
+  public TopicImpl getPlayer() {
     final HGHandle playerHandle = targetSet[0];
     return playerHandle == null ? null : ((HGTopicSupport) getGraph().get(playerHandle)).getOwner();
   }
@@ -93,13 +92,13 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     final HGHandle typeHandle = targetSet[1];
     return typeHandle == null ? null : ((HGTopicSupport) getGraph().get(typeHandle)).getOwner();
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     targetSet[1] = getHandle(getGraph(), type);
   }
 

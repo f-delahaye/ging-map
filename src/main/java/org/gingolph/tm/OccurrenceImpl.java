@@ -37,7 +37,7 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override

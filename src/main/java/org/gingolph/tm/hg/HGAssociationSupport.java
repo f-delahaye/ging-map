@@ -15,13 +15,12 @@ import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Association;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 public class HGAssociationSupport extends HGScopedSupport<Association>
     implements AssociationSupport, HGLink {
 
   transient List<HGHandle> roles;
-  Topic type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
+  TopicImpl type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
               // topics which have roles.
   // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
   // TODO fix this
@@ -80,7 +79,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     if (type == null) {
       final HGHandle thisHandle = getHandle(hyperGraph, this);
       HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
@@ -91,7 +90,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }

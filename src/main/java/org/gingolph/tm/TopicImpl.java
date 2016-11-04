@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gingolph.tm.equality.Equality;
+import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -253,7 +255,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Name createName(Topic type, String value, Collection<Topic> scope)
+  public NameImpl createName(Topic type, String value, Collection<Topic> scope)
       throws ModelConstraintException {
     if (type == null) {
       throw new ModelConstraintException(this, "Null type not allowed");
@@ -315,7 +317,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Occurrence createOccurrence(Topic type, String value, Collection<Topic> scope)
+  public OccurrenceImpl createOccurrence(Topic type, String value, Collection<Topic> scope)
       throws ModelConstraintException {
     return createOccurrence(type, value, LocatorImpl.XSD_STRING, scope);
   }
@@ -333,7 +335,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Occurrence createOccurrence(Topic type, String value, Locator dataType,
+  public OccurrenceImpl createOccurrence(Topic type, String value, Locator dataType,
       Collection<Topic> scope) throws ModelConstraintException {
     return createOccurrence(type, dataType, value, scope);
   }
@@ -344,7 +346,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return createOccurrence(type, LocatorImpl.XSD_ANY_URI, value, scope);
   }
 
-  private Occurrence createOccurrence(Topic type, Locator datatype, Object value,
+  private OccurrenceImpl createOccurrence(Topic type, Locator datatype, Object value,
       Collection<Topic> scope) throws ModelConstraintException {
     if (type == null) {
       throw new ModelConstraintException(this, "Null type not allowed");
@@ -457,17 +459,20 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
     final Collection<Role> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
+    Equality equalityForMege = getTopicMap().getEqualityForMerge();
+    
     // and work off otherTopic's actual data to do the actual merging.
-    otherNames.stream().forEach(otherName -> {
-      Optional<Name> equivalentName = 
-          getNames().stream().filter(name -> name.equals(otherName)).findAny();
-      Name mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
-      ((NameImpl)mergee).importIn(otherName, merge);
+    otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
+      Optional<NameImpl> equivalentName = 
+          getNames().stream().map(name -> (NameImpl)name).filter(name -> equalityForMege.equals(name, otherName)).findAny();
+      NameImpl mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
+      mergee.importIn(otherName, merge);
     });
-    otherOccurrences.stream().forEach(otherOccurrence -> {
-      Optional<Occurrence> equivalentOccurrence = getOccurrences().stream().filter(occurrence -> occurrence.equals(otherOccurrence)).findAny();
-      Occurrence mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
-      ((OccurrenceImpl) mergee).importIn(otherOccurrence, merge);
+    otherOccurrences.stream().map(otherOccurrence -> (OccurrenceImpl)otherOccurrence).forEach(otherOccurrence -> {
+      Optional<OccurrenceImpl> equivalentOccurrence = 
+          getOccurrences().stream().map(occurrence -> (OccurrenceImpl)occurrence).filter(occurrence -> equalityForMege.equals(occurrence, otherOccurrence)).findAny();
+      OccurrenceImpl mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
+      mergee.importIn(otherOccurrence, merge);
     });
 
 
@@ -481,7 +486,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     if (otherRolesPlayed != null) {
       otherRolesPlayed.stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association).forEach(otherAssociation -> {
-        Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation);
+        Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation, equalityForMege);
         AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
         mergee.importIn(otherAssociation, merge);
       });
@@ -493,12 +498,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
   
-  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association) {
+  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association, Equality equalityForMerge) {
 //    getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
 //    .filter(association -> association.equals(otherAssociation)).findAny();
     for (Role role: rolesPlayed) {
       AssociationImpl candidate = (AssociationImpl) role.getParent();
-      if (candidate.equals(association)) {
+      if (equalityForMerge.equals( candidate, association)) {
         return Optional.of(candidate);
       }
     }

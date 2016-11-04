@@ -11,7 +11,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.gingolph.tm.equality.Equality;
-import org.gingolph.tm.equality.GingolphEquality;
+import org.gingolph.tm.equality.SAMEquality;
+import org.gingolph.tm.equality.TMAPIEquality;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
@@ -27,6 +28,8 @@ import org.tmapi.index.Index;
 
 public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
 
+  private static final Equality EQUALITY_FOR_MERGE = new SAMEquality();
+
   transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
   TopicMapSystemImpl topicMapSystem;
@@ -34,7 +37,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
-  private Equality equality = new GingolphEquality();
+  private Equality equality = new TMAPIEquality();
   
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
@@ -168,7 +171,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return topic;
   }
 
-  public Topic doCreateTopic(TopicSupport topicSupport) {
+  public TopicImpl doCreateTopic(TopicSupport topicSupport) {
     TopicImpl topic = new TopicImpl(this);
     if (topicSupport == null) {
       // Most of the time, topicSupport will be null. The ability to pass an externally created support should be used with caution.
@@ -244,11 +247,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
       return;
     }
     final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
-    otherTopics.stream().forEach(otherTopic -> {
-      Optional<Topic> sameTopic =
-          getTopics().stream().filter(topic -> topic.equals(otherTopic)).findAny();
-      TopicImpl mergee =
-          (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : doCreateTopic(null));
+    otherTopics.stream().map(otherTopic -> (TopicImpl)otherTopic).forEach(otherTopic -> {
+      Optional<TopicImpl> sameTopic =
+          getTopics().stream().map(topic-> (TopicImpl)topic).filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
+      TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic(null);
       mergee.importIn(otherTopic, false);
     });
 
@@ -341,6 +343,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   Equality getEquality() {
     return equality;
+  }
+  
+  Equality getEqualityForMerge() {
+    return EQUALITY_FOR_MERGE;
   }
   
   @Override

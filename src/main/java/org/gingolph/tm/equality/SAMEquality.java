@@ -11,11 +11,16 @@ import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Role;
+import org.tmapi.core.Topic;
 
 public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(TopicImpl topic1, TopicImpl topic2) {
+    return equalsStatic(topic1, topic2);
+  }
+  
+  private static boolean equalsStatic(TopicImpl topic1, TopicImpl topic2) {
     if (topic2.getId().equals(topic1.getId())) {
       return true;
     }
@@ -46,33 +51,41 @@ public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(AssociationImpl association1, AssociationImpl association2) {
-    return association1.getType().equals(association2.getType()) && association1.getScope().equals(association2.getScope()) && association1.getRoles().equals(association2.getRoles()); 
+    return equals(association1.getType(), association2.getType()) && equalsScope(association1.getScope(), association2.getScope()) && association1.getRoles().equals(association2.getRoles()); 
   }
 
   @Override
   public boolean equals(RoleImpl role1, RoleImpl role2) {
-    return role1.getParent().equals(role2.getParent()) && equalsNoParent(role1, role2);
+    return equals(role1.getParent(), role2.getParent()) && equalsNoParent(role1, role2);
   }
 
+  protected boolean equalsNoParent(RoleImpl role, RoleImpl otherRole) {
+    return equalsStatic(role.getPlayer(), otherRole.getPlayer()) && equalsStatic(role.getType(), otherRole.getType());
+  }
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
   public static boolean equalsNoParent(Role role, Role otherRole) {
-    return role.getPlayer().equals(otherRole.getPlayer()) && role.getType().equals(otherRole.getType());    
+    RoleImpl role1 = (RoleImpl) role;
+    RoleImpl role2 = (RoleImpl) otherRole;
+    return equalsStatic(role1.getPlayer(), role2.getPlayer()) && equalsStatic(role1.getType(), role2.getType());    
   }
 
   @Override
   public boolean equals(NameImpl name1, NameImpl name2) {
-    return equalsNoParent(name1, name2) && name1.getParent().equals(name2.getParent());
+    return equalsNoParent(name1, name2) && equals(name1.getParent(), name2.getParent());
   }
 
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent
   protected boolean equalsNoParent(NameImpl name1, NameImpl name2) {
-    return name1.getValue().equals(name2.getValue()) && name1.getType().equals(name2.getType())
-        && name1.getScope().equals(name2.getScope());    
+    return name1.getValue().equals(name2.getValue()) && equals(name1.getType(), name2.getType())
+        && equalsScope(name1.getScope(), name2.getScope());    
   }
 
+  protected boolean equalsScope(Set<Topic> scope1, Set<Topic> scope2) {
+    return scope1.equals(scope2);
+  }
   @Override
   public boolean equals(OccurrenceImpl occurrence1, OccurrenceImpl occurrence2) {
-    return equalsNoParent(occurrence1, occurrence2) && occurrence1.getParent().equals(occurrence2.getParent());
+    return equalsNoParent(occurrence1, occurrence2) && equals(occurrence1.getParent(), occurrence2.getParent());
   }
   
   protected boolean equalsNoParent(OccurrenceImpl occurrence1, OccurrenceImpl occurrence2) {

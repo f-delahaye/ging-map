@@ -7,17 +7,17 @@ import org.tmapi.core.Topic;
 
 
 public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
-  Topic type;
+  TopicImpl type;
   TopicImpl reifier;
   TopicImpl player;
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return type;
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
   }
 

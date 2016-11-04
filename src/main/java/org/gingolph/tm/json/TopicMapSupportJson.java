@@ -315,13 +315,13 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }  
   
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     Json typeId = at(TYPE_PP);
-    return typeId == null?null:(Topic) getTopicMap().getConstructById(typeId.asString());
+    return typeId == null?null:(TopicImpl) getTopicMap().getConstructById(typeId.asString());
   }
   
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     set(TYPE_PP, type.getId());
   }
   
@@ -483,9 +483,9 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Topic getPlayer() {
+  public TopicImpl getPlayer() {
     Json playerId = at(PLAYER_PP);
-    return playerId == null ? null : (Topic) getTopicMap().getConstructById(playerId.asString());
+    return playerId == null ? null : (TopicImpl) getTopicMap().getConstructById(playerId.asString());
   }
   
   @Override

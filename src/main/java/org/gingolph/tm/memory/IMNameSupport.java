@@ -6,14 +6,13 @@ import java.util.Set;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
-import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
 public class IMNameSupport extends IMScopedSupport implements NameSupport {
   private TopicImpl reifier;
   private String value;
   private Set<Variant> variants;
-  private Topic type;
+  private TopicImpl type;
 
   @Override
   public TopicImpl getReifier() {
@@ -56,12 +55,12 @@ public class IMNameSupport extends IMScopedSupport implements NameSupport {
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return type;
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
   }
 

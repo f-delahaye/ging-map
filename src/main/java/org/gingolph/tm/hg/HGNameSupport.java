@@ -12,7 +12,6 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
 import org.tmapi.core.Name;
-import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
 public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport {
@@ -58,7 +57,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     final HGHandle thisHandle = getHandle(hyperGraph, this);
     HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
     return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
@@ -79,7 +78,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
 

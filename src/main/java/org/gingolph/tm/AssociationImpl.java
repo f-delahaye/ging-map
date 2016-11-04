@@ -75,7 +75,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -85,7 +85,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override

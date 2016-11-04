@@ -8,21 +8,20 @@ import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 
 public class IMAssociationSupport extends IMScopedSupport implements AssociationSupport {
-  private Topic type;
+  private TopicImpl type;
   private final Set<Role> roles = new ArraySet<>(SAMEquality::equalsNoParent);
   private TopicImpl reifier;
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return type;
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
   }
 

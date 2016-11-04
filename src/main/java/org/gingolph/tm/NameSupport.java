@@ -1,7 +1,7 @@
 package org.gingolph.tm;
 
 import java.util.Set;
-import org.tmapi.core.Topic;
+
 import org.tmapi.core.Variant;
 
 
@@ -22,9 +22,9 @@ public interface NameSupport extends ConstructSupport, ScopedSupport, TypedSuppo
 
   void setReifier(TopicImpl reifier);
 
-  Topic getType();
+  TopicImpl getType();
 
-  void setType(Topic type);
+  void setType(TopicImpl type);
 
   String getValue();
 
