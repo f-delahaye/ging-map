@@ -28,7 +28,7 @@ import org.tmapi.index.Index;
 
 public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
 
-  private static final Equality EQUALITY_FOR_MERGE = new SAMEquality();
+  private static final SAMEquality EQUALITY_FOR_MERGE = new SAMEquality();
 
   transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
@@ -345,7 +345,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return equality;
   }
   
-  Equality getEqualityForMerge() {
+  SAMEquality getEqualityForMerge() {
     return EQUALITY_FOR_MERGE;
   }
   

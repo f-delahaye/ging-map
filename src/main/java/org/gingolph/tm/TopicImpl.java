@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
@@ -375,7 +374,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   @Override
   public Set<Role> getRolesPlayed() {
     final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
-    return rolesPlayed == null ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed, SAMEquality::equalsNoParent);
+    return rolesPlayed == null ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed);
   }
 
   @Override
@@ -460,7 +459,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
     final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
-    Equality equalityForMege = getTopicMap().getEqualityForMerge();
+    SAMEquality equalityForMege = getTopicMap().getEqualityForMerge();
     
     // and work off otherTopic's actual data to do the actual merging.
     otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
@@ -486,11 +485,15 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     }
 
     if (otherRolesPlayed != null) {
-      otherRolesPlayed.stream().map(role -> role.getParent()).forEach(otherAssociation -> {
+      for (RoleImpl otherRole: otherRolesPlayed) {
+        // otherRole.setPlayer(this); not needed because player is manged by TopicSupport so switching the support also changed the player
+        AssociationImpl otherAssociation = otherRole.getParent();
+        
         Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation, equalityForMege);
         AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
         mergee.importIn(otherAssociation, merge);
-      });
+        addRolePlayed(otherRole);
+      };
     }
   }
 
@@ -499,10 +502,10 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
   
-  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association, Equality equalityForMerge) {
+  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association, SAMEquality equalityForMerge) {
     for (Role role: rolesPlayed) {
       AssociationImpl candidate = (AssociationImpl) role.getParent();
-      if (equalityForMerge.equals( candidate, association)) {
+      if (equalityForMerge.associationEquals( candidate, association, false)) {
         return Optional.of(candidate);
       }
     }

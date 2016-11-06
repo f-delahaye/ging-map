@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiPredicate;
 
 /**
  * Implementation of Set which does NOT check for duplicates.
@@ -30,7 +28,6 @@ import java.util.function.BiPredicate;
 public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
 
   final List<E> delegate;
-  final BiPredicate<E, E> equals;
 
   /**
    * Allows to specify the list that will be used to store elements.
@@ -40,12 +37,7 @@ public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
    * @param equals
    */
   public UnmodifiableArraySet(Collection<? extends E> c) {
-    this(c, Objects::equals);
-  }
-  
-  public UnmodifiableArraySet(Collection<? extends E> c, BiPredicate<E, E> equals) {
     this.delegate = c instanceof List?(List<E>)c:new ArrayList<E>(c);
-    this.equals = equals;
   }
     
   @Override
@@ -83,7 +75,7 @@ public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
     E element = (E)o;
     for (int i=0; i<delegate.size(); i++) {
       E candidate = delegate.get(i);
-      if (equals.test(candidate, element)) {
+      if (candidate.equals(element)) {
         return i;
       }
     }

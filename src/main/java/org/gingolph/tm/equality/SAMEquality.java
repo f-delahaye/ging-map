@@ -1,6 +1,7 @@
 package org.gingolph.tm.equality;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.gingolph.tm.AssociationImpl;
@@ -9,7 +10,6 @@ import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
-import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
@@ -52,7 +52,24 @@ public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(AssociationImpl association1, AssociationImpl association2) {
-    return topicEquals(association1.getType(), association2.getType()) && scopeEquals(association1.getScope(), association2.getScope()) && association1.getRoles().equals(association2.getRoles()); 
+    return associationEquals(association1, association2, true); 
+  }
+
+  public boolean associationEquals(AssociationImpl association1, AssociationImpl association2, boolean checkRolesParents) {
+    return topicEquals(association1.getType(), association2.getType()) && scopeEquals(association1.getScope(), association2.getScope()) && rolesEquals(association1.getNullSafeRoleImpls(), association2.getNullSafeRoleImpls(), checkRolesParents);
+  }
+
+  private boolean rolesEquals(List<RoleImpl> roles1, List<RoleImpl> roles2, boolean checkRolesParent) {
+    if (roles1.size() != roles2.size()) {
+      return false;
+    }
+    for (int i=0; i<roles1.size(); i++) {
+      boolean equals = checkRolesParent?equals(roles1.get(i), roles2.get(i)):roleEqualsNoParent(roles1.get(i), roles2.get(i));
+      if (!equals) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -64,9 +81,7 @@ public class SAMEquality implements Equality {
     return topicEquals(role.getPlayer(), otherRole.getPlayer()) && topicEquals(role.getType(), otherRole.getType());
   }
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
-  public static boolean equalsNoParent(Role role, Role otherRole) {
-    RoleImpl role1 = (RoleImpl) role;
-    RoleImpl role2 = (RoleImpl) otherRole;
+  public static boolean roleEqualsNoParent(RoleImpl role1, RoleImpl role2) {
     return topicEquals(role1.getPlayer(), role2.getPlayer()) && topicEquals(role1.getType(), role2.getType());    
   }
 

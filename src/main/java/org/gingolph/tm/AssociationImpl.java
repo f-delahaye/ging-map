@@ -3,6 +3,7 @@ package org.gingolph.tm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -32,13 +33,18 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   
   @Override
   protected void customRemove() {
-    new ArrayList<>(support.getRoles()).forEach(role -> ((RoleImpl) role).doRemove());
+    new ArrayList<>(getNullSafeRoleImpls()).forEach(role -> ((RoleImpl) role).doRemove());
     getParent().removeAssociation(this);
   }
 
   @Override
   public Set<Role> getRoles() {
-    return new UnmodifiableArraySet<>(support.getRoles(), SAMEquality::equalsNoParent);
+    return new UnmodifiableArraySet<>(getNullSafeRoleImpls());
+  }
+
+  public List<RoleImpl> getNullSafeRoleImpls() {
+    List<RoleImpl> roles = support.getRoles();
+    return roles == null?Collections.emptyList():roles;
   }
 
   @Override
@@ -46,14 +52,14 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     if (type == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    return support.getRoles().stream().filter(role -> role.getType() == type)
+    return getNullSafeRoleImpls().stream().filter(role -> role.getType() == type)
         .collect(Collectors.toSet());
   }
 
   @Override
   public Set<Topic> getRoleTypes() {
     Set<TopicImpl> roleTypes = new IdentityHashSet<>();
-    support.getRoles().forEach((role) -> {
+    getNullSafeRoleImpls().forEach((role) -> {
       roleTypes.add(role.getType());
     });
     return Collections.unmodifiableSet(roleTypes);
@@ -141,15 +147,22 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
   
   void importIn(AssociationImpl otherAssociation, boolean merge) {
-    final Collection<Role> otherRoles = new ArrayList<>(otherAssociation.getRoles());
+    final Collection<RoleImpl> otherRoles = new ArrayList<>(otherAssociation.getNullSafeRoleImpls());
     final Set<Locator> itemIdentifiers = otherAssociation.getItemIdentifiers();
     final Topic otherReifier = otherAssociation.getReifier();
     if (merge) {
       otherAssociation.doRemove();
     }
     
-    otherRoles.forEach(otherRole -> createRole(otherRole.getType(), otherRole.getPlayer())
-        .importIn(otherRole, merge));
+    for (RoleImpl otherRole: otherRoles) {
+      Optional<RoleImpl> equivalentRole = getNullSafeRoleImpls().stream().filter(candidateRole -> getTopicMap().getEqualityForMerge().equals(candidateRole, otherRole)).findAny();
+      if (equivalentRole.isPresent()) {
+        equivalentRole.get().importIn(otherRole, merge);
+      } else {
+        otherRole.setParent(this);        
+        support.addRole(otherRole);
+      }
+    }
     
     itemIdentifiers.forEach(identifier -> importItemIdentifier(identifier));
     if (getReifier() == null) {
