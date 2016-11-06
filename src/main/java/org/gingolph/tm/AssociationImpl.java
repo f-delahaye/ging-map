@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.equality.Equality;
-import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -153,15 +150,19 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     if (merge) {
       otherAssociation.doRemove();
     }
+
+    // This method can be called from TopicImpl.importIn when either:
+    // - an existing association is imported into a newly created one
+    // - or 2 existing equivalent associations are merged together
+    // In the first case, we know there will never be an equivalent role, since its a newly created association with no role.
+    // In the second case, we know that there always be an equivalent trole: this (amongst other things) is a requirement for 2 associations to be deemed equivalent.
+    // So either the lookup of equivalentRole is not needed, or it has been done already.
+    // However, code below should be cheap, and it works for both logics.
     
     for (RoleImpl otherRole: otherRoles) {
       Optional<RoleImpl> equivalentRole = getNullSafeRoleImpls().stream().filter(candidateRole -> getTopicMap().getEqualityForMerge().equals(candidateRole, otherRole)).findAny();
-      if (equivalentRole.isPresent()) {
-        equivalentRole.get().importIn(otherRole, merge);
-      } else {
-        otherRole.setParent(this);        
-        support.addRole(otherRole);
-      }
+      RoleImpl mergee = equivalentRole.orElse(createRole(otherRole.getType(), otherRole.getPlayer()));
+      mergee.importIn(otherRole, merge);
     }
     
     itemIdentifiers.forEach(identifier -> importItemIdentifier(identifier));

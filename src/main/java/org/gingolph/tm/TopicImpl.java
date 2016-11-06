@@ -373,8 +373,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Role> getRolesPlayed() {
+    final List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls();
+    return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed);
+  }
+
+  private List<RoleImpl> getNullSafeRolePlayedImpls() {
     final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
-    return rolesPlayed == null ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed);
+    return rolesPlayed == null?Collections.emptyList():rolesPlayed;
   }
 
   @Override
@@ -489,7 +494,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
         // otherRole.setPlayer(this); not needed because player is manged by TopicSupport so switching the support also changed the player
         AssociationImpl otherAssociation = otherRole.getParent();
         
-        Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation, equalityForMege);
+        Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> getTopicMap().getEqualityForMerge().associationEquals(candidateAssociation, otherAssociation, false)).findAny();
         AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
         mergee.importIn(otherAssociation, merge);
         addRolePlayed(otherRole);
@@ -500,16 +505,6 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   @Override
   protected boolean equalTo(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
-  }
-  
-  private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association, SAMEquality equalityForMerge) {
-    for (Role role: rolesPlayed) {
-      AssociationImpl candidate = (AssociationImpl) role.getParent();
-      if (equalityForMerge.associationEquals( candidate, association, false)) {
-        return Optional.of(candidate);
-      }
-    }
-    return Optional.empty();
   }
 
   @Override
