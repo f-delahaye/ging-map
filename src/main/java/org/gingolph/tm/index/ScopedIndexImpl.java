@@ -8,6 +8,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Association;
 import org.tmapi.core.Name;
@@ -22,7 +24,7 @@ public final class ScopedIndexImpl extends AbstractIndex
 
   Map<Class<? extends Scoped>, Scope> scopes = new HashMap<>();
 
-  public ScopedIndexImpl(Collection<Topic> topics, Collection<Association> associations) {
+  public ScopedIndexImpl(Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
     associations.forEach(association -> addScoped(association));
     topics.forEach(topic -> {
       topic.getOccurrences().forEach(occurrence -> addScoped(occurrence));

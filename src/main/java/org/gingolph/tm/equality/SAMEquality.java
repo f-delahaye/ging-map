@@ -9,6 +9,7 @@ import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
+import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
@@ -17,10 +18,10 @@ public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(TopicImpl topic1, TopicImpl topic2) {
-    return equalsStatic(topic1, topic2);
+    return topicEquals(topic1, topic2);
   }
   
-  private static boolean equalsStatic(TopicImpl topic1, TopicImpl topic2) {
+  private static boolean topicEquals(TopicImpl topic1, TopicImpl topic2) {
     if (topic2.getId().equals(topic1.getId())) {
       return true;
     }
@@ -51,7 +52,7 @@ public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(AssociationImpl association1, AssociationImpl association2) {
-    return equals(association1.getType(), association2.getType()) && equalsScope(association1.getScope(), association2.getScope()) && association1.getRoles().equals(association2.getRoles()); 
+    return topicEquals(association1.getType(), association2.getType()) && scopeEquals(association1.getScope(), association2.getScope()) && association1.getRoles().equals(association2.getRoles()); 
   }
 
   @Override
@@ -60,13 +61,13 @@ public class SAMEquality implements Equality {
   }
 
   protected boolean equalsNoParent(RoleImpl role, RoleImpl otherRole) {
-    return equalsStatic(role.getPlayer(), otherRole.getPlayer()) && equalsStatic(role.getType(), otherRole.getType());
+    return topicEquals(role.getPlayer(), otherRole.getPlayer()) && topicEquals(role.getType(), otherRole.getType());
   }
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent  
   public static boolean equalsNoParent(Role role, Role otherRole) {
     RoleImpl role1 = (RoleImpl) role;
     RoleImpl role2 = (RoleImpl) otherRole;
-    return equalsStatic(role1.getPlayer(), role2.getPlayer()) && equalsStatic(role1.getType(), role2.getType());    
+    return topicEquals(role1.getPlayer(), role2.getPlayer()) && topicEquals(role1.getType(), role2.getType());    
   }
 
   @Override
@@ -77,10 +78,10 @@ public class SAMEquality implements Equality {
   // specific method to be called when we know for sure (or don't care that) other.parent = this.parent
   protected boolean equalsNoParent(NameImpl name1, NameImpl name2) {
     return name1.getValue().equals(name2.getValue()) && equals(name1.getType(), name2.getType())
-        && equalsScope(name1.getScope(), name2.getScope());    
+        && scopeEquals(name1.getScope(), name2.getScope());    
   }
 
-  protected boolean equalsScope(Set<Topic> scope1, Set<Topic> scope2) {
+  protected static boolean scopeEquals(Set<Topic> scope1, Set<Topic> scope2) {
     return scope1.equals(scope2);
   }
   @Override

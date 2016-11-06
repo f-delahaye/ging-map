@@ -3,7 +3,8 @@ package org.gingolph.tm.hg;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.RoleImpl;
@@ -13,10 +14,9 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
-import org.tmapi.core.Association;
 import org.tmapi.core.Role;
 
-public class HGAssociationSupport extends HGScopedSupport<Association>
+public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
     implements AssociationSupport, HGLink {
 
   transient List<HGHandle> roles;
@@ -38,7 +38,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  public void addRole(Role role) {
+  public void addRole(RoleImpl role) {
     final HyperGraph graph = getGraph();
     RoleSupport support = ((RoleImpl) role).getSupport();
     roles.add(add(graph, support));
@@ -57,8 +57,8 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  public Set<Role> getRoles() {
-    return new RoleSet(getGraph(), this);
+  public List<RoleImpl> getRoles() {
+    return this.roles.stream().map(role -> (RoleImpl)((HGRoleSupport) getGraph().get(role)).getOwner()).collect(Collectors.toList());
   }
 
   @HGIgnore
@@ -117,7 +117,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  protected Association createOwner() {
+  protected AssociationImpl createOwner() {
     final AssociationImpl association = new AssociationImpl(getTopicMapSupport().getOwner());
     association.setSupport(this);
     return association;

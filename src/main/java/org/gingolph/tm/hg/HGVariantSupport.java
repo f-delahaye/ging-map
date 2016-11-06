@@ -10,9 +10,8 @@ import org.hypergraphdb.annotation.AtomReference;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
-import org.tmapi.core.Variant;
 
-public class HGVariantSupport extends HGScopedSupport<Variant> implements VariantSupport {
+public class HGVariantSupport extends HGScopedSupport<VariantImpl> implements VariantSupport {
 
   private String value;
   @AtomReference("symbolic")
@@ -30,7 +29,7 @@ public class HGVariantSupport extends HGScopedSupport<Variant> implements Varian
   }
   
   @Override
-  protected Variant createOwner() {
+  protected VariantImpl createOwner() {
     HGNameSupport parent = getParent();
     VariantImpl variant = new VariantImpl(parent.getParent().getTopicMapSupport().getOwner(),
         (NameImpl) parent.getOwner());

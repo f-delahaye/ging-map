@@ -1,17 +1,18 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.VariantImpl;
 import org.tmapi.core.Variant;
 
 public class IMNameSupport extends IMScopedSupport implements NameSupport {
   private TopicImpl reifier;
   private String value;
-  private Set<Variant> variants;
+  private List<VariantImpl> variants;
   private TopicImpl type;
 
   @Override
@@ -35,14 +36,14 @@ public class IMNameSupport extends IMScopedSupport implements NameSupport {
   }
 
   @Override
-  public Set<Variant> getVariants() {
+  public List<VariantImpl> getVariants() {
     return variants;
   }
 
   @Override
-  public void addVariant(Variant variant) {
+  public void addVariant(VariantImpl variant) {
     if (variants == null) {
-      variants = new HashSet<>();
+      variants = new ArrayList<>();
     }
     this.variants.add(variant);
   }

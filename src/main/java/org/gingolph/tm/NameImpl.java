@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Name;
@@ -40,8 +42,8 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
 
   @Override
   public Set<Variant> getVariants() {
-    Set<Variant> variants = support.getVariants();
-    return variants == null ? Collections.emptySet() : Collections.unmodifiableSet(variants);
+    List<VariantImpl> variants = support.getVariants();
+    return variants == null ? Collections.emptySet() : new UnmodifiableArraySet<>(variants);
   }
 
   @Override

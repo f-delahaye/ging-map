@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TypedConstruct;
 import org.tmapi.core.Association;
 import org.tmapi.core.Name;
@@ -22,7 +24,7 @@ public final class TypeInstanceIndexImpl extends AbstractIndex implements TypeIn
   Map<Topic, Collection<Occurrence>> occurrencesByTypes = new IdentityHashMap<>();
   Map<Topic, Collection<Name>> namesByTypes = new IdentityHashMap<>();
 
-  public TypeInstanceIndexImpl(Collection<Topic> topics, Collection<Association> associations) {
+  public TypeInstanceIndexImpl(Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
     topics.forEach(topic -> {
       topic.getTypes().forEach(type -> addType(topicsByTypes, type, topic));
       topic.getOccurrences()

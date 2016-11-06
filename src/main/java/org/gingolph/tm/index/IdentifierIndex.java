@@ -3,8 +3,10 @@ package org.gingolph.tm.index;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.event.TopicMapEventListener;
-import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
@@ -22,8 +24,8 @@ public class IdentifierIndex extends AbstractIndex implements Index, TopicMapEve
   Map<Locator, Topic> topicsBySubjectLocators = new LinkedHashMap<>();
   Map<Locator, Construct> constructsByItemIdentifiers = new LinkedHashMap<>();
 
-  public IdentifierIndex(TopicMap topicMap, Collection<Topic> topics,
-      Collection<Association> associations) {
+  public IdentifierIndex(TopicMap topicMap, Collection<TopicImpl> topics,
+      Collection<AssociationImpl> associations) {
     onConstructCreated(topicMap);
     topics.forEach(topic -> {
       onConstructCreated(topic);

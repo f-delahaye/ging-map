@@ -11,7 +11,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.ArraySet;
+import org.gingolph.tm.IdentityHashSet;
+import org.gingolph.tm.UnmodifiableArraySet;
 import org.gingolph.tm.event.TopicMapEventListenerSupport;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
@@ -72,7 +73,7 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
       return propertiedObjects.stream().filter(propertiedObject -> propertiesSource
           .apply(propertiedObject).containsAll(remainingProperties)).collect(Collectors.toList());
     } else {
-      Set<T> propertiedObjects = new ArraySet<>(Objects::equals);
+      Set<T> propertiedObjects = new IdentityHashSet<>();
       for (Topic theme : properties) {
         propertiedObjects.addAll(cache.getOrDefault(theme, Collections.emptyList()));
       }

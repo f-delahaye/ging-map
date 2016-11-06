@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -230,8 +231,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Name> getNames() {
-    Set<NameImpl> names = support.getNames();
-    return names == null ? Collections.emptySet() : Collections.unmodifiableSet(names);
+    List<NameImpl> names = support.getNames();
+    return names == null ? Collections.emptySet() : new UnmodifiableArraySet<>(names);
   }
 
   @Override
@@ -291,8 +292,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Occurrence> getOccurrences() {
-    Set<Occurrence> occurrences = support.getOccurrences();
-    return occurrences == null ? Collections.emptySet() : Collections.unmodifiableSet(occurrences);
+    List<OccurrenceImpl> occurrences = support.getOccurrences();
+    return occurrences == null ? Collections.emptySet() : new UnmodifiableArraySet<>(occurrences);
   }
 
   @Override
@@ -373,8 +374,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Role> getRolesPlayed() {
-    final Set<Role> rolesPlayed = support.getRolesPlayed();
-    return rolesPlayed == null ? Collections.emptySet() : Collections.unmodifiableSet(rolesPlayed);
+    final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
+    return rolesPlayed == null ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed, SAMEquality::equalsNoParent);
   }
 
   @Override
@@ -399,7 +400,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
         .collect(Collectors.toSet());
   }
 
-  void addRolePlayed(Role role) {
+  void addRolePlayed(RoleImpl role) {
     support.addRolePlayed(role);
   }
 
@@ -457,7 +458,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     final Collection<Name> otherNames = new ArrayList<>(otherTopic.getNames());
     final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
-    final Collection<Role> otherRolesPlayed = otherTopicData.getRolesPlayed();
+    final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
     Equality equalityForMege = getTopicMap().getEqualityForMerge();
     
@@ -485,7 +486,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     }
 
     if (otherRolesPlayed != null) {
-      otherRolesPlayed.stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association).forEach(otherAssociation -> {
+      otherRolesPlayed.stream().map(role -> role.getParent()).forEach(otherAssociation -> {
         Optional<AssociationImpl> equivalentAssociation = findEquivalentAssociation(getRolesPlayed(), otherAssociation, equalityForMege);
         AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
         mergee.importIn(otherAssociation, merge);
@@ -499,8 +500,6 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
   
   private Optional<AssociationImpl> findEquivalentAssociation(Set<Role> rolesPlayed, AssociationImpl association, Equality equalityForMerge) {
-//    getRolesPlayed().stream().map(role -> role.getParent()).map(association -> (AssociationImpl)association)
-//    .filter(association -> association.equals(otherAssociation)).findAny();
     for (Role role: rolesPlayed) {
       AssociationImpl candidate = (AssociationImpl) role.getParent();
       if (equalityForMerge.equals( candidate, association)) {

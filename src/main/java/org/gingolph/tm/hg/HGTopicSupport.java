@@ -1,15 +1,16 @@
 package org.gingolph.tm.hg;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
-import org.gingolph.tm.ArraySet;
+import org.gingolph.tm.IdentityHashSet;
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
-import org.gingolph.tm.equality.SAMEquality;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HGSearchResult;
@@ -124,7 +125,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
 
   @Override
   public Set<Topic> getTypes() {
-    return new ArraySet<>(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false), Objects::equals);
+    return new IdentityHashSet<>(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false));
   }
 
   @Override
@@ -141,7 +142,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public void addOccurrence(Occurrence occurrence) {
+  public void addOccurrence(OccurrenceImpl occurrence) {
     HyperGraph graph = getGraph();
     HGHandle occurrenceHandle = add(graph, occurrence);
     graph.add(
@@ -150,8 +151,8 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public Set<Occurrence> getOccurrences() {
-    return new ArraySet<>(HGTMUtil.getRelatedObjects(this, HGTM.hOccurrenceOf, false), Objects::equals);
+  public List<OccurrenceImpl> getOccurrences() {
+    return HGTMUtil.getRelatedObjects(this, HGTM.hOccurrenceOf, false);
   }
 
   @Override
@@ -172,13 +173,13 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   public void setReified(Reifiable reifiable) {}
 
   @Override
-  public void addRolePlayed(Role role) {
+  public void addRolePlayed(RoleImpl role) {
 
   }
 
   @Override
-  public Set<Role> getRolesPlayed() {
-    Set<Role> result = new ArraySet<Role>(SAMEquality::equalsNoParent);
+  public List<RoleImpl> getRolesPlayed() {
+    List<RoleImpl> result = new ArrayList<>();
     HGSearchResult<HGRoleSupport> rs = null;
     try {
       HyperGraph graph = getGraph();
@@ -222,8 +223,8 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public Set<NameImpl> getNames() {
-    return new ArraySet<>(HGTMUtil.getRelatedObjects(this, HGTM.hNameOf, false), Objects::equals);
+  public List<NameImpl> getNames() {
+    return HGTMUtil.getRelatedObjects(this, HGTM.hNameOf, false);
   }
 
   @Override

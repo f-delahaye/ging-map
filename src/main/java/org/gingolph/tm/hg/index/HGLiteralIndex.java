@@ -2,6 +2,7 @@ package org.gingolph.tm.hg.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.gingolph.tm.LocatorImpl;
@@ -90,7 +91,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     }
     List<HGVariantSupport> variantSupports = hg.getAll(graph, hg
         .and(hg.type(HGVariantSupport.class), hg.eq("value", value), hg.eq("datatype", datatype)));
-    return getIndexResults(variantSupports);
+    return Collections.unmodifiableCollection(getIndexResults(variantSupports));
   }
 
   @Override

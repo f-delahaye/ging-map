@@ -1,6 +1,7 @@
 package org.gingolph.tm;
 
-import java.util.Set;
+import java.util.List;
+
 import org.tmapi.core.Role;
 
 
@@ -19,13 +20,13 @@ public interface AssociationSupport extends ConstructSupport, ScopedSupport, Typ
   
   TopicImpl getReifier();
 
-  Set<Role> getRoles();
+  List<RoleImpl> getRoles();
 
   TopicImpl getType();
 
   void setReifier(TopicImpl reifier);
 
-  void addRole(Role role);
+  void addRole(RoleImpl role);
 
   void removeRole(Role role);
 

@@ -1,13 +1,12 @@
 package org.gingolph.tm.hg;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.VariantImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
@@ -30,7 +29,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   }
 
   @Override
-  public void addVariant(Variant v) {
+  public void addVariant(VariantImpl v) {
     HGHandle h = add(hyperGraph, v);
     hyperGraph.add(new HGRel(HGTM.VariantOf, new HGHandle[] {h, getHandle(hyperGraph, this)}),
         HGTM.hVariantOf);
@@ -69,11 +68,11 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   }
 
   @Override
-  public Set<Variant> getVariants() {
+  public List<VariantImpl> getVariants() {
     final HGHandle handle = getHandle(hyperGraph, this);
     return handle == null ? null
-        : new ArraySet<>(HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
-            .stream().map(support -> support.getOwner()).collect(Collectors.toList()), Objects::equals);
+        : HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
+            .stream().map(support -> support.getOwner()).collect(Collectors.toList());
   }
 
   @HGIgnore

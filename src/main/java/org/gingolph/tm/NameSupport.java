@@ -1,6 +1,6 @@
 package org.gingolph.tm;
 
-import java.util.Set;
+import java.util.List;
 
 import org.tmapi.core.Variant;
 
@@ -30,9 +30,9 @@ public interface NameSupport extends ConstructSupport, ScopedSupport, TypedSuppo
 
   void setValue(String value);
 
-  Set<Variant> getVariants();
+  List<VariantImpl> getVariants();
 
-  void addVariant(Variant variant);
+  void addVariant(VariantImpl variant);
 
   void removeVariant(Variant variant);
 }

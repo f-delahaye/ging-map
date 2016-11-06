@@ -3,11 +3,11 @@ package org.gingolph.tm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import org.gingolph.tm.equality.Equality;
@@ -72,7 +72,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   @Override
   public Set<Topic> getTopics() {
-    return Collections.unmodifiableSet(support.getTopics());
+    return new UnmodifiableArraySet<>(support.getTopics());
   }
 
   @Override
@@ -202,7 +202,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public Set<Association> getAssociations() {
-    return Collections.unmodifiableSet(support.getAssociations());
+    return new UnmodifiableArraySet<>(support.getAssociations());
   }
 
   @Override

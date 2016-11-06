@@ -1,6 +1,8 @@
 package org.gingolph.tm.json;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -209,8 +211,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Set<Role> getRoles() {
-    Set<Role> roles = new HashSet<>();
+  public List<RoleImpl> getRoles() {
+    List<RoleImpl> roles = new ArrayList<>();
     for (Json roleJson: nullSafeRoles().asJsonList()) {
       TopicMapSupportJson roleSupport = (TopicMapSupportJson) roleJson;
       roles.add(roleSupport.getOwner());
@@ -219,7 +221,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void addRole(Role role) {
+  public void addRole(RoleImpl role) {
     nullSafeRoles().add(getTopicMapSupportJson(role));
   }
 
@@ -233,8 +235,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public Set<NameImpl> getNames() {
-    Set<NameImpl> names = new HashSet<>();
+  public List<NameImpl> getNames() {
+    List<NameImpl> names = new ArrayList<>();
     for (Json nameJson: nullSafeNames().asJsonList()) {
       TopicMapSupportJson nameSupport = (TopicMapSupportJson) nameJson;
       names.add(nameSupport.getOwner());
@@ -257,8 +259,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public Set<Occurrence> getOccurrences() {
-    Set<Occurrence> occurrences = new HashSet<>();
+  public List<OccurrenceImpl> getOccurrences() {
+    List<OccurrenceImpl> occurrences = new ArrayList<>();
     for (Json occurrenceJson: nullSafeOccurrences().asJsonList()) {
       TopicMapSupportJson occurrenceSupport = (TopicMapSupportJson) occurrenceJson;
       occurrences.add(occurrenceSupport.getOwner());
@@ -267,7 +269,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void addOccurrence(Occurrence occurrence) {
+  public void addOccurrence(OccurrenceImpl occurrence) {
     nullSafeOccurrences().add(getTopicMapSupportJson(occurrence));
   }
 
@@ -330,8 +332,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Set<Topic> getTopics() {
-    Set<Topic> topics = new HashSet<>();
+  public List<TopicImpl> getTopics() {
+    List<TopicImpl> topics = new ArrayList<>();
     for (Json topicJson: nullSafeTopics().asJsonList()) {
       TopicMapSupportJson topicSupport = (TopicMapSupportJson) topicJson;
       topics.add(topicSupport.getOwner());
@@ -340,7 +342,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void addTopic(Topic topic) {
+  public void addTopic(TopicImpl topic) {
     nullSafeTopics().add(getTopicMapSupportJson(topic));
   }
 
@@ -354,8 +356,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Set<Association> getAssociations() {
-    Set<Association> associations = new HashSet<>();
+  public List<AssociationImpl> getAssociations() {
+    List<AssociationImpl> associations = new ArrayList<>();
     for (Json topicJson: nullSafeAssociations().asJsonList()) {
       TopicMapSupportJson associationSupport = (TopicMapSupportJson) topicJson;
       associations.add(associationSupport.getOwner());
@@ -364,7 +366,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void addAssociation(Association association) {
+  public void addAssociation(AssociationImpl association) {
     nullSafeAssociations().add(getTopicMapSupportJson(association));
   }
 
@@ -378,8 +380,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Set<Variant> getVariants() {
-    Set<Variant> variants = new HashSet<>();
+  public List<VariantImpl> getVariants() {
+    List<VariantImpl> variants = new ArrayList<>();
     for (Json variantJson: nullSafeVariants().asJsonList()) {
       TopicMapSupportJson variantSupport = (TopicMapSupportJson) variantJson;
       variants.add(variantSupport.getOwner());
@@ -388,7 +390,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void addVariant(Variant variant) {
+  public void addVariant(VariantImpl variant) {
     nullSafeVariants().add(getTopicMapSupportJson(variant));
   }
 
@@ -498,17 +500,17 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public final Set<Role> getRolesPlayed() {
-    Set<Role> rolesPlayed = new HashSet<>();
+  public final List<RoleImpl> getRolesPlayed() {
+    List<RoleImpl> rolesPlayed = new ArrayList<>();
     for (Json roleJson: nullSafeRolesPlayed().asJsonList()) {
-      Role role = (Role) getTopicMap().getConstructById(roleJson.asString());
+      RoleImpl role = (RoleImpl) getTopicMap().getConstructById(roleJson.asString());
       rolesPlayed.add(role);
     }    
     return rolesPlayed;
   }
 
   @Override
-  public final void addRolePlayed(Role role) {
+  public final void addRolePlayed(RoleImpl role) {
     nullSafeRolesPlayed().add(role.getId());
   }
 

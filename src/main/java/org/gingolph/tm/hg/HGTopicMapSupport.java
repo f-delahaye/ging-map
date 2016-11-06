@@ -1,13 +1,10 @@
 package org.gingolph.tm.hg;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.List;
 
 import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
-import org.gingolph.tm.ArraySet;
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -62,13 +59,13 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public void addAssociation(Association association) {
+  public void addAssociation(AssociationImpl association) {
     HGHandle associationHandle = add(graph, association);
     HGTMUtil.setTopicMapOf(hyperGraph, associationHandle, getHandle(graph, this));
   }
 
   @Override
-  public void addTopic(Topic topic) {
+  public void addTopic(TopicImpl topic) {
     HGHandle topicHandle = add(graph, topic);
     HGTMUtil.setTopicMapOf(hyperGraph, topicHandle, getHandle(graph, this));
   }
@@ -91,15 +88,15 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public Set<Association> getAssociations() {
+  public List<AssociationImpl> getAssociations() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle), Objects::equals);
+    return HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle);
   }
 
   @Override
-  public Set<Topic> getTopics() {
+  public List<TopicImpl> getTopics() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return new ArraySet<>(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle), Objects::equals);
+    return HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle);
   }
 
   @HGIgnore

@@ -1,10 +1,9 @@
 package org.gingolph.tm.hg;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.ArraySet;
+import org.gingolph.tm.IdentityHashSet;
 import org.gingolph.tm.ScopedSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
@@ -39,8 +38,8 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
     HyperGraph graph = getGraph();
     final HGHandle handle = getHandle(graph, this);
     return handle == null ? null
-        : new ArraySet<>(HGTMUtil.<HGTopicSupport>getRelatedObjects(graph, HGTM.hScopeOf, handle, null).stream()
-            .map(support -> support.getOwner()).collect(Collectors.toList()), Objects::equals);
+        : new IdentityHashSet<>(HGTMUtil.<HGTopicSupport>getRelatedObjects(graph, HGTM.hScopeOf, handle, null).stream()
+            .map(support -> support.getOwner()).collect(Collectors.toList()));
   }
 
   @Override

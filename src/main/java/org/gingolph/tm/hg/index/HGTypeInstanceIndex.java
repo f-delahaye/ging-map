@@ -4,14 +4,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.TypedSupport;
+import org.gingolph.tm.UnmodifiableArraySet;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.gingolph.tm.hg.HGNameSupport;
@@ -84,7 +83,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     typedConstructs =
         hg.findAll(graph, hg.apply(supportHandleToOwnerMapping(graph, instanceSupportClass),
             hg.apply(hg.linkProjection(1), hg.apply(hg.deref(graph), relQuery))));
-    return matchAll ? filterMatchAll(typedConstructs, types) : new ArraySet<>(typedConstructs, Objects::equals);
+    return matchAll ? filterMatchAll(typedConstructs, types) : new UnmodifiableArraySet<>(typedConstructs);
   }
 
   protected <T extends Construct> Set<T> filterMatchAll(Collection<T> typedConstructs,
@@ -97,8 +96,8 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     // TODO: try another solution that does not rely on comparing count with themes.length ... not
     // very reliable as it depends on whether we use a set or not, or whether a given contrutct may
     // have multiple times the same theme.
-    return new ArraySet<>(scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
-        .map(entry -> entry.getKey()).collect(Collectors.toList()), Objects::equals);
+    return new UnmodifiableArraySet<>(scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
+        .map(entry -> entry.getKey()).collect(Collectors.toList()));
   }
 
   protected Collection<Topic> getTypes(
@@ -134,7 +133,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Association> getAssociations(Topic type) {
-    return getInstances(type, HGAssociationSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGAssociationSupport.class, HGTM.hTypeOf));
   }
 
   @Override

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gingolph.tm.equality.Equality;
+import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -35,7 +38,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   public Set<Role> getRoles() {
-    return Collections.unmodifiableSet(support.getRoles());
+    return new UnmodifiableArraySet<>(support.getRoles(), SAMEquality::equalsNoParent);
   }
 
   @Override
@@ -49,11 +52,11 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   public Set<Topic> getRoleTypes() {
-    Set<Topic> roleTypes = new ArraySet<>(Objects::equals, true);
+    Set<TopicImpl> roleTypes = new IdentityHashSet<>();
     support.getRoles().forEach((role) -> {
       roleTypes.add(role.getType());
     });
-    return roleTypes;
+    return Collections.unmodifiableSet(roleTypes);
   }
 
   @Override
@@ -144,8 +147,10 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     if (merge) {
       otherAssociation.doRemove();
     }
+    
     otherRoles.forEach(otherRole -> createRole(otherRole.getType(), otherRole.getPlayer())
         .importIn(otherRole, merge));
+    
     itemIdentifiers.forEach(identifier -> importItemIdentifier(identifier));
     if (getReifier() == null) {
       setReifier(otherReifier);
@@ -153,4 +158,5 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
       getReifier().mergeIn(otherReifier);
     }
   }
+  
 }

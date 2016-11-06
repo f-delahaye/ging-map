@@ -9,7 +9,6 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
-import org.tmapi.core.Role;
 
 /**
  * 
@@ -21,7 +20,7 @@ import org.tmapi.core.Role;
  * @author Borislav Iordanov
  *
  */
-public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSupport, HGLink {
+public class HGRoleSupport extends HGConstructSupport<RoleImpl> implements RoleSupport, HGLink {
   private transient final HGHandle[] targetSet;
 
   public HGRoleSupport() {
@@ -46,7 +45,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
   }
     
   @Override
-  protected Role createOwner() {
+  protected RoleImpl createOwner() {
     HGAssociationSupport parent = hyperGraph.get(targetSet[2]);
     RoleImpl role =
         new RoleImpl(parent.getTopicMapSupport().getOwner(), (AssociationImpl) parent.getOwner());

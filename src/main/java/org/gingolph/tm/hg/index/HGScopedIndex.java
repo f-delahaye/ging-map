@@ -2,16 +2,15 @@ package org.gingolph.tm.hg.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.ArraySet;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.UnmodifiableArraySet;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGNameSupport;
 import org.gingolph.tm.hg.HGOccurrenceSupport;
@@ -120,12 +119,12 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Association> getAssociations(Topic theme) {
-    return getScoped(theme, HGAssociationSupport.class);
+    return Collections.unmodifiableCollection(getScoped(theme, HGAssociationSupport.class));
   }
 
   @Override
   public Collection<Association> getAssociations(Topic[] themes, boolean matchAll) {
-    return getScoped(themes, matchAll, HGAssociationSupport.class);
+    return Collections.unmodifiableCollection(getScoped(themes, matchAll, HGAssociationSupport.class));
   }
 
   @Override
@@ -168,11 +167,11 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     if (theme == null) {
       throw new IllegalArgumentException("Null scope not allowed");
     }
-    Set<Variant> allVariants = new ArraySet<>(Objects::equals, true);
+    List<Variant> allVariants = new ArrayList<>();
     allVariants.addAll(getScoped(theme, HGVariantSupport.class));
     allVariants.addAll(getScoped(theme, HGNameSupport.class).stream()
         .flatMap(name -> name.getVariants().stream()).collect(Collectors.toList()));
-    return allVariants;
+    return new UnmodifiableArraySet<>(allVariants);
   }
 
   @Override
@@ -186,9 +185,9 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    Set<Topic> allThemes = new ArraySet<>(Objects::equals, true);
+    List<Topic> allThemes = new ArrayList<>();
     allThemes.addAll(getScopedThemes(HGVariantSupport.class));
     allThemes.addAll(getScopedThemes(HGNameSupport.class));
-    return allThemes;
+    return new UnmodifiableArraySet<>(allThemes);
   }
 }

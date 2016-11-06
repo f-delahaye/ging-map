@@ -1,11 +1,11 @@
 package org.gingolph.tm.memory;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.gingolph.tm.AbstractConstruct;
-import org.gingolph.tm.ArraySet;
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -24,8 +24,8 @@ import org.tmapi.index.TypeInstanceIndex;
 
 
 public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSupport {
-  Set<Topic> topics = new ArraySet<>(Objects::equals);
-  Set<Association> associations = new ArraySet<>(Objects::equals);
+  List<TopicImpl> topics = new ArrayList<>();
+  List<AssociationImpl> associations = new ArrayList<>();
   TopicImpl reifier;
   TopicMapImpl topicMap;
   private Locator baseLocator;
@@ -40,12 +40,12 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
   
   @Override
-  public Set<Topic> getTopics() {
+  public List<TopicImpl> getTopics() {
     return topics;
   }
 
   @Override
-  public void addTopic(Topic topic) {
+  public void addTopic(TopicImpl topic) {
     topics.add(topic);
   }
 
@@ -55,12 +55,12 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public Set<Association> getAssociations() {
+  public List<AssociationImpl> getAssociations() {
     return associations;
   }
 
   @Override
-  public void addAssociation(Association association) {
+  public void addAssociation(AssociationImpl association) {
     associations.add(association);
   }
 
