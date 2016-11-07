@@ -230,8 +230,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Name> getNames() {
+    List<NameImpl> names = getNullSafeNameImpls();    
+    return names.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(names);
+  }
+
+  private List<NameImpl> getNullSafeNameImpls() {
     List<NameImpl> names = support.getNames();
-    return names == null ? Collections.emptySet() : new UnmodifiableArraySet<>(names);
+    return names == null ? Collections.emptyList():names;
   }
 
   @Override
@@ -239,8 +244,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null not allowed");
     }
-    final Set<Name> names = getNames();
-    return names.stream().filter(name -> name.getType().equals(type)).collect(Collectors.toSet());
+    final List<NameImpl> names = getNullSafeNameImpls().stream().filter(name -> name.getType().equals(type)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(names);
   }
 
   @Override
@@ -291,8 +296,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Occurrence> getOccurrences() {
+    List<OccurrenceImpl> occurrences = getNullSafeOccurrenceImpls();
+    return occurrences.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(occurrences);
+  }
+
+  private List<OccurrenceImpl> getNullSafeOccurrenceImpls() {
     List<OccurrenceImpl> occurrences = support.getOccurrences();
-    return occurrences == null ? Collections.emptySet() : new UnmodifiableArraySet<>(occurrences);
+    return occurrences == null?Collections.emptyList() : occurrences;
   }
 
   @Override
@@ -300,11 +310,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    if (getOccurrences() == null) {
-      return Collections.emptySet();
-    }
-    return getOccurrences().stream().filter(occurrence -> occurrence.getType() == type)
-        .collect(Collectors.toSet());
+    return new UnmodifiableCollectionSet<>(getNullSafeOccurrenceImpls().stream().filter(occurrence -> occurrence.getType().equals(type)).collect(Collectors.toList()));
   }
 
   @Override
@@ -374,7 +380,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   @Override
   public Set<Role> getRolesPlayed() {
     final List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls();
-    return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableArraySet<>(rolesPlayed);
+    return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(rolesPlayed);
   }
 
   private List<RoleImpl> getNullSafeRolePlayedImpls() {
@@ -383,12 +389,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Set<Role> getRolesPlayed(Topic type) {
-    if (type == null) {
+  public Set<Role> getRolesPlayed(Topic roleType) {
+    if (roleType == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    return getRolesPlayed().stream().filter(role -> role.getType() == type)
-        .collect(Collectors.toSet());
+    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(rolesPlayed); 
   }
 
   @Override
@@ -399,9 +405,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (associationType == null) {
       throw new IllegalArgumentException("Null association type not allowed");
     }
-    return getRolesPlayed().stream()
-        .filter(role -> role.getType() == roleType && role.getParent().getType() == associationType)
-        .collect(Collectors.toSet());
+    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType) && role.getParent().getType().equals(associationType)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(rolesPlayed);    
   }
 
   void addRolePlayed(RoleImpl role) {
@@ -410,7 +415,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Topic> getTypes() {
-    Set<Topic> types = support.getTypes();
+    Set<TopicImpl> types = support.getTypes();
     return types == null ? Collections.emptySet() : Collections.unmodifiableSet(types);
   }
 
@@ -420,7 +425,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   protected void doAddType(Topic type) {
-    support.addType(type);
+    support.addType((TopicImpl)type, getTopicMap().getEquality());
     getTopicMap().notifyListeners(listener -> listener.onTypeChanged(this, type, null));
   }
 
@@ -503,7 +508,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
 
@@ -513,9 +518,9 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public int hashCode() {
-    throw new UnsupportedOperationException();
-  }
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
 
 //  public boolean matches(TopicImpl otherTopic) {
 //    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())

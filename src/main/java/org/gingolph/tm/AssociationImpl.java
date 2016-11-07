@@ -16,7 +16,7 @@ import org.tmapi.core.Topic;
 
 
 
-public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSupport>
+public class AssociationImpl extends ScopedTopicMapItem<TopicMapImpl, AssociationSupport>
     implements Association, TypedConstruct {
 
   public AssociationImpl(TopicMapImpl topicMap) {
@@ -36,7 +36,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   public Set<Role> getRoles() {
-    return new UnmodifiableArraySet<>(getNullSafeRoleImpls());
+    return new UnmodifiableCollectionSet<>(getNullSafeRoleImpls());
   }
 
   public List<RoleImpl> getNullSafeRoleImpls() {
@@ -55,7 +55,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
 
   @Override
   public Set<Topic> getRoleTypes() {
-    Set<TopicImpl> roleTypes = new IdentityHashSet<>();
+    Set<TopicImpl> roleTypes = getTopicMap().getEquality().newTopicSet();
     getNullSafeRoleImpls().forEach((role) -> {
       roleTypes.add(role.getType());
     });
@@ -100,12 +100,12 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
@@ -128,9 +128,14 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (AssociationImpl)otherObjectOfSameClass);
   }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
 
   // Consistent with equals and not too much overhead calculating lots of hashCodes ... but probably has poor distribution
   // TODO: should all the roles' hashcodes be included as well?

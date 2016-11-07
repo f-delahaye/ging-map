@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.tmapi.core.Locator;
@@ -15,7 +14,7 @@ import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
 
-public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
+public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
     implements Name, Valued, TypedConstruct {
 
   public NameImpl(TopicMapImpl topicMap, TopicImpl parent) {
@@ -43,7 +42,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   @Override
   public Set<Variant> getVariants() {
     List<VariantImpl> variants = support.getVariants();
-    return variants == null ? Collections.emptySet() : new UnmodifiableArraySet<>(variants);
+    return variants == null ? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
   }
 
   @Override
@@ -142,12 +141,12 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, getSupport());
+    ScopedHelper.setScope(this, scope, getSupport(), getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, getSupport());
+    ScopedHelper.addTheme(this, theme, getSupport(), getTopicMap().getEquality());
     // getVariants().stream().forEach((variant) -> {
     // variant.addTheme(theme);
     // });
@@ -177,16 +176,22 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (NameImpl)otherObjectOfSameClass);
   }
 
   // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+//  @Override
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+//  
+
   @Override
-  public int hashCode() {
-    return Objects.hashCode(getValue());
-  }
-  
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+    
   void importIn(Name otherName, boolean merge) {
     Collection<Variant> otherVariants = otherName.getVariants();
     otherVariants.forEach(otherVariant -> createVariant(otherVariant.getValue(),

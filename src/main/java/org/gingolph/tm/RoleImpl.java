@@ -75,9 +75,14 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (RoleImpl)otherObjectOfSameClass);
   }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
 
   @Override
   public String toString() {

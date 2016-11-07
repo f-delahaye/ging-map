@@ -1,17 +1,18 @@
 package org.gingolph.tm.equality;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.CollectionSet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
 
 public class SAMEquality implements Equality {
@@ -74,7 +75,7 @@ public class SAMEquality implements Equality {
 
   @Override
   public boolean equals(RoleImpl role1, RoleImpl role2) {
-    return equals(role1.getParent(), role2.getParent()) && equalsNoParent(role1, role2);
+    return associationEquals(role1.getParent(), role2.getParent(), false) && equalsNoParent(role1, role2);
   }
 
   protected boolean equalsNoParent(RoleImpl role, RoleImpl otherRole) {
@@ -158,39 +159,6 @@ public class SAMEquality implements Equality {
 
   @Override
   public Set<TopicImpl> newTopicSet() {
-    // TODO Auto-generated method stub
-    return null;
+    return new CollectionSet<>(new ArrayList<>());
   }
-
-  @Override
-  public Set<AssociationImpl> newAssociationSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<RoleImpl> newRoleSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<NameImpl> newNameSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<OccurrenceImpl> newOccurrenceSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<VariantImpl> newVariantSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
- 
 }

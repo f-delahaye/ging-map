@@ -3,6 +3,7 @@ package org.gingolph.tm;
 import java.util.List;
 import java.util.Set;
 
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -58,9 +59,9 @@ public interface TopicSupport extends ConstructSupport {
   void removeRolePlayed(Role role);
 
 
-  void addType(Topic type);
+  void addType(TopicImpl type, Equality equality);
 
-  Set<Topic> getTypes();
+  Set<TopicImpl> getTypes();
 
   boolean removeType(Topic type);
 

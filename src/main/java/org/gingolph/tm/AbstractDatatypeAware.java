@@ -9,7 +9,7 @@ import org.tmapi.core.ModelConstraintException;
 
 
 public abstract class AbstractDatatypeAware<P extends Construct, S extends DatatypeAwareSupport>
-    extends TopicMapItem<P, S> implements DatatypeAware, Valued {
+    extends ScopedTopicMapItem<P, S> implements DatatypeAware, Valued {
 
   public AbstractDatatypeAware(TopicMapImpl topicMap, P parent) {
     super(topicMap, parent);

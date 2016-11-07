@@ -22,6 +22,7 @@ import org.gingolph.tm.TopicMapSupport;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.VariantImpl;
 import org.gingolph.tm.VariantSupport;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.gingolph.tm.index.LiteralIndexImpl;
 import org.gingolph.tm.index.ScopedIndexImpl;
@@ -115,17 +116,17 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public final Set<Topic> getScope() {
-    Set<Topic> scope = new HashSet<>();
+  public final Set<TopicImpl> getScope() {
+    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newTopicSet();
     for (Json themeJson: nullSafeScope().asJsonList()) {
-      Topic theme = (Topic) getTopicMap().getConstructById(themeJson.asString());
+      TopicImpl theme = (TopicImpl) getTopicMap().getConstructById(themeJson.asString());
       scope.add(theme);
     }    
     return scope;
   }
 
   @Override
-  public final void addTheme(Topic theme) {
+  public final void addTheme(TopicImpl theme, Equality equality) {
     nullSafeScope().add(theme.getId());
   }
 
@@ -296,17 +297,17 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public final Set<Topic> getTypes() {
-    Set<Topic> types = new HashSet<>();
+  public final Set<TopicImpl> getTypes() {
+    Set<TopicImpl> types = owner.getTopicMap().getEquality().newTopicSet();
     for (Json typeJson: nullSafeTypes().asJsonList()) {
-      Topic type = (Topic) getTopicMap().getConstructById(typeJson.asString());
+      TopicImpl type = (TopicImpl) getTopicMap().getConstructById(typeJson.asString());
       types.add(type);
     }    
     return types;
   }
 
   @Override
-  public final void addType(Topic type) {
+  public final void addType(TopicImpl type, Equality equality) {
     nullSafeTypes().add(type.getId());
   }
 

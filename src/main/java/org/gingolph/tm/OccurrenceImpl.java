@@ -2,7 +2,6 @@ package org.gingolph.tm;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.Objects;
 
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Occurrence;
@@ -46,12 +45,12 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
@@ -74,13 +73,20 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (OccurrenceImpl)otherObjectOfSameClass);
   }
 
-  public int hashCode() {
-    return Objects.hashCode(getValue());
-  }
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+//  
+
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+  
     
   void importIn(Occurrence otherOccurrence, boolean merge) {
     if (otherOccurrence.getReifier() != null) {

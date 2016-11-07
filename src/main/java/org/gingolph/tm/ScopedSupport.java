@@ -1,14 +1,16 @@
 package org.gingolph.tm;
 
 import java.util.Set;
+
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Topic;
 
 
 public interface ScopedSupport {
 
-  void addTheme(Topic t);
+  void addTheme(TopicImpl t, Equality equality);
 
-  Set<Topic> getScope();
+  Set<TopicImpl> getScope();
 
   void removeTheme(Topic t);
 

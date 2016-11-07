@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.TypedSupport;
-import org.gingolph.tm.UnmodifiableArraySet;
+import org.gingolph.tm.UnmodifiableCollectionSet;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.gingolph.tm.hg.HGNameSupport;
@@ -83,7 +83,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     typedConstructs =
         hg.findAll(graph, hg.apply(supportHandleToOwnerMapping(graph, instanceSupportClass),
             hg.apply(hg.linkProjection(1), hg.apply(hg.deref(graph), relQuery))));
-    return matchAll ? filterMatchAll(typedConstructs, types) : new UnmodifiableArraySet<>(typedConstructs);
+    return matchAll ? filterMatchAll(typedConstructs, types) : new UnmodifiableCollectionSet<>(typedConstructs);
   }
 
   protected <T extends Construct> Set<T> filterMatchAll(Collection<T> typedConstructs,
@@ -96,7 +96,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     // TODO: try another solution that does not rely on comparing count with themes.length ... not
     // very reliable as it depends on whether we use a set or not, or whether a given contrutct may
     // have multiple times the same theme.
-    return new UnmodifiableArraySet<>(scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
+    return new UnmodifiableCollectionSet<>(scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
         .map(entry -> entry.getKey()).collect(Collectors.toList()));
   }
 
@@ -163,7 +163,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Occurrence> getOccurrences(Topic type) {
-    return getInstances(type, HGOccurrenceSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGOccurrenceSupport.class, HGTM.hTypeOf));
   }
 
   @Override
@@ -173,7 +173,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Name> getNames(Topic type) {
-    return getInstances(type, HGNameSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGNameSupport.class, HGTM.hTypeOf));
   }
 
   @Override

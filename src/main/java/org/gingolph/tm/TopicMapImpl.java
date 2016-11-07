@@ -37,7 +37,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
-  private Equality equality = new TMAPIEquality();
+  private Equality equality = new SAMEquality();
   
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
@@ -72,7 +72,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   @Override
   public Set<Topic> getTopics() {
-    return new UnmodifiableArraySet<>(support.getTopics());
+    return new UnmodifiableCollectionSet<>(support.getTopics());
   }
 
   @Override
@@ -202,7 +202,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public Set<Association> getAssociations() {
-    return new UnmodifiableArraySet<>(support.getAssociations());
+    return new UnmodifiableCollectionSet<>(support.getAssociations());
   }
 
   @Override
@@ -341,7 +341,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return supportFactory.createVariantSupport();
   }
   
-  Equality getEquality() {
+  public Equality getEquality() {
     return equality;
   }
   
@@ -350,7 +350,13 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   }
   
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return this == otherObjectOfSameClass;
   }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return System.identityHashCode(this);
+  }  
+  
 }

@@ -131,35 +131,4 @@ public class GingolphEquality implements Equality {
     // TODO Auto-generated method stub
     return null;
   }
-
-  @Override
-  public Set<AssociationImpl> newAssociationSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<RoleImpl> newRoleSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<NameImpl> newNameSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<OccurrenceImpl> newOccurrenceSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<VariantImpl> newVariantSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

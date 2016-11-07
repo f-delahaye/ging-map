@@ -13,7 +13,7 @@ import org.hypergraphdb.atom.HGRel;
 import org.tmapi.core.Name;
 import org.tmapi.core.Variant;
 
-public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport {
+public class HGNameSupport extends HGScopedSupport<NameImpl> implements NameSupport {
 
   private static final long serialVersionUID = 1L;
   
@@ -97,7 +97,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   }
 
   @Override
-  protected Name createOwner() {
+  protected NameImpl createOwner() {
     final HGTopicSupport parent = getParent();
     NameImpl name = new NameImpl(parent.getTopicMapSupport().getOwner(), parent.getOwner());
     name.setSupport(this);

@@ -9,7 +9,7 @@ import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 
-public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements OccurrenceSupport {
+public class HGOccurrenceSupport extends HGScopedSupport<OccurrenceImpl> implements OccurrenceSupport {
   private String value;
   private Locator datatype;
 
@@ -26,7 +26,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
   }
   
   @Override
-  protected Occurrence createOwner() {
+  protected OccurrenceImpl createOwner() {
     HGTopicSupport parent = getParent();
     OccurrenceImpl occurrence =
         new OccurrenceImpl(parent.getTopicMapSupport().getOwner(), parent.getOwner());

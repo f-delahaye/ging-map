@@ -3,6 +3,8 @@ package org.gingolph.tm;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Scoped;
 import org.tmapi.core.Topic;
@@ -11,9 +13,9 @@ import org.tmapi.core.Topic;
 public class ScopedHelper {
 
   public static <T extends TopicMapItem & Scoped> void setScope(T scoped, Collection<Topic> scope,
-      ScopedSupport support) {
+      ScopedSupport support, Equality equality) {
     if (scope != null) {
-      scope.forEach(theme -> addTheme(scoped, theme, support));
+      scope.forEach(theme -> addTheme(scoped, theme, support, equality));
     }
   }
 
@@ -22,14 +24,14 @@ public class ScopedHelper {
   }
 
   public static <T extends TopicMapItem & Scoped> void addTheme(T scoped, Topic theme,
-      ScopedSupport support) throws ModelConstraintException {
+      ScopedSupport support, Equality equality) throws ModelConstraintException {
     if (theme == null) {
       throw new ModelConstraintException(scoped, "Null theme not allowed");
     }
     if (scoped.getTopicMap() != theme.getTopicMap()) {
       throw new ModelConstraintException(scoped, "Different topic maps not allowed");
     }
-    support.addTheme(theme);
+    support.addTheme((TopicImpl)theme, equality);
     scoped.getTopicMap().notifyListeners(listener -> listener.onThemeChanged(scoped, theme, null));
   }
 

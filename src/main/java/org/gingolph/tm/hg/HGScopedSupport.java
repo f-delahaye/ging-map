@@ -3,17 +3,18 @@ package org.gingolph.tm.hg;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.IdentityHashSet;
+import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.ScopedSupport;
+import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.equality.Equality;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
-import org.tmapi.core.Construct;
 import org.tmapi.core.Topic;
 
-public abstract class HGScopedSupport<T extends Construct> extends HGConstructSupport<T>
+public abstract class HGScopedSupport<T extends AbstractConstruct> extends HGConstructSupport<T>
     implements ScopedSupport {
 
   private static final long serialVersionUID = 1L;
@@ -21,7 +22,7 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
   protected HGScopedSupport() {}
 
   @Override
-  public void addTheme(Topic theme) {
+  public void addTheme(TopicImpl theme, Equality equality) {
     HyperGraph graph = getGraph();
     final HGHandle scopedHandle = getHandle(graph, this);
     final HGHandle themeHandle = getHandle(graph, theme);
@@ -34,12 +35,16 @@ public abstract class HGScopedSupport<T extends Construct> extends HGConstructSu
 
   @HGIgnore
   @Override
-  public Set<Topic> getScope() {
+  public Set<TopicImpl> getScope() {
     HyperGraph graph = getGraph();
     final HGHandle handle = getHandle(graph, this);
-    return handle == null ? null
-        : new IdentityHashSet<>(HGTMUtil.<HGTopicSupport>getRelatedObjects(graph, HGTM.hScopeOf, handle, null).stream()
+    if (handle == null) {
+      return null;
+    }
+    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newTopicSet();
+    scope.addAll(HGTMUtil.<HGTopicSupport>getRelatedObjects(graph, HGTM.hScopeOf, handle, null).stream()
             .map(support -> support.getOwner()).collect(Collectors.toList()));
+    return scope;
   }
 
   @Override

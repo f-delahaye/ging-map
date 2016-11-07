@@ -3,16 +3,14 @@ package org.gingolph.tm.memory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
-import org.gingolph.tm.IdentityHashSet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
-import org.gingolph.tm.UnmodifiableArraySet;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -26,7 +24,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   private List<NameImpl> names;
   private List<OccurrenceImpl> occurrences;
   private List<RoleImpl> roles;
-  private Set<Topic> types;
+  private Set<TopicImpl> types;
   private Reifiable reified;
 
   public IMTopicSupport() {}
@@ -138,9 +136,9 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public void addType(Topic type) {
+  public void addType(TopicImpl type, Equality equality) {
     if (types == null) {
-      types = new IdentityHashSet<>();
+      types = equality.newTopicSet();
     }
     types.add(type);
   }
@@ -155,7 +153,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public Set<Topic> getTypes() {
+  public Set<TopicImpl> getTypes() {
     return types;
   }
 

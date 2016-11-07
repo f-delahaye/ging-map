@@ -36,15 +36,5 @@ public interface Equality {
     public int hashCode(VariantImpl variant);
     
     
-    public Set<TopicImpl> newTopicSet();
-
-    public Set<AssociationImpl> newAssociationSet();
-    
-    public Set<RoleImpl> newRoleSet();
-    
-    public Set<NameImpl> newNameSet();
-    
-    public Set<OccurrenceImpl> newOccurrenceSet();
-    
-    public Set<VariantImpl> newVariantSet();    
+    public Set<TopicImpl> newTopicSet();    
 }

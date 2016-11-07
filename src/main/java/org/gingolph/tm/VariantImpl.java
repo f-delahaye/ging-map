@@ -29,7 +29,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    Set<TopicImpl> scope = new IdentityHashSet<>();
+    Set<TopicImpl> scope = getTopicMap().getEquality().newTopicSet();
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(getParent().getScope()));
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(support.getScope()));
     return Collections.unmodifiableSet(scope);
@@ -37,12 +37,12 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
@@ -65,13 +65,19 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   }
   
   @Override
-  protected boolean equalTo(Object otherObjectOfSameClass) {
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
     return getTopicMap().getEquality().equals(this, (VariantImpl)otherObjectOfSameClass);
   }
   
   // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+//  @Override
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+
   @Override
-  public int hashCode() {
-    return Objects.hashCode(getValue());
-  }
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+  
 }

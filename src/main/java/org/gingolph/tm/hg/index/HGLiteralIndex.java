@@ -65,7 +65,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     List<HGOccurrenceSupport> occurrenceSupports =
         hg.getAll(graph, hg.and(hg.type(HGOccurrenceSupport.class), hg.eq("value", value),
             hg.eq("datatype", datatype)));
-    return getIndexResults(occurrenceSupports);
+    return Collections.unmodifiableCollection(getIndexResults(occurrenceSupports));
   }
 
   @Override
@@ -101,7 +101,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     }
     List<HGNameSupport> nameSupports =
         hg.getAll(graph, hg.and(hg.type(HGNameSupport.class), hg.eq("value", value)));
-    return getIndexResults(nameSupports);
+    return Collections.unmodifiableCollection(getIndexResults(nameSupports));
   }
 
   protected <C extends Construct> Collection<C> getIndexResults(

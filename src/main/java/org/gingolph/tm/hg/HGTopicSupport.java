@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gingolph.tm.IdentityHashSet;
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.equality.Equality;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HGSearchResult;
@@ -116,7 +116,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public void addType(Topic type) {
+  public void addType(TopicImpl type, Equality equality) {
     HyperGraph graph = getGraph();
     HGHandle tHandle = getHandle(graph, type);
     graph.add(new HGRel(HGTM.TypeOf, new HGHandle[] {tHandle, getHandle(graph, this)}),
@@ -124,8 +124,10 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public Set<Topic> getTypes() {
-    return new IdentityHashSet<>(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false));
+  public Set<TopicImpl> getTypes() {
+    Set<TopicImpl> types = owner.getTopicMap().getEquality().newTopicSet();
+    types.addAll(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false));
+    return types;
   }
 
   @Override

@@ -88,9 +88,15 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
     if (obj.getClass() != getClass()) {
       return false;
     }
-    return equalTo(obj);
+    return equalsFromEquality(obj);
   }
   
-  protected abstract boolean equalTo(Object otherObjectOfSameClass);
+  protected abstract boolean equalsFromEquality(Object otherObjectOfSameClass);
   
+  @Override
+  public final int hashCode() {
+    return hashCodeFromEquality();
+  }
+
+  protected abstract int hashCodeFromEquality();
 }

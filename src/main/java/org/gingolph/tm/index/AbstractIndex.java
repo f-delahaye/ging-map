@@ -6,13 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.IdentityHashSet;
-import org.gingolph.tm.UnmodifiableArraySet;
+import org.gingolph.tm.UnmodifiableCollectionSet;
 import org.gingolph.tm.event.TopicMapEventListenerSupport;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
@@ -73,11 +70,11 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
       return propertiedObjects.stream().filter(propertiedObject -> propertiesSource
           .apply(propertiedObject).containsAll(remainingProperties)).collect(Collectors.toList());
     } else {
-      Set<T> propertiedObjects = new IdentityHashSet<>();
+      List<T> propertiedObjects = new ArrayList<>();
       for (Topic theme : properties) {
         propertiedObjects.addAll(cache.getOrDefault(theme, Collections.emptyList()));
       }
-      return Collections.unmodifiableCollection(propertiedObjects);
+      return new UnmodifiableCollectionSet<>(propertiedObjects);
     }
   }
 

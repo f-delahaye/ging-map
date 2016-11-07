@@ -1,5 +1,6 @@
 package org.gingolph.tm.equality;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.gingolph.tm.AssociationImpl;
@@ -43,74 +44,36 @@ public class TMAPIEquality implements Equality {
 
   @Override
   public int hashCode(TopicImpl topic) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(topic);
   }
 
   @Override
   public int hashCode(AssociationImpl association) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(association);    
   }
 
   @Override
   public int hashCode(RoleImpl role) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(role);
   }
 
   @Override
   public int hashCode(NameImpl name) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(name);
   }
 
   @Override
   public int hashCode(OccurrenceImpl occurrence) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(occurrence);
   }
 
   @Override
   public int hashCode(VariantImpl variant) {
-    // TODO Auto-generated method stub
-    return 0;
+    return System.identityHashCode(variant);
   }
 
   @Override
   public Set<TopicImpl> newTopicSet() {
-    // TODO Auto-generated method stub
-    return null;
+    return new HashSet<>();
   }
-
-  @Override
-  public Set<AssociationImpl> newAssociationSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<RoleImpl> newRoleSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<NameImpl> newNameSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<OccurrenceImpl> newOccurrenceSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Set<VariantImpl> newVariantSet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

@@ -1,16 +1,14 @@
 package org.gingolph.tm;
 
 import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Implementation of Set which does NOT check for duplicates.
  * 
- *  To honour the Set contract, this class is <b>NOT</> modifiable, and <b>MUST</> backed by a List which does not contain duplicates.
+ *  To honour the Set contract, this class does <b>NOT</> support add(), and <b>MUST</> backed by a List which does not contain duplicates.
  * 
  * This guarantees this Set will never contain duplicates.
  * 
@@ -21,13 +19,13 @@ import java.util.Set;
  * But class allows us to call Construct.equals(), which may or may not be that of the spec, depending of the Equality algorithm selected by users.
  * So for example, users may call TopicMap.getTopics().contains(topic) and expect contains() to be compliant with their selected Equality, which would not be the case had we use an IdentityHashSet.
  * 
- * To have a modifiable set of Topics which still respects the selected Equality, Equality.newTopicSet(TopicMap.getTopics()) could be used.
+ * To have a modifiable set of Topics which still respects the selected Equality, new ArraySet(TopicMap.getTopics()) could be used.
  * 
  * @param <E>
  */
-public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
+public class UnmodifiableCollectionSet<E> extends AbstractSet<E> implements Set<E> {
 
-  final List<E> delegate;
+  final Collection<E> delegate;
 
   /**
    * Allows to specify the list that will be used to store elements.
@@ -36,8 +34,8 @@ public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
    * 
    * @param equals
    */
-  public UnmodifiableArraySet(Collection<? extends E> c) {
-    this.delegate = c instanceof List?(List<E>)c:new ArrayList<E>(c);
+  public UnmodifiableCollectionSet(Collection<? extends E> c) {
+    this.delegate = (Collection)c;
   }
     
   @Override
@@ -46,56 +44,25 @@ public class UnmodifiableArraySet<E> extends AbstractSet<E> implements Set<E> {
   }
 
   @Override
-  public boolean isEmpty() {
-    return delegate.isEmpty();
-  }
-
-  @Override
-  public boolean contains(Object o) {
-    return indexOf(o) != -1;
-  }
-
-
-  @Override
   public Iterator<E> iterator() {
-    return delegate.iterator();
-  }
+    return new Iterator<E>() {
+      Iterator<E> i = delegate.iterator();
 
-  @Override
-  public Object[] toArray() {
-    return delegate.toArray();
-  }
-
-  @Override
-  public <T> T[] toArray(T[] a) {
-    return delegate.toArray(a);
-  }
-  protected int indexOf(Object o) {
-    @SuppressWarnings("unchecked")
-    E element = (E)o;
-    for (int i=0; i<delegate.size(); i++) {
-      E candidate = delegate.get(i);
-      if (candidate.equals(element)) {
-        return i;
+      @Override
+      public boolean hasNext() {
+        return i.hasNext();
       }
-    }
-    return -1;
-    
-  }
 
-  @Override
-  public boolean add(E e) {
-    throw new UnsupportedOperationException();  
+      @Override
+      public E next() {
+        return i.next();
+      }
+      // remove() by default is not supported which is the desired behavior.
+    };
   }
   
   @Override
   public boolean remove(Object o) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
+  }  
 }
