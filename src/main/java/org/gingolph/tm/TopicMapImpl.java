@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import org.gingolph.tm.equality.Equality;
@@ -37,7 +36,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
-  private Equality equality = new SAMEquality();
+  private final Equality equality;
   
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
@@ -45,6 +44,8 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     this.topicMapSystem = topicMapSystem;
     this.autoMerge = autoMerge;
     this.supportFactory = supportFactory;
+    String userSpecifiedEquality = topicMapSystem.getProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.TMAPI_EQUALITY);    
+    equality = AbstractTopicMapSystemFactory.SAM_EQUALITY.equals(userSpecifiedEquality)? new SAMEquality():new TMAPIEquality();
   }
 
   @Override
@@ -297,10 +298,9 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return listener;
   }
 
-  public NameImpl createName(TopicImpl topic, String value) {
+  public NameImpl createName(TopicImpl topic) {
     NameImpl name = new NameImpl(this, topic);
     name.setSupport(createNameSupport());
-    name.setValue(value);
     return name;
   }
 

@@ -36,13 +36,21 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
     if (value == null) {
       throw new ModelConstraintException(this, "Null value not allowed");
     }
+    String oldValue = support.getValue();
     support.setValue(value);
+    getTopicMap().notifyListeners(listener -> listener.onValueChanged(this, value, oldValue));
+    
   }
 
   @Override
   public Set<Variant> getVariants() {
+    List<VariantImpl> variants = getNullSafeVariantImpls();
+    return variants.isEmpty()? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
+  }
+
+  public List<VariantImpl> getNullSafeVariantImpls() {
     List<VariantImpl> variants = support.getVariants();
-    return variants == null ? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
+    return variants == null?Collections.emptyList():variants;
   }
 
   @Override

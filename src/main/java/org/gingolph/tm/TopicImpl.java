@@ -234,7 +234,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return names.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(names);
   }
 
-  private List<NameImpl> getNullSafeNameImpls() {
+  public List<NameImpl> getNullSafeNameImpls() {
     List<NameImpl> names = support.getNames();
     return names == null ? Collections.emptyList():names;
   }
@@ -268,10 +268,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (scope == null) {
       throw new ModelConstraintException(this, "Null scope not allowed");
     }
-    NameImpl name = getTopicMap().createName(this, value);
+    NameImpl name = getTopicMap().createName(this);
     support.addName(name);
     name.setScope(scope);
     name.setType(type);
+    name.setValue(value);
     getTopicMap().notifyListeners(listener -> listener.onConstructCreated(name));
     return name;
   }
@@ -300,7 +301,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return occurrences.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(occurrences);
   }
 
-  private List<OccurrenceImpl> getNullSafeOccurrenceImpls() {
+  public List<OccurrenceImpl> getNullSafeOccurrenceImpls() {
     List<OccurrenceImpl> occurrences = support.getOccurrences();
     return occurrences == null?Collections.emptyList() : occurrences;
   }

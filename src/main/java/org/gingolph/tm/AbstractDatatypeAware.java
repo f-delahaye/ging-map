@@ -47,8 +47,10 @@ public abstract class AbstractDatatypeAware<P extends Construct, S extends Datat
     if (datatype == null) {
       throw new ModelConstraintException(this, "Null datatype not allowed");
     }
+    String oldValue = support.getValue();
     support.setValue(value.toString());
     support.setDatatype(datatype);
+    getTopicMap().notifyListeners(listener -> listener.onValueChanged(this, value.toString(), oldValue));
   }
 
   @Override

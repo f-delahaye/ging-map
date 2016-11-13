@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.Valued;
+import org.tmapi.core.Construct;
 import org.tmapi.core.DatatypeAware;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Name;
@@ -37,7 +38,7 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
       throw new IllegalArgumentException("Null datatype not allowed");
     }
     return getValued(value, valuedClass).stream()
-        .filter(occurrence -> occurrence.getDatatype() == datatype).collect(Collectors.toList());
+        .filter(occurrence -> LocatorImpl.XSD_ANY_URI.equals(datatype) || datatype.equals(occurrence.getDatatype())).collect(Collectors.toList());
   }
 
   @Override
@@ -47,6 +48,9 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
 
   @Override
   public Collection<Occurrence> getOccurrences(Locator value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
+    }    
     return getOccurrences(value.getReference(), LocatorImpl.XSD_ANY_URI);
   }
 
@@ -62,6 +66,9 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
 
   @Override
   public Collection<Variant> getVariants(Locator value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
+    }
     return getVariants(value.getReference(), LocatorImpl.XSD_ANY_URI);
   }
 
@@ -72,6 +79,9 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
 
   @Override
   public Collection<Name> getNames(String value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Null value not supported");
+    }    
     return getValued(value, Name.class);
   }
 
@@ -90,18 +100,32 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
   @Override
   public void onValueChanged(Valued valued, String valueSet, String valueRemoved) {
     if (valueSet != null) {
-      Collection<Valued> collection = cache.get(valueSet);
-      if (collection == null) {
-        collection = new ArrayList<>();
-        cache.put(valueSet, collection);
-      }
-      collection.add(valued);
+      cache.computeIfAbsent(valueSet, key -> new ArrayList<>()).add(valued);
     }
     if (valueRemoved != null) {
-      Collection<Valued> collection = cache.get(valueSet);
-      if (collection != null) {
-        collection.remove(valued);
-      }
+      cache.computeIfPresent(valueRemoved, (k, v) -> removeAndNullifyIfEmpty(v, valued));
     }
+  }
+  
+
+//  @Override
+//  public void onConstructCreated(Construct construct) {
+//      if (construct instanceof Valued) {
+//        Valued valued = (Valued) construct;
+//        cache.computeIfAbsent(valued.getValue(), key -> new ArrayList<>()).add(valued);
+//    }
+//  }
+
+  @Override
+  public void onConstructRemoved(Construct construct) {
+    if (construct instanceof Valued) {
+      Valued valued = (Valued) construct;
+      cache.computeIfPresent(valued.getValue(), (k, v) -> removeAndNullifyIfEmpty(v, valued));
+    }  
+  }
+  
+  protected Collection<Valued> removeAndNullifyIfEmpty(Collection<Valued> collection, Valued toRemove) {
+    collection.remove(toRemove);
+    return collection.isEmpty() ? null : collection; 
   }
 }

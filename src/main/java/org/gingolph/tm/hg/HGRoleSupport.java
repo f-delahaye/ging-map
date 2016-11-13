@@ -4,7 +4,6 @@ import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
-import org.gingolph.tm.TopicMapImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
@@ -29,19 +28,20 @@ public class HGRoleSupport extends HGConstructSupport<RoleImpl> implements RoleS
 
   private HGRoleSupport(HGHandle[] targetSet) {
     this.targetSet = targetSet;
-    // HGRoleSupport does not have the same needs as other constructs:
-    // usually graph is injected to Constructs when they get persisted (by virtue of them
-    // implementing HoldingContainer).
-    // However, in order to persist a HGRoleConstruct, we need a graph to lookup handles of player
-    // and type, so it has to be provided externally.
-    setHyperGraph(
-        ((HGTopicMapSupport) ((TopicMapImpl) owner.getTopicMap()).getSupport()).getGraph());
-    targetSet[2] = getHandle(getGraph(), owner.getParent());
   }
 
   @Override
   public void setOwner(RoleImpl owner) {
       this.owner = owner;
+      // HGRoleSupport does not have the same needs as other constructs:
+      // usually graph is injected to Constructs when they get persisted (by virtue of them
+      // implementing HoldingContainer).
+      // However, in order to persist a HGRoleConstruct, we need a graph to lookup handles of player
+      // and type, so it has to be provided externally.
+      setHyperGraph(
+          ((HGTopicMapSupport) (owner.getTopicMap()).getSupport()).getGraph());
+    targetSet[2] = getHandle(getGraph(), owner.getParent());
+      
   }
     
   @Override

@@ -1,6 +1,7 @@
 package org.gingolph.tm.equality;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 import org.gingolph.tm.AssociationImpl;
@@ -74,6 +75,6 @@ public class TMAPIEquality implements Equality {
 
   @Override
   public Set<TopicImpl> newTopicSet() {
-    return new HashSet<>();
+    return Collections.newSetFromMap(new IdentityHashMap<>());
   }
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Construct;
@@ -44,7 +45,7 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
       if (classified != null) {
       // If scoped does have themes, they will be registered when construct.addTheme is invoked so we only handle unscoped items.
       if (getNullSafeClassifierList(classified).isEmpty()) {
-        getItemsByClassifier(classified.getClass()).unclassifiedItems.add(classified);
+        getItems(classified.getClass()).unclassifiedItems.add(classified);
       }
     }
   }
@@ -53,7 +54,7 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
   public void onConstructRemoved(Construct construct) {
     T classified = cast(construct);
     if (classified != null) {
-      ClassifiedAndUnclassifiedItems<T> itemsByThemes = getItemsByClassifier(classified.getClass());
+      ClassifiedAndUnclassifiedItems<T> itemsByThemes = getItems(classified.getClass());
       Collection<Topic> classifiers = getNullSafeClassifierList(classified);
       if (classifiers.isEmpty()) {
         itemsByThemes.unclassifiedItems.remove(classified);
@@ -84,22 +85,22 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
   }
 
   @SuppressWarnings("rawtypes")
-  protected abstract ClassifiedAndUnclassifiedItems<T> getItemsByClassifier(Class classifiedClass);
+  protected abstract ClassifiedAndUnclassifiedItems<T> getItems(Class classifiedClass);
 
-  protected <I extends T> Collection<I> getItemsByTheme(ClassifiedAndUnclassifiedItems<I> items, Topic theme) {
-    Collection<I> itemsByTheme = theme == null ? items.unclassifiedItems : items.scopedItems.get(theme);
+  protected <TM, G extends TM> Collection<TM> getItemsByClassifier(ClassifiedAndUnclassifiedItems<G> items, Topic theme) {
+    Collection<G> itemsByTheme = theme == null ? items.unclassifiedItems : items.scopedItems.get(theme);
     return itemsByTheme == null ? Collections.emptyList():Collections.unmodifiableCollection(itemsByTheme);
   }
   
-  protected <I extends T> Collection<I> getItemsByThemes(ClassifiedAndUnclassifiedItems<I> scopedAndUnscopedItems, Topic[] themes, boolean matchAll)
+  protected <TM, G extends TM> Collection<TM> getItemsByClassifiers(ClassifiedAndUnclassifiedItems<G> scopedAndUnscopedItems, Topic[] themes, boolean matchAll, Function<G, Collection<Topic>> propertiesSource)
       throws IllegalArgumentException {
     if (themes == null) {
       throw new IllegalArgumentException("Null themes not supported");
     }
-    return AbstractIndex.getPropertiedObjects(scopedAndUnscopedItems.scopedItems, this::getNullSafeClassifierList, themes, matchAll);
+    return AbstractIndex.getPropertiedObjects(scopedAndUnscopedItems.scopedItems, propertiesSource, themes, matchAll);
   }  
   
-  protected  Collection<Topic> getThemes(ClassifiedAndUnclassifiedItems<? extends T> itemsByThemes) {
+  protected  Collection<Topic> getClassifiers(ClassifiedAndUnclassifiedItems<? extends T> itemsByThemes) {
     return Collections.unmodifiableCollection(itemsByThemes.scopedItems.keySet());
   }
 }

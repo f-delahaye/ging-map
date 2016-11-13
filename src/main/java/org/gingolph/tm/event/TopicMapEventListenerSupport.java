@@ -35,7 +35,7 @@ public class TopicMapEventListenerSupport implements TopicMapEventListener {
 
   @Override
   public void onThemeChanged(Scoped scoped, Topic themeToAdd, Topic themeToRemove) {}
-
+    
   @Override
   public void onTypeChanged(TypedConstruct typed, Topic typeToAdd, Topic typeToRemove) {}
 
