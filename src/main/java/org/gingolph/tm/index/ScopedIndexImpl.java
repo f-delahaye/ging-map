@@ -10,6 +10,7 @@ import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Name;
@@ -27,7 +28,8 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
   ClassifiedAndUnclassifiedItems<Occurrence> occurrencesByThemes = new ClassifiedAndUnclassifiedItems<>();
   ClassifiedAndUnclassifiedItems<Variant> variantsByThemes = new ClassifiedAndUnclassifiedItems<>();
 
-  public ScopedIndexImpl(Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
+  public ScopedIndexImpl(Equality equality, Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
+    super(equality);
     associations.forEach(association -> registerItem(association, this.scopedAndUnscopedAssociations));
     topics.forEach(topic -> {
       topic.getNullSafeOccurrenceImpls().forEach(occurrence -> registerItem(occurrence, this.occurrencesByThemes));
@@ -36,6 +38,15 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
         name.getNullSafeVariantImpls().forEach(variant -> registerItem(variant, this.variantsByThemes));
       });
     });
+  }
+  
+  protected void onClassifiedWithClassifiersCreated(Scoped classified, Collection<Topic> classifiers) {
+    if (classified instanceof VariantImpl) {
+      // Variant.getScope() includes themes from parent but these are never added directly into the variant's scope and therefore never captured by addTheme.
+      // So we need to manually add them.
+      VariantImpl variant = (VariantImpl) classified;
+      classifiers.forEach(classifier -> { variantsByThemes.unclassify(variant, classifier); variantsByThemes.classify(variant, classifier);});      
+    }
   }
   
   @Override
@@ -143,6 +154,9 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
         // was previously unscoped, remove it from there
         scopedAndUnscoped.unclassifiedItems.remove(scoped);
       }
+    }
+    if (scoped instanceof NameImpl) {
+      ((NameImpl)scoped).getNullSafeVariantImpls().forEach(variant -> onThemeChanged(variant, themeToAdd, themeToRemove));
     }
   }
 

@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.gingolph.tm.UnmodifiableCollectionSet;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.event.TopicMapEventListenerSupport;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
@@ -18,8 +20,10 @@ import org.tmapi.index.Index;
 public abstract class AbstractIndex extends TopicMapEventListenerSupport implements Index {
 
   boolean open = false;
+  private Equality equality;
 
-  protected AbstractIndex() {}
+  protected AbstractIndex(Equality equality) {
+    this.equality = equality;}
 
   @Override
   public void open() {
@@ -61,21 +65,25 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
     if (properties.length == 0) {
       return Collections.emptyList();
     }
+    
+    Collection<T> result;
     if (matchAll) {
       List<Topic> remainingProperties = Arrays.asList(properties).subList(1, properties.length);
       Collection<C> propertiedObjects = cache.get(properties[0]);
       if (propertiedObjects == null) {
         return Collections.emptyList();
       }
-      return propertiedObjects.stream().filter(propertiedObject -> propertiesSource
+      result = propertiedObjects.stream().filter(propertiedObject -> propertiesSource
           .apply(propertiedObject).containsAll(remainingProperties)).collect(Collectors.toList());
     } else {
-      List<T> propertiedObjects = new ArrayList<>();
+      result = new ArrayList<>();
       for (Topic theme : properties) {
-        propertiedObjects.addAll(cache.getOrDefault(theme, Collections.emptyList()));
+        result.addAll(cache.getOrDefault(theme, Collections.emptyList()));
       }
-      return new UnmodifiableCollectionSet<>(propertiedObjects);
     }
+    Set<T> set = Collections.newSetFromMap(new IdentityHashMap<>());
+    set.addAll(result);
+    return Collections.unmodifiableSet(set);
   }
 
   protected <T> void onPropertyChanged(Map<Topic, Collection<T>> cache, T propertied,
@@ -104,6 +112,11 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
       }
       propertiedObjects.add(propertied);
     }
+  }
+
+  protected static <T> Collection<T> removeAndNullifyIfEmpty(Collection<T> collection, T toRemove) {
+    collection.remove(toRemove);
+    return collection.isEmpty() ? null : collection; 
   }
 
 }

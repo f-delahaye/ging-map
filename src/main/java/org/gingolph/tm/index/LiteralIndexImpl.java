@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.Valued;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Construct;
 import org.tmapi.core.DatatypeAware;
 import org.tmapi.core.Locator;
@@ -20,9 +21,12 @@ import org.tmapi.index.LiteralIndex;
 
 public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, TopicMapEventListener {
 
+  public LiteralIndexImpl(Equality equality) {
+    super(equality);
+  }
+
   Map<String, Collection<Valued>> cache = new LinkedHashMap<>();
 
-  public LiteralIndexImpl() {}
 
   @Override
   public boolean isAutoUpdated() {
@@ -122,10 +126,5 @@ public class LiteralIndexImpl extends AbstractIndex implements LiteralIndex, Top
       Valued valued = (Valued) construct;
       cache.computeIfPresent(valued.getValue(), (k, v) -> removeAndNullifyIfEmpty(v, valued));
     }  
-  }
-  
-  protected Collection<Valued> removeAndNullifyIfEmpty(Collection<Valued> collection, Valued toRemove) {
-    collection.remove(toRemove);
-    return collection.isEmpty() ? null : collection; 
   }
 }

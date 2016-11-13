@@ -155,18 +155,11 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
     ScopedHelper.addTheme(this, theme, getSupport(), getTopicMap().getEquality());
-    // getVariants().stream().forEach((variant) -> {
-    // variant.addTheme(theme);
-    // });
   }
 
   @Override
   public void removeTheme(Topic theme) {
-    ScopedHelper.removeTheme(this, theme, getSupport());
-    // getVariants().stream().forEach((variant) -> {
-    // variant.removeTheme(theme);
-    // });
-
+    ScopedHelper.removeTheme(this, theme, getSupport()); 
   }
 
   @Override

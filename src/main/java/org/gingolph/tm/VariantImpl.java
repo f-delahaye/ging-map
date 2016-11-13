@@ -33,7 +33,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(getParent().getScope()));
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(support.getScope()));
     return Collections.unmodifiableSet(scope);
-    // return ScopedHelper.getScope(scope);
+//    return ScopedHelper.getScope(support.getScope());
   }
 
   protected final void setScope(Collection<Topic> scope) {
@@ -47,7 +47,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public void removeTheme(Topic theme) {
-    ScopedHelper.removeTheme(this, theme, support);
+      ScopedHelper.removeTheme(this, theme, support);
   }
 
   @Override

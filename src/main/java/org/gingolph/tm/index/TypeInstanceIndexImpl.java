@@ -12,6 +12,7 @@ import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TypedConstruct;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Name;
@@ -30,7 +31,8 @@ public final class TypeInstanceIndexImpl extends ClassifiedItemsIndexImpl<TypedC
   ClassifiedAndUnclassifiedItems<OccurrenceImpl> occurrencesByTypes = new ClassifiedAndUnclassifiedItems<>();
   ClassifiedAndUnclassifiedItems<NameImpl> namesByTypes = new ClassifiedAndUnclassifiedItems<>();
 
-  public TypeInstanceIndexImpl(Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
+  public TypeInstanceIndexImpl(Equality equality, Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
+    super(equality);
     topics.forEach(topic -> {
       registerItem(topic, topicsByTypes);
       topic.getNullSafeOccurrenceImpls()

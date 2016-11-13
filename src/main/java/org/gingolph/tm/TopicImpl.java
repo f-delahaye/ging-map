@@ -427,7 +427,6 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   protected void doAddType(Topic type) {
     support.addType((TopicImpl)type, getTopicMap().getEquality());
-    getTopicMap().notifyListeners(listener -> listener.onTypeChanged(this, type, null));
   }
 
   @Override

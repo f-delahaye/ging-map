@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Locator;
@@ -24,8 +25,9 @@ public class IdentifierIndex extends AbstractIndex implements Index, TopicMapEve
   Map<Locator, Topic> topicsBySubjectLocators = new LinkedHashMap<>();
   Map<Locator, Construct> constructsByItemIdentifiers = new LinkedHashMap<>();
 
-  public IdentifierIndex(TopicMap topicMap, Collection<TopicImpl> topics,
+  public IdentifierIndex(TopicMapImpl topicMap, Collection<TopicImpl> topics,
       Collection<AssociationImpl> associations) {
+    super(topicMap.getEquality());
     onConstructCreated(topicMap);
     topics.forEach(topic -> {
       onConstructCreated(topic);

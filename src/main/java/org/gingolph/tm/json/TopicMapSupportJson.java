@@ -405,15 +405,15 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
     TopicMapImpl topicMap = getOwner();
     Index index;
       if (LiteralIndex.class.isAssignableFrom(type)) {
-        index = topicMap.registerListener(new LiteralIndexImpl());
+        index = topicMap.registerListener(new LiteralIndexImpl(topicMap.getEquality()));
       } else if (IdentifierIndex.class.isAssignableFrom(type)) {
         index = topicMap
             .registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
       } else if (ScopedIndex.class.isAssignableFrom(type)) {
-        index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
+        index = topicMap.registerListener(new ScopedIndexImpl(topicMap.getEquality(), getTopics(), getAssociations()));
       } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
         index =
-            topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
+            topicMap.registerListener(new TypeInstanceIndexImpl(topicMap.getEquality(), getTopics(), getAssociations()));
       } else {
         throw new UnsupportedOperationException("Unknown index " + type);
       }

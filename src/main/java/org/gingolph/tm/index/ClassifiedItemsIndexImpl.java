@@ -7,6 +7,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Topic;
@@ -14,6 +15,10 @@ import org.tmapi.core.Topic;
 public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
     implements TopicMapEventListener {
   
+  protected ClassifiedItemsIndexImpl(Equality equality) {
+    super(equality);
+  }
+
   // Inner class that mentions scoped and unscoped items for a given subclass of Scoped
   static class ClassifiedAndUnclassifiedItems<T> {
     // Using identityHashMap doesn't honour the selected EQuality but i see no other solutions ... its possible to implement an ArraySet but an ArrayMap seems impossible.
@@ -21,13 +26,7 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
     Collection<T> unclassifiedItems = new ArrayList<>();
     
     void unclassify(T scoped, Topic theme) {
-      Collection<T> itemsForTheme = scopedItems.get(theme);
-      if (itemsForTheme != null) {
-        itemsForTheme.remove(scoped);
-        if (itemsForTheme.isEmpty()) {
-          scopedItems.remove(theme);
-        }
-      }
+      scopedItems.computeIfPresent(theme, (k,v) -> removeAndNullifyIfEmpty(v, scoped));
     }
     
     void classify(T scoped, Topic theme) {
@@ -41,13 +40,22 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
   
   @Override
   public void onConstructCreated(Construct construct) {
-      T classified = cast(construct);
-      if (classified != null) {
-      // If scoped does have themes, they will be registered when construct.addTheme is invoked so we only handle unscoped items.
-      if (getNullSafeClassifierList(classified).isEmpty()) {
-        getItems(classified.getClass()).unclassifiedItems.add(classified);
+    T classified = cast(construct);
+    if (classified != null) {
+      Collection<Topic> classifiers = getNullSafeClassifierList(classified);
+      ClassifiedAndUnclassifiedItems<T> classifiedAndUnclassifiedItems = getItems(classified.getClass());
+      if (classifiers.isEmpty()) {
+        classifiedAndUnclassifiedItems.unclassifiedItems.add(classified);
+      } else {
+        onClassifiedWithClassifiersCreated(classified, classifiers);
       }
     }
+  }
+
+  protected void onClassifiedWithClassifiersCreated(T classified, Collection<Topic> classifiers) {
+    // In many cases, If classified does have classifiers, they will be registered when construct.addClassifier
+    // is invoked so we only handle unclassified items.
+    // However every rule has its exceptions, and variants are one.
   }
 
   @Override
