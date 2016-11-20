@@ -15,6 +15,7 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HGSearchResult;
 import org.hypergraphdb.HyperGraph;
+import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
 import org.hypergraphdb.util.HGUtils;
 import org.tmapi.core.Locator;
@@ -34,6 +35,9 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
    */
   private static final long serialVersionUID = 1L;
 
+  protected HGTopicSupport() {
+  }
+  
   public HGTopicMapSupport getTopicMapSupport() {
     return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
   }
@@ -59,6 +63,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hSubjectIdentifier);
   }
 
+  @HGIgnore
   @Override
   public Set<Locator> getSubjectIdentifiers() {
     HyperGraph graph = getGraph();
@@ -91,6 +96,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hSubjectLocator);
   }
 
+  @HGIgnore
   @Override
   public Set<Locator> getSubjectLocators() {
     HyperGraph graph = getGraph();
@@ -123,6 +129,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hTypeOf);
   }
 
+  @HGIgnore
   @Override
   public Set<TopicImpl> getTypes() {
     try {
@@ -157,6 +164,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hOccurrenceOf);
   }
 
+  @HGIgnore
   @Override
   public List<OccurrenceImpl> getOccurrences() {
     return HGTMUtil.getRelatedObjects(this, HGTM.hOccurrenceOf, false);
@@ -168,6 +176,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
     graph.remove(getHandle(graph, occurrence), false);
   }
 
+  @HGIgnore
   @Override
   public Reifiable getReified() {
     HyperGraph graph = getGraph();
@@ -184,6 +193,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
 
   }
 
+  @HGIgnore
   @Override
   public List<RoleImpl> getRolesPlayed() {
     List<RoleImpl> result = new ArrayList<>();
@@ -229,6 +239,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hNameOf);
   }
 
+  @HGIgnore
   @Override
   public List<NameImpl> getNames() {
     return HGTMUtil.getRelatedObjects(this, HGTM.hNameOf, false);

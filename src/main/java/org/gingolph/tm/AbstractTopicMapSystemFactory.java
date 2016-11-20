@@ -26,8 +26,8 @@ public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactor
                                                                        // Features
   public static final String READONLY = TMAPI_FEATURE_BASE_URL + "readOnly"; // - Read-only System
   
-  private static final String GINGOLPH_FEATURE_BASE_URL = "org.gingolph.";
-  public static final String EQUALITY_PROPERTY = GINGOLPH_FEATURE_BASE_URL+"Equality";
+  protected static final String GINGOLPH_BASE_URL = "org.gingolph.";
+  public static final String EQUALITY_PROPERTY = GINGOLPH_BASE_URL+"Equality";
   public static final String SAM_EQUALITY = "sam";
   public static final String TMAPI_EQUALITY = "tmapi";
 

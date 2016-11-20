@@ -7,7 +7,6 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Occurrence;
 
 public class HGOccurrenceSupport extends HGScopedSupport<OccurrenceImpl> implements OccurrenceSupport {
   private String value;
@@ -72,12 +71,8 @@ public class HGOccurrenceSupport extends HGScopedSupport<OccurrenceImpl> impleme
   @Override
   public void setValue(String value) {
     this.value = value;
-    final HyperGraph graph = getGraph();
-    if (graph != null) {
-      HGHandle handle = getHandle(graph, this);
-      if (handle != null) {
-        graph.replace(handle, this);
-      }
+    if (hyperGraph != null) {
+      hyperGraph.update(this);
     }
   }
 

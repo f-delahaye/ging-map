@@ -63,12 +63,8 @@ public class HGVariantSupport extends HGScopedSupport<VariantImpl> implements Va
   public void setValue(String value) {
     this.value = value;
     // let the index know about this change
-    final HyperGraph graph = getGraph();
-    if (graph != null) {
-      HGHandle handle = getHandle(graph, this);
-      if (handle != null) {
-        graph.replace(handle, this);
-      }
+    if (hyperGraph!= null) {
+        hyperGraph.update(this);
     }
   }
 

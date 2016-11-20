@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.gingolph.tm.ConstructSupport;
 import org.gingolph.tm.AbstractConstruct;
+import org.gingolph.tm.ConstructSupport;
+import org.gingolph.tm.TopicMapImpl;
 import org.hypergraphdb.HGGraphHolder;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
@@ -81,10 +82,10 @@ public abstract class HGConstructSupport<T extends Construct>
   }
 
   public HyperGraph getGraph() {
-    // if (hyperGraph == null) {
-    // hyperGraph =
-    // ((HGTopicMapSupport)((TopicMapImpl)owner.getTopicMap()).getSupport()).getGraph();
-    // }
+     if (hyperGraph == null) {
+     hyperGraph =
+     ((HGTopicMapSupport)((TopicMapImpl)getOwner().getTopicMap()).getSupport()).getGraph();
+     }
     return hyperGraph;
   }
 

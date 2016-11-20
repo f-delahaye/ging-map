@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
+
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.LocatorImpl;
@@ -22,7 +23,6 @@ import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.atom.HGRelType;
 import org.hypergraphdb.indexing.ByPartIndexer;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Occurrence;
 import org.tmapi.core.TopicMap;
 
 
@@ -32,18 +32,21 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   public static final String INFERRED_TYPES_RESOURCE =
       "/org/gingolph/tm/hg/inferredTypes.properties";
 
-  static {
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        HyperGraph graph = getHypergraphInstance();
-        if (graph != null) {
-          graph.close();
-        }
-      }
-    });
-  }
-
+  protected static final String HG_BASE_URL = GINGOLPH_BASE_URL + "hg.";
+  protected static final String HG_STORAGE_BASE_PROPERTY = HG_BASE_URL + "storage.";
+  public static final String HG_STORAGE_PATH_PROPERTY = HG_STORAGE_BASE_PROPERTY + "path";
+  
   public HGTopicMapSystemFactory() {
+// According to specs, HGEnvironment already registers a shutdown hook.    
+//    Runtime.getRuntime().addShutdownHook(new Thread() {
+//      public void run() {
+//        HyperGraph graph = getHypergraphInstance();
+//        if (graph != null) {
+//          graph.close();
+//        }
+//      }
+//    });
+    
     features.put(AUTOMERGE, Boolean.FALSE);
     features.put(MODEL, Boolean.FALSE);
     features.put(MERGE, Boolean.FALSE);
@@ -91,7 +94,7 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
     return topicMapSupport;
   }
 
-  protected static HyperGraph getHypergraphInstance() {
+  protected  HyperGraph getHypergraphInstance() {
     String path = getTopicMapPath();
     boolean exists = HGEnvironment.exists(path);
     HyperGraph graph = HGEnvironment.get(path);
@@ -101,12 +104,12 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
     return graph;
   }
 
-  protected static String getTopicMapPath() {
+  protected  String getTopicMapPath() {
     // final String path =
     // Integer.toString(locator.hashCode())+"/"+locator.getReference().replaceAll("[^A-Za-z0-9]",
     // "");
     // return path;
-    return "topicmaps";
+    return (String) getProperty(HG_STORAGE_PATH_PROPERTY);
   }
 
   @Override
@@ -202,5 +205,8 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   public void close(TopicMap topic) {}
 
   @Override
-  public void close() {}
+  public void close() {
+// Closing the instance would make sense in reallife but it massively slows unit tests down so we don't do anything here and wait until the ShutdownHook does its magic.
+//    getHypergraphInstance().close();
+  }
 }
