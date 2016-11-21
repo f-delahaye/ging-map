@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gingolph.tm.ScopedTopicMapItem;
@@ -186,9 +188,9 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    List<Topic> allThemes = new ArrayList<>();
+    Set<Topic> allThemes = Collections.newSetFromMap(new IdentityHashMap<Topic, Boolean>());
     allThemes.addAll(getScopedThemes(HGVariantSupport.class));
     allThemes.addAll(getScopedThemes(HGNameSupport.class));
-    return new UnmodifiableCollectionSet<>(allThemes);
+    return Collections.unmodifiableCollection(allThemes);
   }
 }

@@ -35,6 +35,10 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
   protected static final String HG_BASE_URL = GINGOLPH_BASE_URL + "hg.";
   protected static final String HG_STORAGE_BASE_PROPERTY = HG_BASE_URL + "storage.";
   public static final String HG_STORAGE_PATH_PROPERTY = HG_STORAGE_BASE_PROPERTY + "path";
+  // Whether the hypergraphdb instance should be closed or kept open when HGTopicMapSystemFactory.close() is called.
+  // If the property is "true", then the hypergraphdb will be left open, however, HG automatically registers a shutdown hook that will close it when the JVM terminates.
+  // If you have control over when HGTopicMapSystemFactory.close() is called then this flag should not be set (or set to false).
+  public static final String HG_STORAGE_KEEP_OPEN_PROPERTY = HG_STORAGE_BASE_PROPERTY + "keep-open";
   
   public HGTopicMapSystemFactory() {
 // According to specs, HGEnvironment already registers a shutdown hook.    
@@ -206,7 +210,8 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
 
   @Override
   public void close() {
-// Closing the instance would make sense in reallife but it massively slows unit tests down so we don't do anything here and wait until the ShutdownHook does its magic.
-//    getHypergraphInstance().close();
+    if (!Boolean.getBoolean(HG_STORAGE_KEEP_OPEN_PROPERTY)) {
+      getHypergraphInstance().close();
+    }
   }
 }
