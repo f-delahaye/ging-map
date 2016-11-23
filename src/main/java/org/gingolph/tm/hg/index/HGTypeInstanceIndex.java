@@ -3,7 +3,6 @@ package org.gingolph.tm.hg.index;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +11,7 @@ import java.util.stream.Collectors;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.TypedSupport;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.gingolph.tm.hg.HGNameSupport;
@@ -87,7 +87,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     if (matchAll) {
       typedConstructs = filterMatchAll(typedConstructs, types);
     }
-    Set<T> set = Collections.newSetFromMap(new IdentityHashMap<>());
+    Set<T> set = equality.newSet();
     set.addAll(typedConstructs);
     return Collections.unmodifiableSet(set);    
   }
@@ -115,8 +115,8 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
         .collect(Collectors.toList());
   }
 
-  public HGTypeInstanceIndex(HyperGraph graph) {
-    super(graph);
+  public HGTypeInstanceIndex(HyperGraph graph, Equality equality) {
+    super(graph, equality);
   }
 
 

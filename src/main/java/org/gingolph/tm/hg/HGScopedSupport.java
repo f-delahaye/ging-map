@@ -41,7 +41,7 @@ public abstract class HGScopedSupport<T extends AbstractConstruct> extends HGCon
     if (handle == null) {
       return null;
     }
-    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newTopicSet();
+    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newSet();
     scope.addAll(HGTMUtil.<HGTopicSupport>getRelatedObjects(graph, HGTM.hScopeOf, handle, null).stream()
             .map(support -> support.getOwner()).collect(Collectors.toList()));
     return scope;

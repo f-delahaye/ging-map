@@ -133,7 +133,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   @Override
   public Set<TopicImpl> getTypes() {
     try {
-      Set<TopicImpl> types = owner.getTopicMap().getEquality().newTopicSet();
+      Set<TopicImpl> types = owner.getTopicMap().getEquality().newSet();
       types.addAll(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false));
       return types;
     } catch (RuntimeException e) {

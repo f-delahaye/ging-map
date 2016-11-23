@@ -36,5 +36,5 @@ public interface Equality {
     public int hashCode(VariantImpl variant);
     
     
-    public Set<TopicImpl> newTopicSet();    
+    public <T> Set<T> newSet();    
 }

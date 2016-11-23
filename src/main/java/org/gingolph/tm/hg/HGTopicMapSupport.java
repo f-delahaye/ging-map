@@ -143,14 +143,14 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   public <I extends Index> I getIndex(Class<I> type) {
     Index index;
     if (LiteralIndex.class.isAssignableFrom(type)) {
-      index = new HGLiteralIndex(graph);
+      index = new HGLiteralIndex(graph, getOwner().getEquality());
     } else if (IdentifierIndex.class.isAssignableFrom(type)) {
       index = ((TopicMapImpl) owner)
           .registerListener(new IdentifierIndex(getOwner(), getTopics(), getAssociations()));
     } else if (ScopedIndex.class.isAssignableFrom(type)) {
-      index = new HGScopedIndex(graph);
+      index = new HGScopedIndex(graph, getOwner().getEquality());
     } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-      index = new HGTypeInstanceIndex(graph);
+      index = new HGTypeInstanceIndex(graph, getOwner().getEquality());
     } else {
       throw new UnsupportedOperationException("Unknown index " + type);
     }

@@ -29,7 +29,7 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    Set<TopicImpl> scope = getTopicMap().getEquality().newTopicSet();
+    Set<TopicImpl> scope = getTopicMap().getEquality().newSet();
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(getParent().getScope()));
     scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(support.getScope()));
     return Collections.unmodifiableSet(scope);

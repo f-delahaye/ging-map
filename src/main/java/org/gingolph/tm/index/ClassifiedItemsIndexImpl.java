@@ -105,7 +105,7 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
     if (themes == null) {
       throw new IllegalArgumentException("Null themes not supported");
     }
-    return AbstractIndex.getPropertiedObjects(scopedAndUnscopedItems.scopedItems, propertiesSource, themes, matchAll);
+    return getPropertiedObjects(scopedAndUnscopedItems.scopedItems, propertiesSource, themes, matchAll);
   }  
   
   protected  Collection<Topic> getClassifiers(ClassifiedAndUnclassifiedItems<? extends T> itemsByThemes) {

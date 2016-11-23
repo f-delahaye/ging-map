@@ -117,7 +117,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   
   @Override
   public final Set<TopicImpl> getScope() {
-    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newTopicSet();
+    Set<TopicImpl> scope = owner.getTopicMap().getEquality().newSet();
     for (Json themeJson: nullSafeScope().asJsonList()) {
       TopicImpl theme = (TopicImpl) getTopicMap().getConstructById(themeJson.asString());
       scope.add(theme);
@@ -298,7 +298,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   
   @Override
   public final Set<TopicImpl> getTypes() {
-    Set<TopicImpl> types = owner.getTopicMap().getEquality().newTopicSet();
+    Set<TopicImpl> types = owner.getTopicMap().getEquality().newSet();
     for (Json typeJson: nullSafeTypes().asJsonList()) {
       TopicImpl type = (TopicImpl) getTopicMap().getConstructById(typeJson.asString());
       types.add(type);

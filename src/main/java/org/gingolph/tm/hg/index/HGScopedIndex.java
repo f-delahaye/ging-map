@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.gingolph.tm.ScopedTopicMapItem;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.UnmodifiableCollectionSet;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGNameSupport;
 import org.gingolph.tm.hg.HGOccurrenceSupport;
@@ -50,8 +50,8 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     }
   }
 
-  public HGScopedIndex(HyperGraph graph) {
-    super(graph);
+  public HGScopedIndex(HyperGraph graph, Equality equality) {
+    super(graph, equality);
   }
 
   protected <T extends ScopedTopicMapItem<?, ?>, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic theme,
@@ -188,7 +188,7 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    Set<Topic> allThemes = Collections.newSetFromMap(new IdentityHashMap<Topic, Boolean>());
+    Set<Topic> allThemes = equality.newSet();
     allThemes.addAll(getScopedThemes(HGVariantSupport.class));
     allThemes.addAll(getScopedThemes(HGNameSupport.class));
     return Collections.unmodifiableCollection(allThemes);

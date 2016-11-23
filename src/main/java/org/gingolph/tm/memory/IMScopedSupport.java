@@ -13,7 +13,7 @@ public class IMScopedSupport extends IMConstructSupport implements ScopedSupport
 
   protected Set<TopicImpl> nullSafeScope(Equality equality) {
     if (scope == null) {
-      scope = equality.newTopicSet();
+      scope = equality.newSet();
     }
     return scope;
   }

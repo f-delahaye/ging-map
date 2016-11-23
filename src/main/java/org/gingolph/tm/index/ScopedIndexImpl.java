@@ -2,7 +2,6 @@ package org.gingolph.tm.index;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Set;
 
 import org.gingolph.tm.AssociationImpl;
@@ -115,7 +114,7 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    Set<Topic> variantThemes = Collections.newSetFromMap(new IdentityHashMap<Topic, Boolean>());
+    Set<Topic> variantThemes = equality.newSet();
     variantThemes.addAll(getClassifiers(variantsByThemes));
     variantThemes.addAll(getClassifiers(namesByThemes));
     return Collections.unmodifiableCollection(variantThemes);

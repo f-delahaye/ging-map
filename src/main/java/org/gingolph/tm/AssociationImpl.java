@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.tmapi.core.Association;
-import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
@@ -55,7 +53,7 @@ public class AssociationImpl extends ScopedTopicMapItem<TopicMapImpl, Associatio
 
   @Override
   public Set<Topic> getRoleTypes() {
-    Set<TopicImpl> roleTypes = getTopicMap().getEquality().newTopicSet();
+    Set<TopicImpl> roleTypes = getTopicMap().getEquality().newSet();
     getNullSafeRoleImpls().forEach((role) -> {
       roleTypes.add(role.getType());
     });

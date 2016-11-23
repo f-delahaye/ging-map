@@ -138,7 +138,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   @Override
   public void addType(TopicImpl type, Equality equality) {
     if (types == null) {
-      types = equality.newTopicSet();
+      types = equality.newSet();
     }
     types.add(type);
   }

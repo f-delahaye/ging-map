@@ -158,7 +158,7 @@ public class SAMEquality implements Equality {
   }
 
   @Override
-  public Set<TopicImpl> newTopicSet() {
+  public <T> Set<T> newSet() {
     return new CollectionSet<>(new ArrayList<>());
   }
 }

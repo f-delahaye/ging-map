@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,7 @@ import org.tmapi.index.Index;
 public abstract class AbstractIndex extends TopicMapEventListenerSupport implements Index {
 
   boolean open = false;
-  private Equality equality;
+  protected Equality equality;
 
   protected AbstractIndex(Equality equality) {
     this.equality = equality;}
@@ -56,7 +55,7 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
     return source == null ? Collections.emptyList() : Collections.unmodifiableCollection(source);
   }
 
-  protected static <T, C extends T> Collection<T> getPropertiedObjects(
+  protected <T, C extends T> Collection<T> getPropertiedObjects(
       Map<Topic, Collection<C>> cache, Function<C, Collection<Topic>> propertiesSource,
       Topic[] properties, boolean matchAll) throws IllegalArgumentException {
     if (properties == null) {
@@ -81,7 +80,7 @@ public abstract class AbstractIndex extends TopicMapEventListenerSupport impleme
         result.addAll(cache.getOrDefault(theme, Collections.emptyList()));
       }
     }
-    Set<T> set = Collections.newSetFromMap(new IdentityHashMap<>());
+    Set<T> set = equality.newSet();
     set.addAll(result);
     return Collections.unmodifiableSet(set);
   }

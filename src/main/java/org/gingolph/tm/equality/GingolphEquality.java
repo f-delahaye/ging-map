@@ -127,7 +127,7 @@ public class GingolphEquality implements Equality {
   }
 
   @Override
-  public Set<TopicImpl> newTopicSet() {
+  public <T> Set<T> newSet() {
     // TODO Auto-generated method stub
     return null;
   }

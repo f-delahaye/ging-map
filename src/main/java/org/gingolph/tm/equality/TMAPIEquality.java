@@ -74,7 +74,7 @@ public class TMAPIEquality implements Equality {
   }
 
   @Override
-  public Set<TopicImpl> newTopicSet() {
+  public <T> Set<T> newSet() {
     return Collections.newSetFromMap(new IdentityHashMap<>());
   }
 }
