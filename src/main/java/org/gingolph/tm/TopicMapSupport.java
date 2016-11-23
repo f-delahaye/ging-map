@@ -1,6 +1,7 @@
 package org.gingolph.tm;
 
-import java.util.Set;
+import java.util.List;
+
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
@@ -20,15 +21,15 @@ public interface TopicMapSupport extends ConstructSupport {
    */  
   void setOwner(TopicMapImpl owner);
   
-  Set<Topic> getTopics();
+  List<TopicImpl> getTopics();
 
-  void addTopic(Topic topic);
+  void addTopic(TopicImpl topic);
 
   void removeTopic(Topic topic);
 
-  Set<Association> getAssociations();
+  List<AssociationImpl> getAssociations();
 
-  void addAssociation(Association association);
+  void addAssociation(AssociationImpl association);
 
   void removeAssociation(Association association);
 
@@ -41,4 +42,13 @@ public interface TopicMapSupport extends ConstructSupport {
   public String generateId(AbstractConstruct construct);
 
   Locator createLocator(String value);
+  
+  /**
+   * Returns the topicmap's base locator
+   * 
+   * @return
+   */
+  public Locator getBaseLocator();
+
+  public void setBaseLocator(Locator locator);  
 }

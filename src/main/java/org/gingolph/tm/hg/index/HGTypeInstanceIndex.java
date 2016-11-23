@@ -3,13 +3,15 @@ package org.gingolph.tm.hg.index;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
 import org.gingolph.tm.TypedSupport;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.gingolph.tm.hg.HGNameSupport;
@@ -82,10 +84,15 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     typedConstructs =
         hg.findAll(graph, hg.apply(supportHandleToOwnerMapping(graph, instanceSupportClass),
             hg.apply(hg.linkProjection(1), hg.apply(hg.deref(graph), relQuery))));
-    return matchAll ? filterMatchAll(typedConstructs, types) : new HashSet<>(typedConstructs);
+    if (matchAll) {
+      typedConstructs = filterMatchAll(typedConstructs, types);
+    }
+    Set<T> set = equality.newSet();
+    set.addAll(typedConstructs);
+    return Collections.unmodifiableSet(set);    
   }
 
-  protected <T extends Construct> Set<T> filterMatchAll(Collection<T> typedConstructs,
+  protected <T extends Construct> List<T> filterMatchAll(Collection<T> typedConstructs,
       Topic[] types) {
     // we have collected all the scoped linked to any of the specified themes.
     // now we need to find those which are linked to all themes.
@@ -96,7 +103,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
     // very reliable as it depends on whether we use a set or not, or whether a given contrutct may
     // have multiple times the same theme.
     return scopedCount.entrySet().stream().filter(entry -> entry.getValue() == types.length)
-        .map(entry -> entry.getKey()).collect(Collectors.toSet());
+        .map(entry -> entry.getKey()).collect(Collectors.toList());
   }
 
   protected Collection<Topic> getTypes(
@@ -108,8 +115,8 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
         .collect(Collectors.toList());
   }
 
-  public HGTypeInstanceIndex(HyperGraph graph) {
-    super(graph);
+  public HGTypeInstanceIndex(HyperGraph graph, Equality equality) {
+    super(graph, equality);
   }
 
 
@@ -132,7 +139,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Association> getAssociations(Topic type) {
-    return getInstances(type, HGAssociationSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGAssociationSupport.class, HGTM.hTypeOf));
   }
 
   @Override
@@ -162,7 +169,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Occurrence> getOccurrences(Topic type) {
-    return getInstances(type, HGOccurrenceSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGOccurrenceSupport.class, HGTM.hTypeOf));
   }
 
   @Override
@@ -172,7 +179,7 @@ public class HGTypeInstanceIndex extends HGAbstractIndex implements TypeInstance
 
   @Override
   public Collection<Name> getNames(Topic type) {
-    return getInstances(type, HGNameSupport.class, HGTM.hTypeOf);
+    return Collections.unmodifiableCollection(getInstances(type, HGNameSupport.class, HGTM.hTypeOf));
   }
 
   @Override

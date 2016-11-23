@@ -20,13 +20,12 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
 
   @Override
   public void customRemove() {
-    TopicImpl player = (TopicImpl) getPlayer();
-    player.getSupport().removeRolePlayed(this);
+    ((TopicImpl) getPlayer()).getSupport().removeRolePlayed(this);
     getParent().removeRole(this);
   }
 
   @Override
-  public Topic getPlayer() {
+  public TopicImpl getPlayer() {
     return support.getPlayer();
   }
 
@@ -48,7 +47,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -58,7 +57,7 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override
@@ -76,26 +75,17 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   }
 
   @Override
-  public int hashCode() {
-    return getId().hashCode();
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (RoleImpl)otherObjectOfSameClass);
   }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Role && equals((Role) other);
-  }
-
-  // According to the TopicMap specs, roles are deemed equals if they have the same player, type and
-  // parent.
-  // But I can't see how TestTopic.testRoleAssociationFilter can work with that (role1 and role2
-  // have the same player, type and parent so getRolesPlayed(), which returns a set, should haved 1
-  // item, not 2)
-  protected boolean equals(Role otherRole) {
-    return this == otherRole || getId().equals(otherRole.getId());
-  }
-
-  protected void importIn(Role otherRole, boolean merge) {
-    this.id = otherRole.getId();
-    otherRole.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));
+  public String toString() {
+    return "[type="+getType()+", player="+getPlayer()+"]";
   }
 }

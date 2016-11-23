@@ -2,6 +2,7 @@ package org.gingolph.tm;
 
 import java.util.Collection;
 import java.util.Set;
+
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Topic;
@@ -35,7 +36,7 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override
@@ -44,12 +45,12 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
@@ -72,16 +73,21 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Occurrence && equals((Occurrence) other);
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (OccurrenceImpl)otherObjectOfSameClass);
   }
 
-  protected boolean equals(Occurrence other) {
-    return getValue().equals(other.getValue()) && getDatatype().equals(other.getDatatype())
-        && getType().equals(other.getType()) && getParent().equals(other.getParent())
-        && getScope().equals(other.getScope());
-  }
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+//  
 
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+  
+    
   void importIn(Occurrence otherOccurrence, boolean merge) {
     if (otherOccurrence.getReifier() != null) {
       setReifier(otherOccurrence.getReifier());

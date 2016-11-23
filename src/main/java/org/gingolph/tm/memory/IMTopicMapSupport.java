@@ -1,13 +1,12 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.gingolph.tm.AbstractConstruct;
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.LocatorImpl;
-import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
 import org.gingolph.tm.TopicMapSupport;
@@ -18,7 +17,6 @@ import org.gingolph.tm.index.TypeInstanceIndexImpl;
 import org.tmapi.core.Association;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
-import org.tmapi.core.TopicMap;
 import org.tmapi.index.Index;
 import org.tmapi.index.LiteralIndex;
 import org.tmapi.index.ScopedIndex;
@@ -26,22 +24,28 @@ import org.tmapi.index.TypeInstanceIndex;
 
 
 public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSupport {
-  Set<Topic> topics = new HashSet<>();
-  Set<Association> associations = new HashSet<>();
+  List<TopicImpl> topics = new ArrayList<>();
+  List<AssociationImpl> associations = new ArrayList<>();
   TopicImpl reifier;
   TopicMapImpl topicMap;
+  private Locator baseLocator;
 
   static AtomicLong counter = new AtomicLong();
 
   IMTopicMapSupport() {}
 
   @Override
-  public Set<Topic> getTopics() {
+  public void setOwner(TopicMapImpl owner) {
+    this.topicMap = owner;
+  }
+  
+  @Override
+  public List<TopicImpl> getTopics() {
     return topics;
   }
 
   @Override
-  public void addTopic(Topic topic) {
+  public void addTopic(TopicImpl topic) {
     topics.add(topic);
   }
 
@@ -51,12 +55,12 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public Set<Association> getAssociations() {
+  public List<AssociationImpl> getAssociations() {
     return associations;
   }
 
   @Override
-  public void addAssociation(Association association) {
+  public void addAssociation(AssociationImpl association) {
     associations.add(association);
   }
 
@@ -79,14 +83,14 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   public <I extends Index> I getIndex(Class<I> type) {
     Index index;
     if (LiteralIndex.class.isAssignableFrom(type)) {
-      index = topicMap.registerListener(new LiteralIndexImpl());
+      index = topicMap.registerListener(new LiteralIndexImpl(topicMap.getEquality()));
     } else if (IdentifierIndex.class.isAssignableFrom(type)) {
       index =
           topicMap.registerListener(new IdentifierIndex(topicMap, getTopics(), getAssociations()));
     } else if (ScopedIndex.class.isAssignableFrom(type)) {
-      index = topicMap.registerListener(new ScopedIndexImpl(getTopics(), getAssociations()));
+      index = topicMap.registerListener(new ScopedIndexImpl(topicMap.getEquality(), getTopics(), getAssociations()));
     } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-      index = topicMap.registerListener(new TypeInstanceIndexImpl(getTopics(), getAssociations()));
+      index = topicMap.registerListener(new TypeInstanceIndexImpl(topicMap.getEquality(), getTopics(), getAssociations()));
     } else {
       throw new UnsupportedOperationException("Unknown index " + type);
     }
@@ -104,7 +108,13 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public void setOwner(TopicMapImpl owner) {
-    this.topicMap = owner;
+  public Locator getBaseLocator() {
+    return baseLocator;
   }
+
+  @Override
+  public void setBaseLocator(Locator baseLocator) {
+    this.baseLocator = baseLocator;
+  }
+  
 }

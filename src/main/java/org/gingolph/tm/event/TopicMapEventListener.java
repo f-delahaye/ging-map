@@ -30,4 +30,5 @@ public interface TopicMapEventListener {
   public void onTypeChanged(TypedConstruct typed, Topic typeAdded, Topic typeRemoved);
 
   public void onValueChanged(Valued valued, String valueSet, String valueRemoved);
+
 }

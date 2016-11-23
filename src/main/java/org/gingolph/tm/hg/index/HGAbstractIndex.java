@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGIndex;
@@ -49,9 +51,11 @@ public abstract class HGAbstractIndex implements Index {
   boolean open = false;
   List<HGIndex> indexes = new ArrayList<>();
   final transient HyperGraph graph;
+  final transient Equality equality;
 
-  HGAbstractIndex(HyperGraph graph) {
+  HGAbstractIndex(HyperGraph graph, Equality equality) {
     this.graph = graph;
+    this.equality = equality;
   }
 
   protected <C extends Construct> Collection<C> getIndexResults(

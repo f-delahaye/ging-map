@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Name;
@@ -12,7 +14,7 @@ import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
 
-public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
+public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
     implements Name, Valued, TypedConstruct {
 
   public NameImpl(TopicMapImpl topicMap, TopicImpl parent) {
@@ -34,13 +36,21 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
     if (value == null) {
       throw new ModelConstraintException(this, "Null value not allowed");
     }
+    String oldValue = support.getValue();
     support.setValue(value);
+    getTopicMap().notifyListeners(listener -> listener.onValueChanged(this, value, oldValue));
+    
   }
 
   @Override
   public Set<Variant> getVariants() {
-    Set<Variant> variants = support.getVariants();
-    return variants == null ? Collections.emptySet() : Collections.unmodifiableSet(variants);
+    List<VariantImpl> variants = getNullSafeVariantImpls();
+    return variants.isEmpty()? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
+  }
+
+  public List<VariantImpl> getNullSafeVariantImpls() {
+    List<VariantImpl> variants = support.getVariants();
+    return variants == null?Collections.emptyList():variants;
   }
 
   @Override
@@ -108,7 +118,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -118,7 +128,7 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   protected final void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override
@@ -139,24 +149,17 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, getSupport());
+    ScopedHelper.setScope(this, scope, getSupport(), getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, getSupport());
-    // getVariants().stream().forEach((variant) -> {
-    // variant.addTheme(theme);
-    // });
+    ScopedHelper.addTheme(this, theme, getSupport(), getTopicMap().getEquality());
   }
 
   @Override
   public void removeTheme(Topic theme) {
-    ScopedHelper.removeTheme(this, theme, getSupport());
-    // getVariants().stream().forEach((variant) -> {
-    // variant.removeTheme(theme);
-    // });
-
+    ScopedHelper.removeTheme(this, theme, getSupport()); 
   }
 
   @Override
@@ -174,15 +177,22 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Name && equals((Name) other);
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (NameImpl)otherObjectOfSameClass);
   }
 
-  protected boolean equals(Name other) {
-    return getValue().equals(other.getValue()) && getType().equals(other.getType())
-        && getParent().equals(other.getParent()) && getScope().equals(other.getScope());
-  }
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+//  @Override
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+//  
 
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+    
   void importIn(Name otherName, boolean merge) {
     Collection<Variant> otherVariants = otherName.getVariants();
     otherVariants.forEach(otherVariant -> createVariant(otherVariant.getValue(),
@@ -196,5 +206,10 @@ public class NameImpl extends TopicMapItem<TopicImpl, NameSupport>
     if (merge) {
       otherName.remove();
     }
+  }
+  
+  @Override
+  public String toString() {
+    return "[value="+getValue()+"], [variants="+getVariants()+"], type="+getType();
   }
 }

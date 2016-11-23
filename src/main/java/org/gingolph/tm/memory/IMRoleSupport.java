@@ -1,5 +1,6 @@
 package org.gingolph.tm.memory;
 
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
@@ -7,17 +8,17 @@ import org.tmapi.core.Topic;
 
 
 public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
-  Topic type;
+  TopicImpl type;
   TopicImpl reifier;
   TopicImpl player;
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return type;
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
   }
 
@@ -44,5 +45,5 @@ public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
   @Override
   public void setOwner(RoleImpl owner) {
  // Noop - not needed by the in memory implementation    
-  }  
+  }
 }

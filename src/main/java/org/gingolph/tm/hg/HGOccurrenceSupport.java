@@ -7,10 +7,8 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Occurrence;
-import org.tmapi.core.Topic;
 
-public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements OccurrenceSupport {
+public class HGOccurrenceSupport extends HGScopedSupport<OccurrenceImpl> implements OccurrenceSupport {
   private String value;
   private Locator datatype;
 
@@ -27,7 +25,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
   }
   
   @Override
-  protected Occurrence createOwner() {
+  protected OccurrenceImpl createOwner() {
     HGTopicSupport parent = getParent();
     OccurrenceImpl occurrence =
         new OccurrenceImpl(parent.getTopicMapSupport().getOwner(), parent.getOwner());
@@ -52,7 +50,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     HyperGraph graph = getGraph();
     HGHandle type = HGTMUtil.getTypeOf(graph, getHandle(graph, this));
     return type != null ? ((HGTopicSupport) graph.get(type)).getOwner() : null;
@@ -60,7 +58,7 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
 
@@ -73,12 +71,8 @@ public class HGOccurrenceSupport extends HGScopedSupport<Occurrence> implements 
   @Override
   public void setValue(String value) {
     this.value = value;
-    final HyperGraph graph = getGraph();
-    if (graph != null) {
-      HGHandle handle = getHandle(graph, this);
-      if (handle != null) {
-        graph.replace(handle, this);
-      }
+    if (hyperGraph != null) {
+      hyperGraph.update(this);
     }
   }
 

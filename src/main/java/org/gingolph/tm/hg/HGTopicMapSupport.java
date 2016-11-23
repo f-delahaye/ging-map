@@ -1,13 +1,10 @@
 package org.gingolph.tm.hg;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
+import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.AbstractTopicMapSystemFactory;
 import org.gingolph.tm.AssociationImpl;
-import org.gingolph.tm.AbstractConstruct;
 import org.gingolph.tm.LocatorImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicMapImpl;
@@ -32,6 +29,7 @@ import org.tmapi.index.TypeInstanceIndex;
 
 public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implements TopicMapSupport {
 
+  private Locator baseLocator;
   private TopicMapSystemSupport parent;
   private transient HyperGraph graph;
 
@@ -40,11 +38,6 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   public HGTopicMapSupport(HyperGraph graph, TopicMapSystemSupport parent) {
     this.graph = graph;
     this.parent = parent;
-  }
-
-  @Override
-  public void setOwner(TopicMapImpl owner) {
-    this.owner = owner;
   }
 
   @Override
@@ -66,13 +59,13 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public void addAssociation(Association association) {
+  public void addAssociation(AssociationImpl association) {
     HGHandle associationHandle = add(graph, association);
     HGTMUtil.setTopicMapOf(hyperGraph, associationHandle, getHandle(graph, this));
   }
 
   @Override
-  public void addTopic(Topic topic) {
+  public void addTopic(TopicImpl topic) {
     HGHandle topicHandle = add(graph, topic);
     HGTMUtil.setTopicMapOf(hyperGraph, topicHandle, getHandle(graph, this));
   }
@@ -85,17 +78,25 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public Set<Association> getAssociations() {
-    HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections.unmodifiableSet(
-        HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle));
+  public Locator getBaseLocator() {
+    return baseLocator;
   }
 
   @Override
-  public Set<Topic> getTopics() {
+  public void setBaseLocator(Locator locator) {
+    this.baseLocator = locator;
+  }
+
+  @Override
+  public List<AssociationImpl> getAssociations() {
     HGHandle topicMapHandle = getHandle(graph, this);
-    return Collections
-        .unmodifiableSet(HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle));
+    return HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle);
+  }
+
+  @Override
+  public List<TopicImpl> getTopics() {
+    HGHandle topicMapHandle = getHandle(graph, this);
+    return HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle);
   }
 
   @HGIgnore
@@ -134,17 +135,22 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
+  public void setOwner(TopicMapImpl owner) {
+    this.owner = owner;
+  }
+
+  @Override
   public <I extends Index> I getIndex(Class<I> type) {
     Index index;
     if (LiteralIndex.class.isAssignableFrom(type)) {
-      index = new HGLiteralIndex(graph);
+      index = new HGLiteralIndex(graph, getOwner().getEquality());
     } else if (IdentifierIndex.class.isAssignableFrom(type)) {
       index = ((TopicMapImpl) owner)
           .registerListener(new IdentifierIndex(getOwner(), getTopics(), getAssociations()));
     } else if (ScopedIndex.class.isAssignableFrom(type)) {
-      index = new HGScopedIndex(graph);
+      index = new HGScopedIndex(graph, getOwner().getEquality());
     } else if (TypeInstanceIndex.class.isAssignableFrom(type)) {
-      index = new HGTypeInstanceIndex(graph);
+      index = new HGTypeInstanceIndex(graph, getOwner().getEquality());
     } else {
       throw new UnsupportedOperationException("Unknown index " + type);
     }

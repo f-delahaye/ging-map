@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.tmapi.core.Association;
+
+import org.gingolph.tm.equality.SAMEquality;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -145,7 +147,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (identifier == null) {
       throw new ModelConstraintException(this, "Null identifier not allowed");
     }
-    Topic existingTopic = topicMap.getTopicBySubjectIdentifier(identifier);
+    TopicImpl existingTopic = (TopicImpl) topicMap.getTopicBySubjectIdentifier(identifier);
 
     if (existingTopic != null) {
       if (!existingTopic.equals(this)) {
@@ -154,17 +156,17 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
           return;
         } else {
           throw new IdentityConstraintException(this, existingTopic, identifier,
-              "Duplicate item identifiers not allowed");
+              "Duplicate subject identifiers not allowed:"+identifier);
         }
       }
     }
 
-    Construct existingItemIdentifier = topicMap.getConstructByItemIdentifier(identifier);
+    TopicMapItem<?,?> existingItemIdentifier = (TopicMapItem<?, ?>) topicMap.getConstructByItemIdentifier(identifier);
     if (existingItemIdentifier == null || this.equals(existingItemIdentifier)) {
       importSubjectIdentifier(identifier);
-    } else if (existingItemIdentifier instanceof Topic) {
+    } else if (existingItemIdentifier instanceof TopicImpl) {
       if (isAutoMerge(topicMap)) {
-        this.mergeIn((Topic) existingItemIdentifier);
+        this.mergeIn((TopicImpl) existingItemIdentifier);
       } else {
         throw new IdentityConstraintException(this, existingItemIdentifier, identifier,
             "Identifier is already used as an item identifier");
@@ -228,8 +230,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Name> getNames() {
-    Set<NameImpl> names = support.getNames();
-    return names == null ? Collections.emptySet() : Collections.unmodifiableSet(names);
+    List<NameImpl> names = getNullSafeNameImpls();    
+    return names.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(names);
+  }
+
+  public List<NameImpl> getNullSafeNameImpls() {
+    List<NameImpl> names = support.getNames();
+    return names == null ? Collections.emptyList():names;
   }
 
   @Override
@@ -237,8 +244,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null not allowed");
     }
-    final Set<Name> names = getNames();
-    return names.stream().filter(name -> name.getType().equals(type)).collect(Collectors.toSet());
+    final List<NameImpl> names = getNullSafeNameImpls().stream().filter(name -> name.getType().equals(type)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(names);
   }
 
   @Override
@@ -253,7 +260,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Name createName(Topic type, String value, Collection<Topic> scope)
+  public NameImpl createName(Topic type, String value, Collection<Topic> scope)
       throws ModelConstraintException {
     if (type == null) {
       throw new ModelConstraintException(this, "Null type not allowed");
@@ -261,10 +268,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (scope == null) {
       throw new ModelConstraintException(this, "Null scope not allowed");
     }
-    NameImpl name = getTopicMap().createName(this, value);
+    NameImpl name = getTopicMap().createName(this);
     support.addName(name);
     name.setScope(scope);
     name.setType(type);
+    name.setValue(value);
     getTopicMap().notifyListeners(listener -> listener.onConstructCreated(name));
     return name;
   }
@@ -289,8 +297,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Occurrence> getOccurrences() {
-    Set<Occurrence> occurrences = support.getOccurrences();
-    return occurrences == null ? Collections.emptySet() : Collections.unmodifiableSet(occurrences);
+    List<OccurrenceImpl> occurrences = getNullSafeOccurrenceImpls();
+    return occurrences.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(occurrences);
+  }
+
+  public List<OccurrenceImpl> getNullSafeOccurrenceImpls() {
+    List<OccurrenceImpl> occurrences = support.getOccurrences();
+    return occurrences == null?Collections.emptyList() : occurrences;
   }
 
   @Override
@@ -298,11 +311,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    if (getOccurrences() == null) {
-      return Collections.emptySet();
-    }
-    return getOccurrences().stream().filter(occurrence -> occurrence.getType() == type)
-        .collect(Collectors.toSet());
+    return new UnmodifiableCollectionSet<>(getNullSafeOccurrenceImpls().stream().filter(occurrence -> occurrence.getType().equals(type)).collect(Collectors.toList()));
   }
 
   @Override
@@ -315,7 +324,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Occurrence createOccurrence(Topic type, String value, Collection<Topic> scope)
+  public OccurrenceImpl createOccurrence(Topic type, String value, Collection<Topic> scope)
       throws ModelConstraintException {
     return createOccurrence(type, value, LocatorImpl.XSD_STRING, scope);
   }
@@ -333,7 +342,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   @Override
-  public Occurrence createOccurrence(Topic type, String value, Locator dataType,
+  public OccurrenceImpl createOccurrence(Topic type, String value, Locator dataType,
       Collection<Topic> scope) throws ModelConstraintException {
     return createOccurrence(type, dataType, value, scope);
   }
@@ -344,7 +353,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return createOccurrence(type, LocatorImpl.XSD_ANY_URI, value, scope);
   }
 
-  private Occurrence createOccurrence(Topic type, Locator datatype, Object value,
+  private OccurrenceImpl createOccurrence(Topic type, Locator datatype, Object value,
       Collection<Topic> scope) throws ModelConstraintException {
     if (type == null) {
       throw new ModelConstraintException(this, "Null type not allowed");
@@ -371,17 +380,22 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Role> getRolesPlayed() {
-    final Set<Role> rolesPlayed = support.getRolesPlayed();
-    return rolesPlayed == null ? Collections.emptySet() : Collections.unmodifiableSet(rolesPlayed);
+    final List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls();
+    return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(rolesPlayed);
+  }
+
+  private List<RoleImpl> getNullSafeRolePlayedImpls() {
+    final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
+    return rolesPlayed == null?Collections.emptyList():rolesPlayed;
   }
 
   @Override
-  public Set<Role> getRolesPlayed(Topic type) {
-    if (type == null) {
+  public Set<Role> getRolesPlayed(Topic roleType) {
+    if (roleType == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    return getRolesPlayed().stream().filter(role -> role.getType() == type)
-        .collect(Collectors.toSet());
+    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(rolesPlayed); 
   }
 
   @Override
@@ -392,18 +406,17 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (associationType == null) {
       throw new IllegalArgumentException("Null association type not allowed");
     }
-    return getRolesPlayed().stream()
-        .filter(role -> role.getType() == roleType && role.getParent().getType() == associationType)
-        .collect(Collectors.toSet());
+    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType) && role.getParent().getType().equals(associationType)).collect(Collectors.toList());
+    return new UnmodifiableCollectionSet<>(rolesPlayed);    
   }
 
-  void addRolePlayed(Role role) {
+  void addRolePlayed(RoleImpl role) {
     support.addRolePlayed(role);
   }
 
   @Override
   public Set<Topic> getTypes() {
-    Set<Topic> types = support.getTypes();
+    Set<TopicImpl> types = support.getTypes();
     return types == null ? Collections.emptySet() : Collections.unmodifiableSet(types);
   }
 
@@ -413,8 +426,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   protected void doAddType(Topic type) {
-    support.addType(type);
-    getTopicMap().notifyListeners(listener -> listener.onTypeChanged(this, type, null));
+    support.addType((TopicImpl)type, getTopicMap().getEquality());
   }
 
   @Override
@@ -432,9 +444,8 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (getTopicMap() != other.getTopicMap()) {
       throw new ModelConstraintException(this, "Different topic maps not allowed");
     }
-    if (getReified() != null && other.getReified() != null
-        && !getReified().equals(other.getReified())) {
-      throw new ModelConstraintException(this, "Different reified not allowed");
+    if (getReified() != null && other.getReified() != null && !getReified().equals(other.getReified())) {
+        throw new ModelConstraintException(this, "Different reified not allowed");
     }
     if (!this.equals(other)) {
       importIn(other, true);
@@ -456,28 +467,28 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
     final Collection<Name> otherNames = new ArrayList<>(otherTopic.getNames());
     final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
-    final Collection<Role> otherRolesPlayed = otherTopicData.getRolesPlayed();
+    final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
+    SAMEquality equalityForMege = getTopicMap().getEqualityForMerge();
+    
     // and work off otherTopic's actual data to do the actual merging.
-    otherNames.forEach(otherName -> {
-      Optional<Name> sameName =
-          getNames().stream().filter(name -> name.equals(otherName)).findFirst();
-      NameImpl mergee = (NameImpl) (sameName.isPresent() ? sameName.get()
-          : createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
+    otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
+      Optional<NameImpl> equivalentName = 
+          getNames().stream().map(name -> (NameImpl)name).filter(name -> equalityForMege.equals(name, otherName)).findAny();
+      NameImpl mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
       mergee.importIn(otherName, merge);
     });
-    otherOccurrences.forEach(otherOccurrence -> {
-      Optional<Occurrence> sameOccurrence = getOccurrences().stream()
-          .filter(occurrence -> occurrence.equals(otherOccurrence)).findFirst();
-      OccurrenceImpl mergee = (OccurrenceImpl) (sameOccurrence.isPresent() ? sameOccurrence.get()
-          : createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),
-              otherOccurrence.getScope()));
+    otherOccurrences.stream().map(otherOccurrence -> (OccurrenceImpl)otherOccurrence).forEach(otherOccurrence -> {
+      Optional<OccurrenceImpl> equivalentOccurrence = 
+          getOccurrences().stream().map(occurrence -> (OccurrenceImpl)occurrence).filter(occurrence -> equalityForMege.equals(occurrence, otherOccurrence)).findAny();
+      OccurrenceImpl mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
       mergee.importIn(otherOccurrence, merge);
     });
 
 
+    TopicSupport otherTopicSupport = otherTopic.support;
     if (merge) {
-      getParent().removeTopic(otherTopic);
+//      getParent().removeTopic(otherTopic);
       // Change otherTopic's data so from now on it will be the same as topic ...
       // (e.g. 2 names whose types are resp. this and other will be deemed identical which is what
       // we want)
@@ -485,57 +496,50 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     }
 
     if (otherRolesPlayed != null) {
-      otherRolesPlayed.stream().map(role -> role.getParent()).forEach(otherAssociation -> {
-        Optional<Association> sameAssociation =
-            getRolesPlayed().stream().map(role -> role.getParent())
-                .filter(association -> association.equals(otherAssociation)).findFirst();
-        AssociationImpl mergee =
-            (AssociationImpl) (sameAssociation.isPresent() ? sameAssociation.get()
-                : getParent().createAssociation(otherAssociation.getType(),
-                    otherAssociation.getScope()));
-        mergee.importIn((AssociationImpl) otherAssociation, merge);
-      });
+      for (RoleImpl otherRole: otherRolesPlayed) {
+        // otherRole.setPlayer(this); not needed because player is manged by TopicSupport so switching the support also changed the player
+        AssociationImpl otherAssociation = otherRole.getParent();
+        
+        Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> getTopicMap().getEqualityForMerge().associationEquals(candidateAssociation, otherAssociation, false)).findAny();
+        if (equivalentAssociation.isPresent()) {
+          getTopicMap().removeAssociation(otherAssociation);
+          // should we import otherAssociation's item identifiers and all the roles' item identifiers too?
+        } else {
+          otherRole.setPlayer(this);
+        }
+      };
     }
+    
+    if (merge) {
+      // revert back to the original support so we can remove otherTopic stuff (if we keep otherTopic.support set to this.support we'll actually delete this!!)
+      // Other alternatives would include changing all references to otherTopic by this (in themes, types, ...) which would avoid setting the support back and forth...
+      otherTopic.support = otherTopicSupport;
+      getParent().removeTopic(otherTopic);
+    }
+    
   }
 
   @Override
-  public int hashCode() {
-    return getId().hashCode();
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (TopicImpl)otherObjectOfSameClass);
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (!(other instanceof Topic)) {
-      return false;
-    }
-    Topic otherTopic = (Topic) other;
-    if (otherTopic.getId().equals(this.getId())) {
-      return true;
-    }
-    // Optimization:
-    // If automerge, 2 topics which are equals would have been merged and the above test would have
-    // returned true
-    // commented out: what if equals is called when trying to merge?? 2 Topics may be equals but may
-    // not have been merged yet ...
-    // if (isAutoMerge(getTopicMap())) {
-    // return false;
-    // }
-    final Collection<Locator> subjectIdentifiers = support.getSubjectIdentifiers();
-    final Collection<Locator> subjectLocators = support.getSubjectLocators();
-    final Collection<Locator> itemIdentifiers = support.getItemIdentifiers();
-
-    return subjectIdentifiers != null
-        && subjectIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectIdentifiers().contains(identifier)
-                || otherTopic.getItemIdentifiers().contains(identifier))
-        || subjectLocators != null && subjectLocators.stream()
-            .anyMatch(identifier -> otherTopic.getSubjectLocators().contains(identifier))
-        || itemIdentifiers != null && (itemIdentifiers.stream()
-            .anyMatch(identifier -> otherTopic.getItemIdentifiers().contains(identifier))
-            || otherTopic.getSubjectIdentifiers().stream()
-                .anyMatch(identifier -> itemIdentifiers.contains(identifier)));
+  public String toString() {
+    return "[identifiers="+getItemIdentifiers()+"]";
   }
 
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+
+//  public boolean matches(TopicImpl otherTopic) {
+//    return getItemIdentifiers().equals(otherTopic.getItemIdentifiers()) && getSubjectIdentifiers().equals(otherTopic.getSubjectIdentifiers()) && getSubjectLocators().equals(otherTopic.getSubjectLocators())
+//        && getNames().equals(otherTopic.getNames()) && getOccurrences().equals(otherTopic.getOccurrences());
+//  }
+
+  
   @Override
   public Reifiable getReified() {
     return support.getReified();

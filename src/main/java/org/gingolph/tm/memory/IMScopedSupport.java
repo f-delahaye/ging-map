@@ -1,31 +1,32 @@
 package org.gingolph.tm.memory;
 
-import java.util.HashSet;
 import java.util.Set;
-import org.gingolph.tm.ScopedSupport;
-import org.tmapi.core.Topic;
 
+import org.gingolph.tm.ScopedSupport;
+import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.equality.Equality;
+import org.tmapi.core.Topic;
 
 public class IMScopedSupport extends IMConstructSupport implements ScopedSupport {
 
-  private Set<Topic> scope;
+  private Set<TopicImpl> scope;
 
-  protected Set<Topic> nullSafeScope() {
+  protected Set<TopicImpl> nullSafeScope(Equality equality) {
     if (scope == null) {
-      scope = new HashSet<>();
+      scope = equality.newSet();
     }
     return scope;
   }
 
 
   @Override
-  public final Set<Topic> getScope() {
+  public final Set<TopicImpl> getScope() {
     return scope;
   }
 
   @Override
-  public final void addTheme(Topic theme) {
-    nullSafeScope().add(theme);
+  public final void addTheme(TopicImpl theme, Equality equality) {
+    nullSafeScope(equality).add(theme);
   }
 
   @Override

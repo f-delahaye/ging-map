@@ -3,17 +3,18 @@ package org.gingolph.tm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.tmapi.core.Association;
-import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
 
 
-public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSupport>
+
+public class AssociationImpl extends ScopedTopicMapItem<TopicMapImpl, AssociationSupport>
     implements Association, TypedConstruct {
 
   public AssociationImpl(TopicMapImpl topicMap) {
@@ -27,13 +28,18 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   
   @Override
   protected void customRemove() {
-    support.getRoles().forEach(role -> ((RoleImpl) role).doRemove());
+    new ArrayList<>(getNullSafeRoleImpls()).forEach(role -> ((RoleImpl) role).doRemove());
     getParent().removeAssociation(this);
   }
 
   @Override
   public Set<Role> getRoles() {
-    return Collections.unmodifiableSet(support.getRoles());
+    return new UnmodifiableCollectionSet<>(getNullSafeRoleImpls());
+  }
+
+  public List<RoleImpl> getNullSafeRoleImpls() {
+    List<RoleImpl> roles = support.getRoles();
+    return roles == null?Collections.emptyList():roles;
   }
 
   @Override
@@ -41,17 +47,17 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
     if (type == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    return support.getRoles().stream().filter(role -> role.getType() == type)
+    return getNullSafeRoleImpls().stream().filter(role -> role.getType() == type)
         .collect(Collectors.toSet());
   }
 
   @Override
   public Set<Topic> getRoleTypes() {
-    Set<Topic> roleTypes = new HashSet<>();
-    support.getRoles().forEach((role) -> {
+    Set<TopicImpl> roleTypes = getTopicMap().getEquality().newSet();
+    getNullSafeRoleImpls().forEach((role) -> {
       roleTypes.add(role.getType());
     });
-    return roleTypes;
+    return Collections.unmodifiableSet(roleTypes);
   }
 
   @Override
@@ -73,7 +79,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     return support.getType();
   }
 
@@ -83,7 +89,7 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   protected void doSetType(Topic type) {
-    support.setType(type);
+    support.setType((TopicImpl)type);
   }
 
   @Override
@@ -92,12 +98,12 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
@@ -120,40 +126,24 @@ public class AssociationImpl extends TopicMapItem<TopicMapImpl, AssociationSuppo
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other instanceof Association && equals((Association) other);
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (AssociationImpl)otherObjectOfSameClass);
   }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
 
-  protected boolean equals(Association other) {
-    return getType().equals(other.getType()) && getScope().equals(other.getScope())
-        && equals(getRoles(), other.getRoles());
+  // Consistent with equals and not too much overhead calculating lots of hashCodes ... but probably has poor distribution
+  // TODO: should all the roles' hashcodes be included as well?
+//  @Override
+//  public int hashCode() {
+//    return getType().getId().hashCode();
+//  }
+
+  public String toString() {
+    return "[type="+getType()+", roles="+getRoles()+"]";
   }
-
-  protected boolean equals(Collection<Role> roles, Collection<Role> otherRoles) {
-    return roles.stream().noneMatch(
-        (role) -> (!otherRoles.stream().anyMatch((otherRole) -> equals(role, otherRole))));
-  }
-
-
-  void importIn(AssociationImpl otherAssociation, boolean merge) {
-    final Collection<Role> otherRoles = new ArrayList<>(otherAssociation.getRoles());
-    final Set<Locator> itemIdentifiers = otherAssociation.getItemIdentifiers();
-    final Topic otherReifier = otherAssociation.getReifier();
-    if (merge) {
-      otherAssociation.doRemove();
-    }
-    otherRoles.forEach(otherRole -> createRole(otherRole.getType(), otherRole.getPlayer())
-        .importIn(otherRole, merge));
-    itemIdentifiers.forEach(identifier -> importItemIdentifier(identifier));
-    if (getReifier() == null) {
-      setReifier(otherReifier);
-    } else if (otherReifier != null) {
-      getReifier().mergeIn(otherReifier);
-    }
-  }
-
-  private boolean equals(Role role, Role otherRole) {
-    return role.getType().equals(otherRole.getType())
-        && role.getPlayer().equals(otherRole.getPlayer());
-  }
+    
 }

@@ -1,26 +1,35 @@
 package org.gingolph.tm.hg;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.gingolph.tm.NameImpl;
 import org.gingolph.tm.NameSupport;
 import org.gingolph.tm.TopicImpl;
+import org.gingolph.tm.VariantImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
 import org.tmapi.core.Name;
-import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
 
-public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport {
+public class HGNameSupport extends HGScopedSupport<NameImpl> implements NameSupport {
 
+  private static final long serialVersionUID = 1L;
+  
   String value;
 
+  // For compliance with Javabeans standard (which allows NameSupport to be persisted as a
+  // JavabeansType)
   protected HGNameSupport() {}
+  
+  @Override
+  public void setOwner(NameImpl owner) {
+      this.owner = owner;
+  }
 
   @Override
-  public void addVariant(Variant v) {
+  public void addVariant(VariantImpl v) {
     HGHandle h = add(hyperGraph, v);
     hyperGraph.add(new HGRel(HGTM.VariantOf, new HGHandle[] {h, getHandle(hyperGraph, this)}),
         HGTM.hVariantOf);
@@ -47,7 +56,7 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     final HGHandle thisHandle = getHandle(hyperGraph, this);
     HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
     return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
@@ -59,16 +68,16 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   }
 
   @Override
-  public Set<Variant> getVariants() {
+  public List<VariantImpl> getVariants() {
     final HGHandle handle = getHandle(hyperGraph, this);
     return handle == null ? null
         : HGTMUtil.<HGVariantSupport>getRelatedObjects(hyperGraph, HGTM.hVariantOf, null, handle)
-            .stream().map(support -> support.getOwner()).collect(Collectors.toSet());
+            .stream().map(support -> support.getOwner()).collect(Collectors.toList());
   }
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
 
@@ -88,15 +97,10 @@ public class HGNameSupport extends HGScopedSupport<Name> implements NameSupport 
   }
 
   @Override
-  protected Name createOwner() {
+  protected NameImpl createOwner() {
     final HGTopicSupport parent = getParent();
     NameImpl name = new NameImpl(parent.getTopicMapSupport().getOwner(), parent.getOwner());
     name.setSupport(this);
     return name;
   }
-  
-  @Override
-  public void setOwner(NameImpl owner) {
-      this.owner = owner;
-  }  
 }

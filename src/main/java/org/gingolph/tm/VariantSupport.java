@@ -19,4 +19,5 @@ public interface VariantSupport extends ConstructSupport, ScopedSupport, Datatyp
   Topic getReifier();
 
   void setReifier(TopicImpl reifier);
+  
 }

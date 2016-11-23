@@ -1,8 +1,5 @@
 package org.gingolph.tm;
 
-import org.tmapi.core.Topic;
-
-
 public interface OccurrenceSupport
     extends ConstructSupport, ScopedSupport, TypedSupport, DatatypeAwareSupport {
 
@@ -19,10 +16,10 @@ public interface OccurrenceSupport
   
   TopicImpl getReifier();
 
-  Topic getType();
+  TopicImpl getType();
 
   void setReifier(TopicImpl reifier);
 
-  void setType(Topic type);
+  void setType(TopicImpl type);
 
 }

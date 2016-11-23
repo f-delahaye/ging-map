@@ -2,9 +2,12 @@ package org.gingolph.tm.hg.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.gingolph.tm.LocatorImpl;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGConstructSupport;
 import org.gingolph.tm.hg.HGNameSupport;
 import org.gingolph.tm.hg.HGOccurrenceSupport;
@@ -23,8 +26,8 @@ import org.tmapi.index.LiteralIndex;
 
 public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
 
-  public HGLiteralIndex(HyperGraph graph) {
-    super(graph);
+  public HGLiteralIndex(HyperGraph graph, Equality equality) {
+    super(graph, equality);
 
     List<HGIndexer<?, ?>> indexers = new ArrayList<>();
 
@@ -64,7 +67,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     List<HGOccurrenceSupport> occurrenceSupports =
         hg.getAll(graph, hg.and(hg.type(HGOccurrenceSupport.class), hg.eq("value", value),
             hg.eq("datatype", datatype)));
-    return getIndexResults(occurrenceSupports);
+    return Collections.unmodifiableCollection(getIndexResults(occurrenceSupports));
   }
 
   @Override
@@ -90,7 +93,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     }
     List<HGVariantSupport> variantSupports = hg.getAll(graph, hg
         .and(hg.type(HGVariantSupport.class), hg.eq("value", value), hg.eq("datatype", datatype)));
-    return getIndexResults(variantSupports);
+    return Collections.unmodifiableCollection(getIndexResults(variantSupports));
   }
 
   @Override
@@ -100,7 +103,7 @@ public class HGLiteralIndex extends HGAbstractIndex implements LiteralIndex {
     }
     List<HGNameSupport> nameSupports =
         hg.getAll(graph, hg.and(hg.type(HGNameSupport.class), hg.eq("value", value)));
-    return getIndexResults(nameSupports);
+    return Collections.unmodifiableCollection(getIndexResults(nameSupports));
   }
 
   protected <C extends Construct> Collection<C> getIndexResults(

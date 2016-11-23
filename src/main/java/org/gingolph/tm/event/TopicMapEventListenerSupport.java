@@ -7,7 +7,6 @@ import org.tmapi.core.Locator;
 import org.tmapi.core.Scoped;
 import org.tmapi.core.Topic;
 
-
 public class TopicMapEventListenerSupport implements TopicMapEventListener {
 
   @Override
@@ -36,7 +35,7 @@ public class TopicMapEventListenerSupport implements TopicMapEventListener {
 
   @Override
   public void onThemeChanged(Scoped scoped, Topic themeToAdd, Topic themeToRemove) {}
-
+    
   @Override
   public void onTypeChanged(TypedConstruct typed, Topic typeToAdd, Topic typeToRemove) {}
 

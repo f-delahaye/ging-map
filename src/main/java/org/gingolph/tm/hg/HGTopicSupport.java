@@ -1,33 +1,43 @@
 package org.gingolph.tm.hg;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.OccurrenceImpl;
+import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
-
-import org.hypergraphdb.HGQuery.hg;
+import org.gingolph.tm.equality.Equality;
 import org.hypergraphdb.HGHandle;
+import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HGSearchResult;
 import org.hypergraphdb.HyperGraph;
+import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
 import org.hypergraphdb.util.HGUtils;
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Occurrence;
-import org.tmapi.core.Topic;
 import org.tmapi.core.Reifiable;
 import org.tmapi.core.Role;
+import org.tmapi.core.Topic;
 
 public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicSupport {
   // Set<Topic> types = null;
   // Set<Occurrence> occurrences = null;
   // Set<NameImpl> names = null;
 
-  public HGTopicSupport() {
-    super();
-  }
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
+  protected HGTopicSupport() {
+  }
+  
   public HGTopicMapSupport getTopicMapSupport() {
     return HGTMUtil.getTopicMapOf(hyperGraph, getHandle(hyperGraph, this));
   }
@@ -53,12 +63,13 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hSubjectIdentifier);
   }
 
+  @HGIgnore
   @Override
   public Set<Locator> getSubjectIdentifiers() {
     HyperGraph graph = getGraph();
     final HGHandle handle = getHandle(graph, this);
     return handle == null ? null
-        : HGTMUtil.getRelatedObjects(graph, HGTM.hSubjectIdentifier, null, handle);
+        : new HashSet<>(HGTMUtil.getRelatedObjects(graph, HGTM.hSubjectIdentifier, null, handle));
   }
 
   @Override
@@ -85,12 +96,13 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hSubjectLocator);
   }
 
+  @HGIgnore
   @Override
   public Set<Locator> getSubjectLocators() {
     HyperGraph graph = getGraph();
     final HGHandle handle = getHandle(graph, this);
     return handle == null ? null
-        : HGTMUtil.getRelatedObjects(graph, HGTM.hSubjectLocator, null, handle);
+        : new HashSet<>(HGTMUtil.getRelatedObjects(graph, HGTM.hSubjectLocator, null, handle));
   }
 
   @Override
@@ -110,16 +122,24 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public void addType(Topic type) {
+  public void addType(TopicImpl type, Equality equality) {
     HyperGraph graph = getGraph();
     HGHandle tHandle = getHandle(graph, type);
     graph.add(new HGRel(HGTM.TypeOf, new HGHandle[] {tHandle, getHandle(graph, this)}),
         HGTM.hTypeOf);
   }
 
+  @HGIgnore
   @Override
-  public Set<Topic> getTypes() {
-    return HGTMUtil.<Topic>getRelatedObjects(this, HGTM.hTypeOf, false);
+  public Set<TopicImpl> getTypes() {
+    try {
+      Set<TopicImpl> types = owner.getTopicMap().getEquality().newSet();
+      types.addAll(HGTMUtil.getRelatedObjects(this, HGTM.hTypeOf, false));
+      return types;
+    } catch (RuntimeException e) {
+      // TODO Auto-generated catch block
+      throw e;
+    }
   }
 
   @Override
@@ -136,7 +156,7 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   }
 
   @Override
-  public void addOccurrence(Occurrence occurrence) {
+  public void addOccurrence(OccurrenceImpl occurrence) {
     HyperGraph graph = getGraph();
     HGHandle occurrenceHandle = add(graph, occurrence);
     graph.add(
@@ -144,8 +164,9 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hOccurrenceOf);
   }
 
+  @HGIgnore
   @Override
-  public Set<Occurrence> getOccurrences() {
+  public List<OccurrenceImpl> getOccurrences() {
     return HGTMUtil.getRelatedObjects(this, HGTM.hOccurrenceOf, false);
   }
 
@@ -155,11 +176,13 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
     graph.remove(getHandle(graph, occurrence), false);
   }
 
+  @HGIgnore
   @Override
   public Reifiable getReified() {
     HyperGraph graph = getGraph();
-    final HGConstructSupport reifiedSupport = (HGConstructSupport) HGTMUtil.getOneRelated(graph,
-        HGTM.hReifierOf, getHandle(graph, this), null);
+    HGHandle thisHandle = getHandle(graph, this);
+    final HGConstructSupport<?> reifiedSupport = thisHandle == null ? null : (HGConstructSupport<?>) HGTMUtil.getOneRelated(graph,
+        HGTM.hReifierOf, thisHandle, null);
     return reifiedSupport == null ? null : (Reifiable) reifiedSupport.getOwner();
   }
 
@@ -167,13 +190,14 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   public void setReified(Reifiable reifiable) {}
 
   @Override
-  public void addRolePlayed(Role role) {
+  public void addRolePlayed(RoleImpl role) {
 
   }
 
+  @HGIgnore
   @Override
-  public Set<Role> getRolesPlayed() {
-    Set<Role> result = new HashSet<Role>();
+  public List<RoleImpl> getRolesPlayed() {
+    List<RoleImpl> result = new ArrayList<>();
     HGSearchResult<HGRoleSupport> rs = null;
     try {
       HyperGraph graph = getGraph();
@@ -216,8 +240,9 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hNameOf);
   }
 
+  @HGIgnore
   @Override
-  public Set<NameImpl> getNames() {
+  public List<NameImpl> getNames() {
     return HGTMUtil.getRelatedObjects(this, HGTM.hNameOf, false);
   }
 

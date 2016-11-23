@@ -1,108 +1,123 @@
 package org.gingolph.tm.index;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.Map;
+
+import org.gingolph.tm.AssociationImpl;
+import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.OccurrenceImpl;
+import org.gingolph.tm.RoleImpl;
+import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TypedConstruct;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Association;
+import org.tmapi.core.Construct;
 import org.tmapi.core.Name;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
+import org.tmapi.core.Typed;
 import org.tmapi.index.TypeInstanceIndex;
 
 
-public final class TypeInstanceIndexImpl extends AbstractIndex implements TypeInstanceIndex {
+public final class TypeInstanceIndexImpl extends ClassifiedItemsIndexImpl<TypedConstruct> implements TypeInstanceIndex {
 
-  Map<Topic, Collection<Topic>> topicsByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Association>> associationsByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Role>> rolesByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Occurrence>> occurrencesByTypes = new LinkedHashMap<>();
-  Map<Topic, Collection<Name>> namesByTypes = new LinkedHashMap<>();
+  ClassifiedAndUnclassifiedItems<TopicImpl> topicsByTypes = new ClassifiedAndUnclassifiedItems<>();
+  ClassifiedAndUnclassifiedItems<AssociationImpl> associationsByTypes = new ClassifiedAndUnclassifiedItems<>();
+  ClassifiedAndUnclassifiedItems<RoleImpl> rolesByTypes = new ClassifiedAndUnclassifiedItems<>();
+  ClassifiedAndUnclassifiedItems<OccurrenceImpl> occurrencesByTypes = new ClassifiedAndUnclassifiedItems<>();
+  ClassifiedAndUnclassifiedItems<NameImpl> namesByTypes = new ClassifiedAndUnclassifiedItems<>();
 
-  public TypeInstanceIndexImpl(Collection<Topic> topics, Collection<Association> associations) {
+  public TypeInstanceIndexImpl(Equality equality, Collection<TopicImpl> topics, Collection<AssociationImpl> associations) {
+    super(equality);
     topics.forEach(topic -> {
-      topic.getTypes().forEach(type -> addType(topicsByTypes, type, topic));
-      topic.getOccurrences()
-          .forEach(occurrence -> addType(occurrencesByTypes, occurrence.getType(), occurrence));
-      topic.getNames().forEach(name -> addType(namesByTypes, name.getType(), name));
+      registerItem(topic, topicsByTypes);
+      topic.getNullSafeOccurrenceImpls()
+          .forEach(occurrence -> registerItem(occurrence, occurrencesByTypes));
+      topic.getNullSafeNameImpls().forEach(name -> registerItem(name, namesByTypes));
     });
     associations.forEach(association -> {
-      addType(associationsByTypes, association.getType(), association);
-      association.getRoles().forEach(role -> addType(rolesByTypes, role.getType(), role));
+      registerItem(association, associationsByTypes);
+      association.getNullSafeRoleImpls().forEach(role -> registerItem(role, rolesByTypes));
     });
   }
 
   @Override
   protected void doClose() {}
-
+  
   @Override
-  public Collection<Topic> getTopics(Topic type) {
-    return unmodifiableCollection(topicsByTypes.get(type));
+  public Collection<Topic> getTopics(Topic[] types, boolean matchAll) {
+    return getItemsByClassifiers(topicsByTypes, types, matchAll, this::getNullSafeClassifierList);
   }
 
   @Override
-  public Collection<Topic> getTopics(Topic[] types, boolean matchAll) {
-    return getPropertiedObjects(topicsByTypes, Topic::getTypes, types, matchAll);
+  public Collection<Topic> getTopics(Topic type) {
+    return getItemsByClassifier(topicsByTypes, type);
   }
 
   @Override
   public Collection<Topic> getTopicTypes() {
-    return unmodifiableCollection(topicsByTypes.keySet());
+    return getClassifiers(topicsByTypes);
   }
 
   @Override
   public Collection<Association> getAssociations(Topic type) {
-    return unmodifiableCollection(associationsByTypes.get(type));
+    return getItemsByClassifier(associationsByTypes, type);
   }
 
   @Override
   public Collection<Topic> getAssociationTypes() {
-    return unmodifiableCollection(associationsByTypes.keySet());
+    return getClassifiers(associationsByTypes);
   }
 
   @Override
   public Collection<Role> getRoles(Topic type) {
-    return unmodifiableCollection(rolesByTypes.get(type));
+    return getItemsByClassifier(rolesByTypes, type);
   }
 
   @Override
   public Collection<Topic> getRoleTypes() {
-    return unmodifiableCollection(rolesByTypes.keySet());
+    return getClassifiers(rolesByTypes);
   }
 
   @Override
   public Collection<Occurrence> getOccurrences(Topic type) {
-    return unmodifiableCollection(occurrencesByTypes.get(type));
+    return getItemsByClassifier(occurrencesByTypes, type);
   }
 
   @Override
   public Collection<Topic> getOccurrenceTypes() {
-    return unmodifiableCollection(occurrencesByTypes.keySet());
+    return getClassifiers(occurrencesByTypes);
   }
 
   @Override
   public Collection<Name> getNames(Topic type) {
-    return unmodifiableCollection(namesByTypes.get(type));
+    return getItemsByClassifier(namesByTypes, type);
   }
 
   @Override
   public Collection<Topic> getNameTypes() {
-    return unmodifiableCollection(namesByTypes.keySet());
+    return getClassifiers(namesByTypes);
   }
 
   @Override
   public void onTypeChanged(TypedConstruct typed, Topic typeToAdd, Topic typeToRemove) {
-    final Map<Topic, Collection<TypedConstruct>> types = getOrCreateType(typed.getClass());
+    final ClassifiedAndUnclassifiedItems<TypedConstruct> typedAndUntyped = getItems(typed.getClass());
     if (typeToRemove != null) {
-      Collection<TypedConstruct> typeds = types.get(typeToRemove);
-      if (typeds != null) {
-        typeds.remove(typed);
+      typedAndUntyped.unclassify(typed, typeToRemove);
+      if (getNullSafeClassifierList(typed).isEmpty()) {
+        typedAndUntyped.unclassifiedItems.add(typed);
       }
     }
     if (typeToAdd != null) {
-      addType(types, typeToAdd, typed);
+      typedAndUntyped.classify(typed,  typeToAdd);
+      if (getNullSafeClassifierList(typed).size() == 1) {
+        // was previously unscoped, remove it from there
+        typedAndUntyped.unclassifiedItems.remove(typed);
+      }
     }
   }
 
@@ -115,8 +130,8 @@ public final class TypeInstanceIndexImpl extends AbstractIndex implements TypeIn
     typeds.add(typed);
   }
 
-  private <T> Map<Topic, Collection<T>> getOrCreateType(Class<? extends Object> typedClass) {
-    Map types;
+  protected ClassifiedAndUnclassifiedItems<TypedConstruct> getItems(Class typedClass) {
+    ClassifiedAndUnclassifiedItems<?> types;
     if (Topic.class.isAssignableFrom(typedClass)) {
       types = topicsByTypes;
     } else if (Association.class.isAssignableFrom(typedClass)) {
@@ -130,7 +145,21 @@ public final class TypeInstanceIndexImpl extends AbstractIndex implements TypeIn
     } else {
       throw new IllegalArgumentException("Unsupported type " + typedClass);
     }
-    return types;
+    return (ClassifiedAndUnclassifiedItems)types;
+  }
+
+  @Override
+  protected TypedConstruct cast(Construct construct) {
+    return construct instanceof TypedConstruct?(TypedConstruct)construct:null;
+  }
+
+  @Override
+  protected Collection<Topic> getNullSafeClassifierList(TypedConstruct classified) {
+    if (classified.getClass() == TopicImpl.class) {
+      return ((TopicImpl)classified).getTypes();
+    }
+    Topic type = ((Typed)classified).getType();
+    return type == null ? Collections.emptyList():Arrays.asList(type);
   }
 
 }

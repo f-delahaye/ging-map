@@ -3,13 +3,15 @@ package org.gingolph.tm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.gingolph.tm.equality.Equality;
+import org.gingolph.tm.equality.SAMEquality;
+import org.gingolph.tm.equality.TMAPIEquality;
 import org.gingolph.tm.event.TopicMapEventListener;
 import org.gingolph.tm.index.IdentifierIndex;
 import org.tmapi.core.Association;
@@ -25,6 +27,8 @@ import org.tmapi.index.Index;
 
 public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements TopicMap {
 
+  private static final SAMEquality EQUALITY_FOR_MERGE = new SAMEquality();
+
   transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
   TopicMapSystemImpl topicMapSystem;
@@ -32,18 +36,18 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
-
-  private Locator baseLocator;
-
+  private final Equality equality;
+  
   public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
     super();
     this.topicMapSystem = topicMapSystem;
     this.autoMerge = autoMerge;
     this.supportFactory = supportFactory;
+    String userSpecifiedEquality = topicMapSystem.getProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.TMAPI_EQUALITY);    
+    equality = AbstractTopicMapSystemFactory.SAM_EQUALITY.equals(userSpecifiedEquality)? new SAMEquality():new TMAPIEquality();
   }
 
-  
   @Override
   public Construct getParent() {
     return null;
@@ -69,16 +73,16 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   @Override
   public Set<Topic> getTopics() {
-    return Collections.unmodifiableSet(support.getTopics());
+    return new UnmodifiableCollectionSet<>(support.getTopics());
   }
 
   @Override
   public Locator getLocator() {
-    return baseLocator;
+    return support.getBaseLocator();
   }
 
   void setLocator(Locator locator) {
-    this.baseLocator = locator;
+    support.setBaseLocator(locator);
   }
 
   @Override
@@ -98,11 +102,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   public <T extends Construct> T getConstructByItemIdentifier(Locator itemIdentifier,
       Class<T> clazz) {
     Construct construct = getConstructByItemIdentifier(itemIdentifier);
-    return clazz.isAssignableFrom(construct.getClass()) ? (T) construct : null;
+    return clazz.isAssignableFrom(construct.getClass()) ? clazz.cast(construct) : null;
   }
 
   @Override
-  
   public Construct getConstructById(String id) {
     return getIdentifierIndex().getConstructById(id);
   }
@@ -120,7 +123,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
       return topic;
     }
     Construct construct = getConstructByItemIdentifier(subjectIdentifier);
-    Topic newTopic = construct instanceof TopicImpl ? (TopicImpl) construct : createTopicInstance();
+    Topic newTopic = construct instanceof TopicImpl ? (TopicImpl) construct : doCreateTopic(null);
     newTopic.addSubjectIdentifier(subjectIdentifier);
     notifyListeners(listener -> listener.onSubjectIdentifierAdded(newTopic, subjectIdentifier));
     return newTopic;
@@ -137,7 +140,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     if (topic != null) {
       return topic;
     }
-    Topic newTopic = createTopicInstance();
+    Topic newTopic = doCreateTopic(null);
     newTopic.addSubjectLocator(subjectLocator);
     notifyListeners(listener -> listener.onSubjectLocatorAdded(newTopic, subjectLocator));
     return newTopic;
@@ -156,7 +159,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     }
     Topic topic = getTopicBySubjectIdentifier(itemIdentifier);
     if (topic == null) {
-      topic = createTopicInstance();
+      topic = doCreateTopic(null);
     }
     topic.addItemIdentifier(itemIdentifier);
     return topic;
@@ -164,14 +167,18 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public Topic createTopic() {
-    Topic topic = createTopicInstance();
+    Topic topic = doCreateTopic(null);
     topic.addItemIdentifier(createLocator("internal-" + topic.getId()));
     return topic;
   }
 
-  private Topic createTopicInstance() {
+  public TopicImpl doCreateTopic(TopicSupport topicSupport) {
     TopicImpl topic = new TopicImpl(this);
-    topic.setSupport(createTopicSupport());
+    if (topicSupport == null) {
+      // Most of the time, topicSupport will be null. The ability to pass an externally created support should be used with caution.
+      topicSupport = createTopicSupport();      
+    }
+    topic.setSupport(topicSupport);
     support.addTopic(topic);
     notifyListeners(listener -> listener.onConstructCreated(topic));
     return topic;
@@ -183,18 +190,20 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   protected void customRemove() {
-    for (Association association : new ArrayList<>(getAssociations())) {
+    Collection<Association> associations = new ArrayList<>(getAssociations());
+    for (Association association : associations) {
       association.remove();
     }
-    for (Topic topic : new ArrayList<>(getTopics())) {
-      ((TopicImpl) topic).doRemove();
+    Collection<Topic> topics = new ArrayList<>(getTopics());
+    for (Topic topic : topics) {
+      ((TopicImpl)topic).doRemove();
     }
     topicMapSystem.removeTopicMap(this);
   }
 
   @Override
   public Set<Association> getAssociations() {
-    return Collections.unmodifiableSet(support.getAssociations());
+    return new UnmodifiableCollectionSet<>(support.getAssociations());
   }
 
   @Override
@@ -239,11 +248,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
       return;
     }
     final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
-    otherTopics.stream().forEach(otherTopic -> {
-      Optional<Topic> sameTopic =
-          getTopics().stream().filter(topic -> topic.equals(otherTopic)).findFirst();
-      TopicImpl mergee =
-          (TopicImpl) (sameTopic.isPresent() ? sameTopic.get() : createTopicInstance());
+    otherTopics.stream().map(otherTopic -> (TopicImpl)otherTopic).forEach(otherTopic -> {
+      Optional<TopicImpl> sameTopic =
+          getTopics().stream().map(topic-> (TopicImpl)topic).filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
+      TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic(null);
       mergee.importIn(otherTopic, false);
     });
 
@@ -290,10 +298,9 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return listener;
   }
 
-  public NameImpl createName(TopicImpl topic, String value) {
+  public NameImpl createName(TopicImpl topic) {
     NameImpl name = new NameImpl(this, topic);
     name.setSupport(createNameSupport());
-    name.setValue(value);
     return name;
   }
 
@@ -333,4 +340,23 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   VariantSupport createVariantSupport() {
     return supportFactory.createVariantSupport();
   }
+  
+  public Equality getEquality() {
+    return equality;
+  }
+  
+  SAMEquality getEqualityForMerge() {
+    return EQUALITY_FOR_MERGE;
+  }
+  
+  @Override
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return this == otherObjectOfSameClass;
+  }
+  
+  @Override
+  protected int hashCodeFromEquality() {
+    return System.identityHashCode(this);
+  }  
+  
 }

@@ -1,7 +1,9 @@
 package org.gingolph.tm;
 
+import java.util.List;
 import java.util.Set;
 
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -38,28 +40,28 @@ public interface TopicSupport extends ConstructSupport {
 
   void addName(NameImpl name);
 
-  Set<NameImpl> getNames();
+  List<NameImpl> getNames();
 
   void removeName(NameImpl name);
 
 
-  void addOccurrence(Occurrence occurrence);
+  void addOccurrence(OccurrenceImpl occurrence);
 
-  Set<Occurrence> getOccurrences();
+  List<OccurrenceImpl> getOccurrences();
 
   void removeOccurrence(Occurrence occurrence);
 
 
-  void addRolePlayed(Role role);
+  void addRolePlayed(RoleImpl role);
 
-  Set<Role> getRolesPlayed();
+  List<RoleImpl> getRolesPlayed();
 
   void removeRolePlayed(Role role);
 
 
-  void addType(Topic type);
+  void addType(TopicImpl type, Equality equality);
 
-  Set<Topic> getTypes();
+  Set<TopicImpl> getTypes();
 
   boolean removeType(Topic type);
 

@@ -4,13 +4,10 @@ import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
-import org.gingolph.tm.TopicMapImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
-import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 /**
  * 
@@ -22,7 +19,7 @@ import org.tmapi.core.Topic;
  * @author Borislav Iordanov
  *
  */
-public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSupport, HGLink {
+public class HGRoleSupport extends HGConstructSupport<RoleImpl> implements RoleSupport, HGLink {
   private transient final HGHandle[] targetSet;
 
   public HGRoleSupport() {
@@ -31,23 +28,24 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   private HGRoleSupport(HGHandle[] targetSet) {
     this.targetSet = targetSet;
-    // HGRoleSupport does not have the same needs as other constructs:
-    // usually graph is injected to Constructs when they get persisted (by virtue of them
-    // implementing HoldingContainer).
-    // However, in order to persist a HGRoleConstruct, we need a graph to lookup handles of player
-    // and type, so it has to be provided externally.
-    setHyperGraph(
-        ((HGTopicMapSupport) ((TopicMapImpl) owner.getTopicMap()).getSupport()).getGraph());
-    targetSet[2] = getHandle(getGraph(), owner.getParent());
   }
 
   @Override
   public void setOwner(RoleImpl owner) {
       this.owner = owner;
+      // HGRoleSupport does not have the same needs as other constructs:
+      // usually graph is injected to Constructs when they get persisted (by virtue of them
+      // implementing HoldingContainer).
+      // However, in order to persist a HGRoleConstruct, we need a graph to lookup handles of player
+      // and type, so it has to be provided externally.
+      setHyperGraph(
+          ((HGTopicMapSupport) (owner.getTopicMap()).getSupport()).getGraph());
+    targetSet[2] = getHandle(getGraph(), owner.getParent());
+      
   }
     
   @Override
-  protected Role createOwner() {
+  protected RoleImpl createOwner() {
     HGAssociationSupport parent = hyperGraph.get(targetSet[2]);
     RoleImpl role =
         new RoleImpl(parent.getTopicMapSupport().getOwner(), (AssociationImpl) parent.getOwner());
@@ -57,7 +55,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public Topic getPlayer() {
+  public TopicImpl getPlayer() {
     final HGHandle playerHandle = targetSet[0];
     return playerHandle == null ? null : ((HGTopicSupport) getGraph().get(playerHandle)).getOwner();
   }
@@ -66,7 +64,7 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
   public void setPlayer(TopicImpl player) {
     final HyperGraph graph = getGraph();
     targetSet[0] = getHandle(graph, player);
-    HGHandle thisHandle = graph.getHandle(this);
+    HGHandle thisHandle = getHandle(graph, this);
     if (thisHandle != null) {
       // If setPlayer is called when the role is being created, it won't be in the graph (yet) and
       // therefore update will fail.
@@ -93,13 +91,13 @@ public class HGRoleSupport extends HGConstructSupport<Role> implements RoleSuppo
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     final HGHandle typeHandle = targetSet[1];
     return typeHandle == null ? null : ((HGTopicSupport) getGraph().get(typeHandle)).getOwner();
   }
 
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     targetSet[1] = getHandle(getGraph(), type);
   }
 

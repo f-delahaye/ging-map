@@ -2,9 +2,9 @@ package org.gingolph.tm.memory;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.gingolph.tm.ConstructSupport;
 import org.tmapi.core.Locator;
-
 
 public class IMConstructSupport implements ConstructSupport {
   private Set<Locator> itemIdentifiers;

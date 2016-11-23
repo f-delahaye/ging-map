@@ -92,6 +92,11 @@ public class TopicMapSystemImpl implements TopicMapSystem {
   public Object getProperty(String propertyName) {
     return support.getProperty(propertyName);
   }
+  
+  public <T> T getProperty(String propertyName, T defaultValue) {
+    Object property = getProperty(propertyName);
+    return property == null ? defaultValue:(T)property;
+  }
 
   @Override
   public void close() {

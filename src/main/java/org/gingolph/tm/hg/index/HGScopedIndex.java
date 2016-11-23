@@ -2,14 +2,18 @@ package org.gingolph.tm.hg.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.gingolph.tm.ScopedTopicMapItem;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.UnmodifiableCollectionSet;
+import org.gingolph.tm.equality.Equality;
 import org.gingolph.tm.hg.HGAssociationSupport;
 import org.gingolph.tm.hg.HGNameSupport;
 import org.gingolph.tm.hg.HGOccurrenceSupport;
@@ -46,11 +50,11 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     }
   }
 
-  public HGScopedIndex(HyperGraph graph) {
-    super(graph);
+  public HGScopedIndex(HyperGraph graph, Equality equality) {
+    super(graph, equality);
   }
 
-  protected <T extends Scoped, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic theme,
+  protected <T extends ScopedTopicMapItem<?, ?>, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic theme,
       Class<S> scopedSupportClass) {
     Collection<T> scoped;
     if (theme == null) {
@@ -63,7 +67,7 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     return scoped;
   }
 
-  protected <T extends Scoped, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic[] themes,
+  protected <T extends ScopedTopicMapItem, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic[] themes,
       boolean matchAll, Class<S> scopedSupportClass) {
     if (themes == null) {
       throw new IllegalArgumentException("Null scope not allowed");
@@ -118,12 +122,12 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Association> getAssociations(Topic theme) {
-    return getScoped(theme, HGAssociationSupport.class);
+    return Collections.unmodifiableCollection(getScoped(theme, HGAssociationSupport.class));
   }
 
   @Override
   public Collection<Association> getAssociations(Topic[] themes, boolean matchAll) {
-    return getScoped(themes, matchAll, HGAssociationSupport.class);
+    return Collections.unmodifiableCollection(getScoped(themes, matchAll, HGAssociationSupport.class));
   }
 
   @Override
@@ -133,12 +137,12 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Occurrence> getOccurrences(Topic theme) {
-    return getScoped(theme, HGOccurrenceSupport.class);
+    return Collections.unmodifiableCollection(getScoped(theme, HGOccurrenceSupport.class));
   }
 
   @Override
   public Collection<Occurrence> getOccurrences(Topic[] themes, boolean matchAll) {
-    return getScoped(themes, matchAll, HGOccurrenceSupport.class);
+    return Collections.unmodifiableCollection(getScoped(themes, matchAll, HGOccurrenceSupport.class));
   }
 
   @Override
@@ -148,12 +152,12 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
 
   @Override
   public Collection<Name> getNames(Topic theme) {
-    return getScoped(theme, HGNameSupport.class);
+    return Collections.unmodifiableCollection(getScoped(theme, HGNameSupport.class));
   }
 
   @Override
   public Collection<Name> getNames(Topic[] themes, boolean matchAll) {
-    return getScoped(themes, matchAll, HGNameSupport.class);
+    return Collections.unmodifiableCollection(getScoped(themes, matchAll, HGNameSupport.class));
   }
 
   @Override
@@ -166,11 +170,11 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     if (theme == null) {
       throw new IllegalArgumentException("Null scope not allowed");
     }
-    Set<Variant> allVariants = new HashSet<>();
+    List<Variant> allVariants = new ArrayList<>();
     allVariants.addAll(getScoped(theme, HGVariantSupport.class));
     allVariants.addAll(getScoped(theme, HGNameSupport.class).stream()
         .flatMap(name -> name.getVariants().stream()).collect(Collectors.toList()));
-    return allVariants;
+    return new UnmodifiableCollectionSet<>(allVariants);
   }
 
   @Override
@@ -178,15 +182,15 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     Collection<Variant> allVariants = new ArrayList<>();
     allVariants.addAll(getScoped(themes, false, HGVariantSupport.class));
     allVariants.addAll(getScoped(themes, false, HGNameSupport.class).stream()
-        .flatMap(name -> name.getVariants().stream()).collect(Collectors.toSet()));
+        .flatMap(name -> name.getVariants().stream()).collect(Collectors.toList()));
     return matchAll ? filterMatchAll(allVariants, themes) : allVariants;
   }
 
   @Override
   public Collection<Topic> getVariantThemes() {
-    Set<Topic> allThemes = new HashSet<>();
+    Set<Topic> allThemes = equality.newSet();
     allThemes.addAll(getScopedThemes(HGVariantSupport.class));
     allThemes.addAll(getScopedThemes(HGNameSupport.class));
-    return allThemes;
+    return Collections.unmodifiableCollection(allThemes);
   }
 }

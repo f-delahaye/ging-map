@@ -1,13 +1,16 @@
 package org.gingolph.tm.memory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.gingolph.tm.NameImpl;
+import org.gingolph.tm.OccurrenceImpl;
+import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.TopicSupport;
+import org.gingolph.tm.equality.Equality;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -18,10 +21,10 @@ import org.tmapi.core.Topic;
 public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   private Set<Locator> subjectIdentifiers;
   private Set<Locator> subjectLocators;
-  private Set<NameImpl> names;
-  private Set<Topic> types;
-  private Set<Occurrence> occurrences;
-  private Collection<Role> roles;
+  private List<NameImpl> names;
+  private List<OccurrenceImpl> occurrences;
+  private List<RoleImpl> roles;
+  private Set<TopicImpl> types;
   private Reifiable reified;
 
   public IMTopicSupport() {}
@@ -75,7 +78,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   @Override
   public void addName(NameImpl name) {
     if (names == null) {
-      names = new HashSet<>();
+      names = new ArrayList<>();
     }
     names.add(name);
   }
@@ -88,14 +91,14 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public Set<NameImpl> getNames() {
+  public List<NameImpl> getNames() {
     return names;
   }
 
   @Override
-  public void addOccurrence(Occurrence occurrence) {
+  public void addOccurrence(OccurrenceImpl occurrence) {
     if (occurrences == null) {
-      occurrences = new HashSet<>();
+      occurrences = new ArrayList<>();
     }
     occurrences.add(occurrence);
   }
@@ -108,12 +111,12 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public Set<Occurrence> getOccurrences() {
+  public List<OccurrenceImpl> getOccurrences() {
     return occurrences;
   }
 
   @Override
-  public void addRolePlayed(Role role) {
+  public void addRolePlayed(RoleImpl role) {
     if (roles == null) {
       roles = new ArrayList<>();
     }
@@ -128,25 +131,14 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public Set<Role> getRolesPlayed() {
-    // roles cannot be a HashSet.
-    // Role.id may be modified by role.importIn() and role.id is used in hashCode() which could lead
-    // to inconsistent behavior of roles (as a general rule, its not safe to put mutable objects in
-    // Set's)
-    // In particular, one of the tests of the standard TMAPI test suite fails because of this
-    // (I suspect IMAssociationSupport.getRoles() would also fail in
-    // IMAssociationSupport.getRoles().contains(xxx) was tested)
-    // So we store roles as a list and create a hashset off it when called.
-    // For better performance, we could use Guava's immutable set instead
-    // TODO if we create a new HashSet here, we no longer need to wrap result of this method in
-    // Collections.unmodifiableSet
-    return roles == null ? null : new HashSet<>(roles);
+  public List<RoleImpl> getRolesPlayed() {
+    return roles;
   }
 
   @Override
-  public void addType(Topic type) {
+  public void addType(TopicImpl type, Equality equality) {
     if (types == null) {
-      types = new HashSet<>();
+      types = equality.newSet();
     }
     types.add(type);
   }
@@ -161,7 +153,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public Set<Topic> getTypes() {
+  public Set<TopicImpl> getTypes() {
     return types;
   }
 

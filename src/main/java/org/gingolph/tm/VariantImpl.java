@@ -1,8 +1,10 @@
 package org.gingolph.tm;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
+
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;
@@ -27,25 +29,25 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    HashSet<Topic> scope = new HashSet<>();
-    scope.addAll(ScopedHelper.getScope(getParent().getScope()));
-    scope.addAll(ScopedHelper.getScope(support.getScope()));
-    return scope;
-    // return ScopedHelper.getScope(scope);
+    Set<TopicImpl> scope = getTopicMap().getEquality().newSet();
+    scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(getParent().getScope()));
+    scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(support.getScope()));
+    return Collections.unmodifiableSet(scope);
+//    return ScopedHelper.getScope(support.getScope());
   }
 
   protected final void setScope(Collection<Topic> scope) {
-    ScopedHelper.setScope(this, scope, support);
+    ScopedHelper.setScope(this, scope, support, getTopicMap().getEquality());
   }
 
   @Override
   public void addTheme(Topic theme) throws ModelConstraintException {
-    ScopedHelper.addTheme(this, theme, support);
+    ScopedHelper.addTheme(this, theme, support, getTopicMap().getEquality());
   }
 
   @Override
   public void removeTheme(Topic theme) {
-    ScopedHelper.removeTheme(this, theme, support);
+      ScopedHelper.removeTheme(this, theme, support);
   }
 
   @Override
@@ -61,4 +63,21 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
   protected void doSetReifier(TopicImpl reifier) {
     support.setReifier(reifier);
   }
+  
+  @Override
+  protected boolean equalsFromEquality(Object otherObjectOfSameClass) {
+    return getTopicMap().getEquality().equals(this, (VariantImpl)otherObjectOfSameClass);
+  }
+  
+  // consistent with equals and avoid too much overhead calculating hashCodes of Type and Scope ... sounds like a reasonable default.
+//  @Override
+//  public int hashCode() {
+//    return Objects.hashCode(getValue());
+//  }
+
+  @Override
+  protected int hashCodeFromEquality() {
+    return getTopicMap().getEquality().hashCode(this);
+  }  
+  
 }

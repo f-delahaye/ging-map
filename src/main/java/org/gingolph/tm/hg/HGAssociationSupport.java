@@ -3,7 +3,8 @@ package org.gingolph.tm.hg;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.RoleImpl;
@@ -13,15 +14,13 @@ import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.HGIgnore;
-import org.tmapi.core.Association;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
-public class HGAssociationSupport extends HGScopedSupport<Association>
+public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
     implements AssociationSupport, HGLink {
 
   transient List<HGHandle> roles;
-  Topic type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
+  TopicImpl type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
               // topics which have roles.
   // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
   // TODO fix this
@@ -39,10 +38,9 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  public void addRole(Role role) {
+  public void addRole(RoleImpl role) {
     final HyperGraph graph = getGraph();
-    RoleSupport support = ((RoleImpl) role).getSupport();
-    roles.add(add(graph, support));
+    roles.add(add(graph, role));
     graph.update(this);
   }
 
@@ -58,8 +56,8 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  public Set<Role> getRoles() {
-    return new RoleSet(getGraph(), this);
+  public List<RoleImpl> getRoles() {
+    return this.roles.stream().map(role -> (RoleImpl)((HGRoleSupport) getGraph().get(role)).getOwner()).collect(Collectors.toList());
   }
 
   @HGIgnore
@@ -80,7 +78,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public Topic getType() {
+  public TopicImpl getType() {
     if (type == null) {
       final HGHandle thisHandle = getHandle(hyperGraph, this);
       HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
@@ -91,7 +89,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
 
   @HGIgnore
   @Override
-  public void setType(Topic type) {
+  public void setType(TopicImpl type) {
     this.type = type;
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
@@ -118,7 +116,7 @@ public class HGAssociationSupport extends HGScopedSupport<Association>
   }
 
   @Override
-  protected Association createOwner() {
+  protected AssociationImpl createOwner() {
     final AssociationImpl association = new AssociationImpl(getTopicMapSupport().getOwner());
     association.setSupport(this);
     return association;
