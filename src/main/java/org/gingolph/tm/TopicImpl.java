@@ -486,8 +486,9 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     });
 
 
+    TopicSupport otherTopicSupport = otherTopic.support;
     if (merge) {
-      getParent().removeTopic(otherTopic);
+//      getParent().removeTopic(otherTopic);
       // Change otherTopic's data so from now on it will be the same as topic ...
       // (e.g. 2 names whose types are resp. this and other will be deemed identical which is what
       // we want)
@@ -500,11 +501,22 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
         AssociationImpl otherAssociation = otherRole.getParent();
         
         Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> getTopicMap().getEqualityForMerge().associationEquals(candidateAssociation, otherAssociation, false)).findAny();
-        AssociationImpl mergee = equivalentAssociation.orElseGet(() -> getParent().createAssociation(otherAssociation.getType(), otherAssociation.getScope()));
-        mergee.importIn(otherAssociation, merge);
-        addRolePlayed(otherRole);
+        if (equivalentAssociation.isPresent()) {
+          getTopicMap().removeAssociation(otherAssociation);
+          // should we import otherAssociation's item identifiers and all the roles' item identifiers too?
+        } else {
+          otherRole.setPlayer(this);
+        }
       };
     }
+    
+    if (merge) {
+      // revert back to the original support so we can remove otherTopic stuff (if we keep otherTopic.support set to this.support we'll actually delete this!!)
+      // Other alternatives would include changing all references to otherTopic by this (in themes, types, ...) which would avoid setting the support back and forth...
+      otherTopic.support = otherTopicSupport;
+      getParent().removeTopic(otherTopic);
+    }
+    
   }
 
   @Override

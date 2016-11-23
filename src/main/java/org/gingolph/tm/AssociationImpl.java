@@ -147,35 +147,5 @@ public class AssociationImpl extends ScopedTopicMapItem<TopicMapImpl, Associatio
   public String toString() {
     return "[type="+getType()+", roles="+getRoles()+"]";
   }
-  
-  void importIn(AssociationImpl otherAssociation, boolean merge) {
-    final Collection<RoleImpl> otherRoles = new ArrayList<>(otherAssociation.getNullSafeRoleImpls());
-    final Set<Locator> itemIdentifiers = otherAssociation.getItemIdentifiers();
-    final Topic otherReifier = otherAssociation.getReifier();
-    if (merge) {
-      otherAssociation.doRemove();
-    }
-
-    // This method can be called from TopicImpl.importIn when either:
-    // - an existing association is imported into a newly created one
-    // - or 2 existing equivalent associations are merged together
-    // In the first case, we know there will never be an equivalent role, since its a newly created association with no role.
-    // In the second case, we know that there always be an equivalent trole: this (amongst other things) is a requirement for 2 associations to be deemed equivalent.
-    // So either the lookup of equivalentRole is not needed, or it has been done already.
-    // However, code below should be cheap, and it works for both logics.
     
-    for (RoleImpl otherRole: otherRoles) {
-      Optional<RoleImpl> equivalentRole = getNullSafeRoleImpls().stream().filter(candidateRole -> getTopicMap().getEqualityForMerge().equals(candidateRole, otherRole)).findAny();
-      RoleImpl mergee = equivalentRole.orElse(createRole(otherRole.getType(), otherRole.getPlayer()));
-      mergee.importIn(otherRole, merge);
-    }
-    
-    itemIdentifiers.forEach(identifier -> importItemIdentifier(identifier));
-    if (getReifier() == null) {
-      setReifier(otherReifier);
-    } else if (otherReifier != null) {
-      getReifier().mergeIn(otherReifier);
-    }
-  }
-  
 }

@@ -88,9 +88,4 @@ public class RoleImpl extends TopicMapItem<AssociationImpl, RoleSupport>
   public String toString() {
     return "[type="+getType()+", player="+getPlayer()+"]";
   }
-  
-  protected void importIn(Role otherRole, boolean merge) {
-    this.id = otherRole.getId();
-    otherRole.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));
-  }
 }

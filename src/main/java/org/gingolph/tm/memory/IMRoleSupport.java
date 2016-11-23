@@ -1,5 +1,6 @@
 package org.gingolph.tm.memory;
 
+import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
@@ -44,5 +45,5 @@ public class IMRoleSupport extends IMConstructSupport implements RoleSupport {
   @Override
   public void setOwner(RoleImpl owner) {
  // Noop - not needed by the in memory implementation    
-  }  
+  }
 }

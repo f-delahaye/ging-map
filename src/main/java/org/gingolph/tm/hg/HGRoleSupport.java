@@ -64,7 +64,7 @@ public class HGRoleSupport extends HGConstructSupport<RoleImpl> implements RoleS
   public void setPlayer(TopicImpl player) {
     final HyperGraph graph = getGraph();
     targetSet[0] = getHandle(graph, player);
-    HGHandle thisHandle = graph.getHandle(this);
+    HGHandle thisHandle = getHandle(graph, this);
     if (thisHandle != null) {
       // If setPlayer is called when the role is being created, it won't be in the graph (yet) and
       // therefore update will fail.

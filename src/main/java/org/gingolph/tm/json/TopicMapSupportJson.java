@@ -477,7 +477,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
 
   @Override
   public String getValue() {
-    return at(VALUE_PP).asString();
+    Json value = at(VALUE_PP);
+    return value == null ? null : value.asString();
   }
 
   @Override

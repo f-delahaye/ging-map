@@ -40,8 +40,7 @@ public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
   @Override
   public void addRole(RoleImpl role) {
     final HyperGraph graph = getGraph();
-    RoleSupport support = ((RoleImpl) role).getSupport();
-    roles.add(add(graph, support));
+    roles.add(add(graph, role));
     graph.update(this);
   }
 

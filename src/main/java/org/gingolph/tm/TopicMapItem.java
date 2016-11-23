@@ -20,10 +20,6 @@ public abstract class TopicMapItem<P extends Construct, S extends ConstructSuppo
     return parent;
   }
 
-  protected void setParent(P newParent) {
-    this.parent = newParent;
-  }
-  
   @Override
   public TopicMapImpl getTopicMap() {
     return topicMap;

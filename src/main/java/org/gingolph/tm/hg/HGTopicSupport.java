@@ -180,8 +180,9 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
   @Override
   public Reifiable getReified() {
     HyperGraph graph = getGraph();
-    final HGConstructSupport<?> reifiedSupport = (HGConstructSupport<?>) HGTMUtil.getOneRelated(graph,
-        HGTM.hReifierOf, getHandle(graph, this), null);
+    HGHandle thisHandle = getHandle(graph, this);
+    final HGConstructSupport<?> reifiedSupport = thisHandle == null ? null : (HGConstructSupport<?>) HGTMUtil.getOneRelated(graph,
+        HGTM.hReifierOf, thisHandle, null);
     return reifiedSupport == null ? null : (Reifiable) reifiedSupport.getOwner();
   }
 
