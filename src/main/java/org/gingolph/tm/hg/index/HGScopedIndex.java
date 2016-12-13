@@ -46,7 +46,7 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     public boolean satisfies(HyperGraph graph, HGHandle handle) {
       Object atom = graph.get(handle);
       return atom instanceof HGScopedSupport
-          && org.assertj.core.util.Collections.isNullOrEmpty(((HGScopedSupport) atom).getScope());
+          && org.assertj.core.util.Collections.isNullOrEmpty(((HGScopedSupport<?>) atom).getScope());
     }
   }
 
@@ -67,7 +67,7 @@ public class HGScopedIndex extends HGAbstractIndex implements ScopedIndex {
     return scoped;
   }
 
-  protected <T extends ScopedTopicMapItem, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic[] themes,
+  protected <T extends ScopedTopicMapItem<?,?>, S extends HGScopedSupport<T>> Collection<T> getScoped(Topic[] themes,
       boolean matchAll, Class<S> scopedSupportClass) {
     if (themes == null) {
       throw new IllegalArgumentException("Null scope not allowed");

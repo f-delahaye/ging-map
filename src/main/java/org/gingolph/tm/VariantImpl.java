@@ -2,7 +2,6 @@ package org.gingolph.tm;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 
 import org.tmapi.core.ModelConstraintException;
@@ -29,9 +28,9 @@ public class VariantImpl extends AbstractDatatypeAware<NameImpl, VariantSupport>
 
   @Override
   public Set<Topic> getScope() {
-    Set<TopicImpl> scope = getTopicMap().getEquality().newSet();
-    scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(getParent().getScope()));
-    scope.addAll((Collection<? extends TopicImpl>) ScopedHelper.getScope(support.getScope()));
+    Set<Topic> scope = getTopicMap().getEquality().newSet();
+    scope.addAll(ScopedHelper.getScope(getParent().getScope()));
+    scope.addAll(ScopedHelper.getScope(support.getScope()));
     return Collections.unmodifiableSet(scope);
 //    return ScopedHelper.getScope(support.getScope());
   }

@@ -94,11 +94,11 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
     } else {
       throw new UnsupportedOperationException("Unknown index " + type);
     }
-    return (I) index;
+    return type.cast(index);
   }
 
   @Override
-  public String generateId(AbstractConstruct construct) {
+  public String generateId(AbstractConstruct<?> construct) {
     return String.valueOf(counter.getAndIncrement());
   }
 

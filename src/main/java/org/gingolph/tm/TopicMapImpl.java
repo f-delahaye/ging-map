@@ -259,7 +259,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
-    I index = (I) indexes.get(type);
+    I index = type.cast(indexes.get(type));
     if (index == null) {
       index = support.getIndex(type);
       indexes.put(type, index);
@@ -281,7 +281,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     support.setReifier(reifier);
   }
 
-  protected final String generateId(AbstractConstruct construct) {
+  protected final String generateId(AbstractConstruct<?> construct) {
     return support.generateId(construct);
   }
 

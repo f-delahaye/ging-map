@@ -9,6 +9,8 @@ import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Locator;
 
 public class HGOccurrenceSupport extends HGScopedSupport<OccurrenceImpl> implements OccurrenceSupport {
+
+  private static final long serialVersionUID = 1L;
   private String value;
   private Locator datatype;
 

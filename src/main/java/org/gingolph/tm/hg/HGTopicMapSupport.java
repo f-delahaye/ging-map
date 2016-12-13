@@ -29,6 +29,7 @@ import org.tmapi.index.TypeInstanceIndex;
 
 public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implements TopicMapSupport {
 
+  private static final long serialVersionUID = 1L;
   private Locator baseLocator;
   private TopicMapSystemSupport parent;
   private transient HyperGraph graph;
@@ -113,7 +114,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public String generateId(AbstractConstruct construct) {
+  public String generateId(AbstractConstruct<?> construct) {
     HGHandle handle = graph.getHandle(construct.getSupport());
     return handle == null ? null : graph.getPersistentHandle(handle).toString();
   }
@@ -154,6 +155,6 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
     } else {
       throw new UnsupportedOperationException("Unknown index " + type);
     }
-    return (I) index;
+    return type.cast(index);
   }
 }

@@ -49,7 +49,7 @@ public abstract class HGAbstractIndex implements Index {
   }
 
   boolean open = false;
-  List<HGIndex> indexes = new ArrayList<>();
+  List<HGIndex<?,?>> indexes = new ArrayList<>();
   final transient HyperGraph graph;
   final transient Equality equality;
 

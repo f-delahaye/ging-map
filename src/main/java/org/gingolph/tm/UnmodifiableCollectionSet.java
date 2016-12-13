@@ -34,8 +34,9 @@ public class UnmodifiableCollectionSet<E> extends AbstractSet<E> implements Set<
    * 
    * @param equals
    */
+  @SuppressWarnings("unchecked")
   public UnmodifiableCollectionSet(Collection<? extends E> c) {
-    this.delegate = (Collection)c;
+    this.delegate = (Collection<E>)c;
   }
     
   @Override

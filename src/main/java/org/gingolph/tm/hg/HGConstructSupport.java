@@ -96,7 +96,7 @@ public abstract class HGConstructSupport<T extends Construct>
 
   public static HGHandle getHandle(HyperGraph graph, Construct construct) {
     return construct == null ? null
-        : graph.getHandle(((AbstractConstruct) construct).getSupport());
+        : graph.getHandle(((AbstractConstruct<?>) construct).getSupport());
   }
 
   public static HGHandle getHandle(HyperGraph graph, ConstructSupport support) {
@@ -104,7 +104,7 @@ public abstract class HGConstructSupport<T extends Construct>
   }
 
   public static HGHandle add(HyperGraph graph, Construct construct) {
-    return add(graph, ((AbstractConstruct) construct).getSupport());
+    return add(graph, ((AbstractConstruct<?>) construct).getSupport());
   }
 
   public static HGHandle add(HyperGraph graph, ConstructSupport support) {

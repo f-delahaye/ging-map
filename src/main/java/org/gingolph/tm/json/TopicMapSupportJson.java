@@ -45,6 +45,8 @@ import mjson.TopicMapJson;
 
 public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport, TopicSupport, AssociationSupport, RoleSupport, NameSupport, OccurrenceSupport, VariantSupport {
 
+  private static final long serialVersionUID = 1L;
+  
   private static final String BASE_LOCATOR_PP = "locator";
   private static final String SCOPE_PP = "scope";
   private static final String TYPES_PP = "types";
@@ -93,10 +95,12 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
     return owner.getTopicMap();
   }
   
+  @SuppressWarnings("unchecked")
   private <T extends AbstractConstruct<?>> T getOwner() {
     return (T)owner;
   }
   
+  @SuppressWarnings("unchecked")
   private TopicMapSupportJson getTopicMapSupportJson(Construct construct) {
     return ((AbstractConstruct<TopicMapSupportJson>)construct).getSupport();
   }
@@ -417,7 +421,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
       } else {
         throw new UnsupportedOperationException("Unknown index " + type);
       }
-    return (I) index;
+    return type.cast(index);
   }
 
 
@@ -456,7 +460,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @Override
-  public String generateId(AbstractConstruct construct) {
+  public String generateId(AbstractConstruct<?> construct) {
     return String.valueOf(counter.getAndIncrement());
   }
 

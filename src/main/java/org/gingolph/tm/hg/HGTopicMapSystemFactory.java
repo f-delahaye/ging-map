@@ -1,7 +1,6 @@
 package org.gingolph.tm.hg;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 
@@ -27,7 +26,7 @@ import org.tmapi.core.TopicMap;
 
 
 public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
-    implements TopicMapSystemSupport, Serializable {
+    implements TopicMapSystemSupport {
 
   public static final String INFERRED_TYPES_RESOURCE =
       "/org/gingolph/tm/hg/inferredTypes.properties";
@@ -176,7 +175,7 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
         Class<?> clazz = Class.forName(e.getKey().toString().trim());
         HGPersistentHandle handle =
             graph.getHandleFactory().makeHandle(e.getValue().toString().trim());
-        graph.getTypeSystem().defineTypeAtom(handle, clazz);
+        graph.getTypeSystem().defineTypeAtom(handle, graph.getTypeSystem().getSchema().toTypeURI(clazz));
       }
     } catch (Exception ex) {
       throw new RuntimeException(ex);
@@ -185,16 +184,16 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory
 
   private static void defineIndexes(HyperGraph graph) {
     HGHandle locatorType = graph.getTypeSystem().getTypeHandle(LocatorImpl.class);
-    graph.getIndexManager().register(new ByPartIndexer(locatorType, "reference"));
+    graph.getIndexManager().register(new ByPartIndexer<>(locatorType, "reference"));
 
     HGHandle nameType = graph.getTypeSystem().getTypeHandle(HGNameSupport.class);
-    graph.getIndexManager().register(new ByPartIndexer(nameType, "value"));
+    graph.getIndexManager().register(new ByPartIndexer<>(nameType, "value"));
 
     HGHandle variantType = graph.getTypeSystem().getTypeHandle(HGVariantSupport.class);
-    graph.getIndexManager().register(new ByPartIndexer(variantType, "value"));
+    graph.getIndexManager().register(new ByPartIndexer<>(variantType, "value"));
 
     HGHandle occurrenceType = graph.getTypeSystem().getTypeHandle(HGOccurrenceSupport.class);
-    graph.getIndexManager().register(new ByPartIndexer(occurrenceType, "value"));
+    graph.getIndexManager().register(new ByPartIndexer<>(occurrenceType, "value"));
   }
 
 

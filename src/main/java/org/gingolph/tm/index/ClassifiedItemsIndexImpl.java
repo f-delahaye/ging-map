@@ -92,8 +92,7 @@ public abstract class ClassifiedItemsIndexImpl<T> extends AbstractIndex
     }
   }
 
-  @SuppressWarnings("rawtypes")
-  protected abstract ClassifiedAndUnclassifiedItems<T> getItems(Class classifiedClass);
+  protected abstract ClassifiedAndUnclassifiedItems<T> getItems(Class<?> classifiedClass);
 
   protected <TM, G extends TM> Collection<TM> getItemsByClassifier(ClassifiedAndUnclassifiedItems<G> items, Topic theme) {
     Collection<G> itemsByTheme = theme == null ? items.unclassifiedItems : items.scopedItems.get(theme);

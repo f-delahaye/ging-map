@@ -39,7 +39,7 @@ public interface TopicMapSupport extends ConstructSupport {
 
   void setReifier(TopicImpl reifier);
 
-  public String generateId(AbstractConstruct construct);
+  public String generateId(AbstractConstruct<?> construct);
 
   Locator createLocator(String value);
   

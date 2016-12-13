@@ -10,7 +10,6 @@ import org.gingolph.tm.VariantImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
-import org.tmapi.core.Name;
 import org.tmapi.core.Variant;
 
 public class HGNameSupport extends HGScopedSupport<NameImpl> implements NameSupport {

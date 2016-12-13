@@ -1,7 +1,5 @@
 package org.gingolph.tm;
 
-import org.tmapi.core.Role;
-
 public interface RoleSupport extends ConstructSupport, TypedSupport {
 
   /**

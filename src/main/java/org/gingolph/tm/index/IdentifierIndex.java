@@ -11,7 +11,6 @@ import org.gingolph.tm.event.TopicMapEventListener;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
-import org.tmapi.core.TopicMap;
 import org.tmapi.index.Index;
 
 /**

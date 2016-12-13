@@ -11,7 +11,6 @@ import org.gingolph.tm.TopicImpl;
 import org.gingolph.tm.VariantImpl;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 public class GingolphEquality implements Equality {
 

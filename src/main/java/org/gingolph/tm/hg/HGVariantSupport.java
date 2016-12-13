@@ -13,6 +13,8 @@ import org.tmapi.core.Topic;
 
 public class HGVariantSupport extends HGScopedSupport<VariantImpl> implements VariantSupport {
 
+  private static final long serialVersionUID = 1L;
+  
   private String value;
   @AtomReference("symbolic")
   private Locator datatype;

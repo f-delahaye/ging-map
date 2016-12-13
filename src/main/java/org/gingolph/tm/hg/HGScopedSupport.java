@@ -14,7 +14,7 @@ import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;
 import org.tmapi.core.Topic;
 
-public abstract class HGScopedSupport<T extends AbstractConstruct> extends HGConstructSupport<T>
+public abstract class HGScopedSupport<T extends AbstractConstruct<?>> extends HGConstructSupport<T>
     implements ScopedSupport {
 
   private static final long serialVersionUID = 1L;

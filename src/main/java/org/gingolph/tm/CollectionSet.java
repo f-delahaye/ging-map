@@ -35,8 +35,9 @@ public class CollectionSet<E> extends AbstractSet<E> {
    * 
    * @param equals
    */
+  @SuppressWarnings("unchecked")
   public CollectionSet(List<? extends E> c) {
-    this.delegate = (Collection)c;
+    this.delegate = (Collection<E>)c;
   }
     
   @Override

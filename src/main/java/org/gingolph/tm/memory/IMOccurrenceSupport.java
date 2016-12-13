@@ -4,7 +4,6 @@ import org.gingolph.tm.OccurrenceImpl;
 import org.gingolph.tm.OccurrenceSupport;
 import org.gingolph.tm.TopicImpl;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Topic;
 
 
 public class IMOccurrenceSupport extends IMScopedSupport implements OccurrenceSupport {

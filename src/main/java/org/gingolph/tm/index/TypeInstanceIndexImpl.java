@@ -130,7 +130,9 @@ public final class TypeInstanceIndexImpl extends ClassifiedItemsIndexImpl<TypedC
     typeds.add(typed);
   }
 
-  protected ClassifiedAndUnclassifiedItems<TypedConstruct> getItems(Class typedClass) {
+  @SuppressWarnings("unchecked")
+@Override
+  protected ClassifiedAndUnclassifiedItems<TypedConstruct> getItems(Class<?> typedClass) {
     ClassifiedAndUnclassifiedItems<?> types;
     if (Topic.class.isAssignableFrom(typedClass)) {
       types = topicsByTypes;
@@ -145,7 +147,7 @@ public final class TypeInstanceIndexImpl extends ClassifiedItemsIndexImpl<TypedC
     } else {
       throw new IllegalArgumentException("Unsupported type " + typedClass);
     }
-    return (ClassifiedAndUnclassifiedItems)types;
+    return ClassifiedAndUnclassifiedItems.class.cast(types);
   }
 
   @Override

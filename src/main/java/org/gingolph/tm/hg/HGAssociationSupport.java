@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.AssociationSupport;
 import org.gingolph.tm.RoleImpl;
-import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
@@ -19,11 +18,8 @@ import org.tmapi.core.Role;
 public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
     implements AssociationSupport, HGLink {
 
+  private static final long serialVersionUID = 1L;
   transient List<HGHandle> roles;
-  TopicImpl type; // For some weird reason, if type is not stored locally, Topic.mergeIn fails for
-              // topics which have roles.
-  // See TestTopicMerge.testRolePlaying and testDuplicateSuppressionAssociation
-  // TODO fix this
 
   public HGAssociationSupport() {
     roles = new ArrayList<>();
@@ -79,18 +75,14 @@ public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
   @HGIgnore
   @Override
   public TopicImpl getType() {
-    if (type == null) {
       final HGHandle thisHandle = getHandle(hyperGraph, this);
       HGHandle h = HGTMUtil.getTypeOf(hyperGraph, thisHandle);
-      type = h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
-    }
-    return type;
+      return h != null ? ((HGTopicSupport) hyperGraph.get(h)).getOwner() : null;
   }
 
   @HGIgnore
   @Override
   public void setType(TopicImpl type) {
-    this.type = type;
     HGTMUtil.setTypeOf(hyperGraph, getHandle(hyperGraph, type), getHandle(hyperGraph, this));
   }
 

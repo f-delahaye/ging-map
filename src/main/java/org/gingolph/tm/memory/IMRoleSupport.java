@@ -1,10 +1,8 @@
 package org.gingolph.tm.memory;
 
-import org.gingolph.tm.AssociationImpl;
 import org.gingolph.tm.RoleImpl;
 import org.gingolph.tm.RoleSupport;
 import org.gingolph.tm.TopicImpl;
-import org.tmapi.core.Topic;
 
 
 public class IMRoleSupport extends IMConstructSupport implements RoleSupport {

@@ -20,6 +20,8 @@ import org.hypergraphdb.annotation.HGIgnore;
  *
  */
 public class HGRoleSupport extends HGConstructSupport<RoleImpl> implements RoleSupport, HGLink {
+  
+  private static final long serialVersionUID = 1L;
   private transient final HGHandle[] targetSet;
 
   public HGRoleSupport() {
