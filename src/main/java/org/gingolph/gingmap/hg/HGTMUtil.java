@@ -3,6 +3,7 @@ package org.gingolph.gingmap.hg;
 import static org.gingolph.gingmap.hg.HGConstructSupport.getHandle;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,9 @@ class HGTMUtil {
     // Stated in English, the query finds all atoms of type HGAssociation
     // that are the 1st element of a link of type HGTM.hMapMember which
     // also point to the atom 'mapHandle'
+    if (topicMapHandle == null) {
+      return Collections.emptyList();
+    }
     Collection<HGHandle> handles = graph.findAll(hg.and(hg.type(topicMapItemClass), hg.apply(
         hg.linkProjection(0),
         hg.apply(hg.deref(graph), hg.and(hg.type(HGTM.hMapMember), hg.incident(topicMapHandle))))));

@@ -110,4 +110,22 @@ public abstract class HGConstructSupport<T extends Construct>
   public static HGHandle add(HyperGraph graph, ConstructSupport support) {
     return graph.add(support);
   }
+
+  public static void remove(HyperGraph graph, Locator locator) {
+    unsafeRemove(graph, locator);
+  }
+  
+  public static void remove(HyperGraph graph, Construct construct) {
+    remove(graph, ((AbstractConstruct<?>) construct).getSupport());
+  }
+
+  public static void remove(HyperGraph graph, ConstructSupport construct) {
+    unsafeRemove(graph, construct);
+  }  
+  private static void unsafeRemove(HyperGraph graph, Object persistedObject) {
+    HGHandle handle = graph.getHandle(persistedObject);
+    if (handle != null) {
+      graph.remove(handle);
+    }
+  }
 }

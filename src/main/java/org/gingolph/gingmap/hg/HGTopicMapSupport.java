@@ -17,10 +17,10 @@ import org.gingolph.gingmap.hg.index.HGTypeInstanceIndex;
 import org.gingolph.gingmap.index.IdentifierIndex;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
+import org.hypergraphdb.annotation.AtomReference;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.tmapi.core.Association;
 import org.tmapi.core.FeatureNotRecognizedException;
-import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
 import org.tmapi.index.LiteralIndex;
@@ -30,72 +30,65 @@ import org.tmapi.index.TypeInstanceIndex;
 public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implements TopicMapSupport {
 
   private static final long serialVersionUID = 1L;
-  private Locator baseLocator;
-  private TopicMapSystemSupport parent;
-  private transient HyperGraph graph;
+  private transient TopicMapSystemSupport parent;
+  @AtomReference("symbolic")
+  private LocatorImpl baseLocator = null;  
 
   public HGTopicMapSupport() {}
 
   public HGTopicMapSupport(HyperGraph graph, TopicMapSystemSupport parent) {
-    this.graph = graph;
+    setHyperGraph(graph);
     this.parent = parent;
   }
 
   @Override
   protected TopicMapImpl createOwner() {
+	  HGTopicMapSystemFactory factory = new HGTopicMapSystemFactory();
     boolean autoMerge;
     try {
-      autoMerge = parent.getFeature(AbstractTopicMapSystemFactory.AUTOMERGE);
+      autoMerge = factory.getFeature(AbstractTopicMapSystemFactory.AUTOMERGE);
     } catch (FeatureNotRecognizedException ex) {
       autoMerge = false;
     }
-    TopicMapImpl topicMap = new TopicMapImpl(new TopicMapSystemImpl(parent), autoMerge, parent);
+    TopicMapImpl topicMap = new TopicMapImpl(new TopicMapSystemImpl(factory, parent), autoMerge, parent);
     topicMap.setSupport(this);
     return topicMap;
   }
 
   @Override
-  public HyperGraph getGraph() {
-    return graph;
-  }
-
-  @Override
   public void addAssociation(AssociationImpl association) {
+    HyperGraph graph = getGraph();
     HGHandle associationHandle = add(graph, association);
     HGTMUtil.setTopicMapOf(hyperGraph, associationHandle, getHandle(graph, this));
   }
 
   @Override
   public void addTopic(TopicImpl topic) {
+    HyperGraph graph = getGraph();
     HGHandle topicHandle = add(graph, topic);
     HGTMUtil.setTopicMapOf(hyperGraph, topicHandle, getHandle(graph, this));
   }
 
   @Override
-  public Locator createLocator(String value) {
-    Locator locator = new LocatorImpl(value);
-    graph.add(locator);
-    return locator;
-  }
-
-  @Override
-  public Locator getBaseLocator() {
+  public LocatorImpl getBaseLocator() {
     return baseLocator;
   }
 
   @Override
-  public void setBaseLocator(Locator locator) {
+  public void setBaseLocator(LocatorImpl locator) {
     this.baseLocator = locator;
   }
 
   @Override
   public List<AssociationImpl> getAssociations() {
+    HyperGraph graph = getGraph();
     HGHandle topicMapHandle = getHandle(graph, this);
     return HGTMUtil.findTopicMapItems(graph, HGAssociationSupport.class, topicMapHandle);
   }
 
   @Override
   public List<TopicImpl> getTopics() {
+    HyperGraph graph = getGraph();
     HGHandle topicMapHandle = getHandle(graph, this);
     return HGTMUtil.findTopicMapItems(graph, HGTopicSupport.class, topicMapHandle);
   }
@@ -103,6 +96,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   @HGIgnore
   @Override
   public TopicImpl getReifier() {
+    HyperGraph graph = getGraph();
     HGHandle h = HGTMUtil.getReifierOf(graph, graph.getHandle(this));
     return h != null ? ((HGTopicSupport) graph.get(h)).getOwner() : null;
   }
@@ -110,29 +104,25 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   @HGIgnore
   @Override
   public void setReifier(TopicImpl t) {
+    HyperGraph graph = getGraph();
     HGTMUtil.setReifierOf(graph, getHandle(graph, this), t == null ? null : getHandle(graph, t));
   }
 
   @Override
   public String generateId(AbstractConstruct<?> construct) {
+    HyperGraph graph = getGraph();
     HGHandle handle = graph.getHandle(construct.getSupport());
     return handle == null ? null : graph.getPersistentHandle(handle).toString();
   }
 
   @Override
   public void removeTopic(Topic topic) {
-    final HGHandle handle = getHandle(graph, topic);
-    if (handle != null) {
-      graph.remove(handle, false);
-    }
+    remove(getGraph(), topic);
   }
 
   @Override
   public void removeAssociation(Association association) {
-    final HGHandle handle = getHandle(graph, association);
-    if (handle != null) {
-      graph.remove(handle, false);
-    }
+    remove(getGraph(), association);
   }
 
   @Override
@@ -142,6 +132,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
+    HyperGraph graph = getGraph();
     Index index;
     if (LiteralIndex.class.isAssignableFrom(type)) {
       index = new HGLiteralIndex(graph, getOwner().getEquality());

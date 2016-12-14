@@ -63,7 +63,6 @@ public class HGTopicSupport extends HGScopedSupport<TopicImpl> implements TopicS
         HGTM.hSubjectIdentifier);
   }
 
-  @HGIgnore
   @Override
   public Set<Locator> getSubjectIdentifiers() {
     HyperGraph graph = getGraph();

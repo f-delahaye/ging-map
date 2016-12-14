@@ -1,8 +1,6 @@
 package org.gingolph.gingmap;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.tmapi.core.FeatureNotRecognizedException;
@@ -12,14 +10,15 @@ import org.tmapi.core.TMAPIRuntimeException;
 import org.tmapi.core.TopicMap;
 import org.tmapi.core.TopicMapExistsException;
 import org.tmapi.core.TopicMapSystem;
-
+import org.tmapi.core.TopicMapSystemFactory;
 
 public class TopicMapSystemImpl implements TopicMapSystem {
 
-  private final Map<Locator, TopicMap> topicMaps = new LinkedHashMap<>();
   private final TopicMapSystemSupport support;
+  private TopicMapSystemFactory factory;
 
-  public TopicMapSystemImpl(TopicMapSystemSupport support) {
+  public TopicMapSystemImpl(TopicMapSystemFactory factory, TopicMapSystemSupport support) {
+    this.factory = factory;
     this.support = support;
   }
 
@@ -30,36 +29,39 @@ public class TopicMapSystemImpl implements TopicMapSystem {
 
   @Override
   public TopicMap getTopicMap(Locator locator) {
-    return topicMaps.get(locator);
+    return support.getTopicMap(locator);
   }
 
   @Override
   public Set<Locator> getLocators() {
-    return Collections.unmodifiableSet(topicMaps.keySet());
+    return Collections.unmodifiableSet(support.getLocators());
   }
 
   @Override
-  public Locator createLocator(String locator) throws MalformedIRIException {
-    return new LocatorImpl(locator);
+  public Locator createLocator(String reference) throws MalformedIRIException {
+    if (reference == null) {
+      throw new IllegalArgumentException("null reference not allowed");
+    }
+    return support.createLocator(reference);
   }
 
   @Override
   public TopicMap createTopicMap(Locator locator) throws TopicMapExistsException {
-    if (topicMaps.containsKey(locator)) {
+    if (getTopicMap(locator) != null) {
       throw new TopicMapExistsException("A topic map with locator " + locator + " already exists");
     }
     TopicMapSupport topicMapSupport = support.createTopicMapSupport();
-    topicMapSupport.setBaseLocator(locator);
+    topicMapSupport.setBaseLocator((LocatorImpl)locator);
     TopicMapImpl topicMap = createTopicMap(topicMapSupport);
     return topicMap;
   }
 
   public TopicMapImpl createTopicMap(TopicMapSupport topicMapSupport) {
-	TopicMapImpl topicMap = new TopicMapImpl(this, isAutoMerge(), support);
-	topicMap.setSupport(topicMapSupport);
-    topicMaps.put(topicMap.getLocator(), topicMap);
-	return topicMap;
-  }  
+    TopicMapImpl topicMap = new TopicMapImpl(this, isAutoMerge(), support);
+    topicMap.setSupport(topicMapSupport);
+    support.addTopicMap(topicMap);
+    return topicMap;
+  }
 
   @Override
   public TopicMap createTopicMap(String locator) throws TopicMapExistsException {
@@ -67,7 +69,6 @@ public class TopicMapSystemImpl implements TopicMapSystem {
   }
 
   void removeTopicMap(TopicMapImpl topicMap) {
-    this.topicMaps.remove(topicMap.getLocator());
     support.removeTopicMap(topicMap);
   }
 
@@ -77,7 +78,7 @@ public class TopicMapSystemImpl implements TopicMapSystem {
 
   @Override
   public boolean getFeature(String featureName) throws FeatureNotRecognizedException {
-    return support.getFeature(featureName);
+    return factory.getFeature(featureName);
   }
 
   public boolean isAutoMerge() {
@@ -91,13 +92,13 @@ public class TopicMapSystemImpl implements TopicMapSystem {
 
   @Override
   public Object getProperty(String propertyName) {
-    return support.getProperty(propertyName);
+    return factory.getProperty(propertyName);
   }
-  
+
   @SuppressWarnings("unchecked")
   public <T> T getProperty(String propertyName, T defaultValue) {
     Object property = getProperty(propertyName);
-    return property == null ? defaultValue:(T)property;
+    return property == null ? defaultValue : (T) property;
   }
 
   @Override

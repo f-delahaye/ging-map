@@ -77,13 +77,13 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   }
 
   @Override
-  public Locator getLocator() {
+  public LocatorImpl getLocator() {
     return support.getBaseLocator();
   }
 
   @Override
   public Locator createLocator(String value) throws MalformedIRIException {
-    return support.createLocator(value);
+    return topicMapSystem.createLocator(value);
   }
 
   IdentifierIndex getIdentifierIndex() {
@@ -186,7 +186,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   protected void customRemove() {
-    Collection<Association> associations = new ArrayList<>(getAssociations());
+    Collection<Association> associations = new ArrayList<>(support.getAssociations());
     for (Association association : associations) {
       association.remove();
     }

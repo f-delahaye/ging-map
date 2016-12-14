@@ -3,7 +3,6 @@ package org.gingolph.gingmap;
 import java.util.List;
 
 import org.tmapi.core.Association;
-import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
 
@@ -40,15 +39,13 @@ public interface TopicMapSupport extends ConstructSupport {
   void setReifier(TopicImpl reifier);
 
   public String generateId(AbstractConstruct<?> construct);
-
-  Locator createLocator(String value);
   
   /**
    * Returns the topicmap's base locator
    * 
    * @return
    */
-  public Locator getBaseLocator();
+  public LocatorImpl getBaseLocator();
 
-  public void setBaseLocator(Locator locator);  
+  public void setBaseLocator(LocatorImpl locator);  
 }

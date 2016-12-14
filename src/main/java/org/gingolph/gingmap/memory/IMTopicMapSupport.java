@@ -15,7 +15,6 @@ import org.gingolph.gingmap.index.LiteralIndexImpl;
 import org.gingolph.gingmap.index.ScopedIndexImpl;
 import org.gingolph.gingmap.index.TypeInstanceIndexImpl;
 import org.tmapi.core.Association;
-import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
 import org.tmapi.index.LiteralIndex;
@@ -28,7 +27,7 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   List<AssociationImpl> associations = new ArrayList<>();
   TopicImpl reifier;
   TopicMapImpl topicMap;
-  private Locator baseLocator;
+  private LocatorImpl baseLocator;
 
   static AtomicLong counter = new AtomicLong();
 
@@ -103,17 +102,12 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public Locator createLocator(String value) {
-    return new LocatorImpl(value);
-  }
-
-  @Override
-  public Locator getBaseLocator() {
+  public LocatorImpl getBaseLocator() {
     return baseLocator;
   }
 
   @Override
-  public void setBaseLocator(Locator baseLocator) {
+  public void setBaseLocator(LocatorImpl baseLocator) {
     this.baseLocator = baseLocator;
   }
   

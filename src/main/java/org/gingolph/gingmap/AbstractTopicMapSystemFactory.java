@@ -2,10 +2,10 @@ package org.gingolph.gingmap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.tmapi.core.FeatureNotRecognizedException;
 import org.tmapi.core.FeatureNotSupportedException;
 import org.tmapi.core.TMAPIException;
-import org.tmapi.core.TopicMapSystem;
 import org.tmapi.core.TopicMapSystemFactory;
 
 
@@ -65,7 +65,7 @@ public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactor
 
   @Override
   public TopicMapSystemImpl newTopicMapSystem() throws TMAPIException {
-    return new TopicMapSystemImpl(getTopicMapSystemSupport());
+    return new TopicMapSystemImpl(this, getTopicMapSystemSupport());
   }
 
   protected abstract TopicMapSystemSupport getTopicMapSystemSupport();

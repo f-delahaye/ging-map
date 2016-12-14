@@ -467,8 +467,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
     return String.valueOf(counter.getAndIncrement());
   }
 
-  @Override
-  public Locator createLocator(String value) {
+  private LocatorImpl createLocator(String value) {
     return new LocatorImpl(value);
   }
 
@@ -564,13 +563,13 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public Locator getBaseLocator() {
+  public LocatorImpl getBaseLocator() {
     Json baseLocator = at(BASE_LOCATOR_PP);
     return baseLocator == null ? null : createLocator(baseLocator.asString());
   }
 
   @Override
-  public void setBaseLocator(Locator locator) {
+  public void setBaseLocator(LocatorImpl locator) {
     set(BASE_LOCATOR_PP, locator.getReference());
   }
   

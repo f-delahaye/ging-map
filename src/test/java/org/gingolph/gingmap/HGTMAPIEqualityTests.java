@@ -17,13 +17,20 @@ public class HGTMAPIEqualityTests {
     System.setProperty("org.tmapi.core.TopicMapSystemFactory", HGTopicMapSystemFactory.class.getName());
     System.setProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.TMAPI_EQUALITY);
     String pathToStorageFile = "test-suite";
-//    String pathToStorageFile = "topicmaps";    
     File path = new File(pathToStorageFile);
+    if (!path.exists()) {
+      path.mkdirs();
+    }
+    if (!path.isDirectory()) {
+      throw new IllegalArgumentException(path+" must be a directory");
+    }
+    // Internal representation of Types are stored in the database. We drop all the files to force a new 
+    // representation to be recreated so that tests run against the latest version of the code (and not a 3 year old version of the types)
     for (File file: path.listFiles()) {
       file.delete();
     }
-    path.delete();   
+//    path.delete();   
     System.setProperty(HGTopicMapSystemFactory.HG_STORAGE_PATH_PROPERTY, pathToStorageFile);
-    System.setProperty(HGTopicMapSystemFactory.HG_STORAGE_KEEP_OPEN_PROPERTY, "true");
+    System.setProperty(HGTopicMapSystemFactory.HG_STORAGE_CLOSE_ON_EXIT_PROPERTY, "false");
   }
 }
