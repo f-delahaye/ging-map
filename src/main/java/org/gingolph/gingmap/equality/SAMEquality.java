@@ -3,6 +3,7 @@ package org.gingolph.gingmap.equality;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.gingolph.gingmap.AssociationImpl;
@@ -23,7 +24,7 @@ public class SAMEquality implements Equality {
   }
   
   private static boolean topicEquals(TopicImpl topic1, TopicImpl topic2) {
-    if (topic2.getId().equals(topic1.getId())) {
+    if (Objects.equals(topic2.getId(), topic1.getId())) {
       return true;
     }
     // Optimization:

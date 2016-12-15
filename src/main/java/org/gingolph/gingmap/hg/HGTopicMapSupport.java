@@ -40,6 +40,10 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
     setHyperGraph(graph);
     this.parent = parent;
   }
+  
+  protected void setParent(TopicMapSystemSupport parent) {
+    this.parent = parent;
+  }
 
   @Override
   protected TopicMapImpl createOwner() {

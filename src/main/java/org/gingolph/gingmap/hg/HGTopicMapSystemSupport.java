@@ -136,6 +136,7 @@ public class HGTopicMapSystemSupport implements TopicMapSystemSupport {
       return null;
     }
     HGTopicMapSupport map = (HGTopicMapSupport) getGraph().get(h);
+    map.setParent(this);
     return map.getOwner();
   }
 

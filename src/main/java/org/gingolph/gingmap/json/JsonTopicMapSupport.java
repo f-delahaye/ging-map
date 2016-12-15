@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.gingolph.gingmap.AbstractConstruct;
 import org.gingolph.gingmap.AssociationImpl;
@@ -19,6 +21,7 @@ import org.gingolph.gingmap.RoleSupport;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.TopicMapImpl;
 import org.gingolph.gingmap.TopicMapSupport;
+import org.gingolph.gingmap.TopicMapSystemImpl;
 import org.gingolph.gingmap.TopicSupport;
 import org.gingolph.gingmap.VariantImpl;
 import org.gingolph.gingmap.VariantSupport;
@@ -43,7 +46,7 @@ import org.tmapi.index.TypeInstanceIndex;
 import mjson.Json;
 import mjson.TopicMapJson;
 
-public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport, TopicSupport, AssociationSupport, RoleSupport, NameSupport, OccurrenceSupport, VariantSupport {
+public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport, TopicSupport, AssociationSupport, RoleSupport, NameSupport, OccurrenceSupport, VariantSupport {
 
   private static final long serialVersionUID = 1L;
   
@@ -73,23 +76,37 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
     Json.setGlobalFactory(new Json.DefaultFactory() {
       @Override
       public Json object() {
-        return new TopicMapSupportJson();
+        return new JsonTopicMapSupport();
       }
     });    
   }
   
   private AbstractConstruct<?> owner;
   
-  public TopicMapSupportJson() {
+  public JsonTopicMapSupport() {
   }
 
-  public TopicMapSupportJson(Json json) {
+  public JsonTopicMapSupport(Json json) {
     super(json);
   }  
   
-  public static TopicMapSupportJson read(String jsonAsString) {
-	  return (TopicMapSupportJson) Json.read(jsonAsString);
+  public static TopicMapImpl read(String jsonAsString, TopicMapSystemImpl topicMapSystem) {
+      JsonTopicMapSupport topicMapSupport = (JsonTopicMapSupport) Json.read(jsonAsString);
+      TopicMapImpl topicMap = topicMapSystem.createTopicMap(topicMapSupport);      
+      // if this json was created from a jsonstring, the owners have not been set, so we need to browse the json object and populate those now.
+      // we start off with the root object which we assume is the topicMap itself.
+      topicMap.setSupport(topicMapSupport);
+      // calling TopicImpl.setSupport will in turn call Support.notifyOwner(topic) which is what we expect.
+      topicMapSupport.nullSafeTopicSupports().forEach(topicSupport -> configureOwners(topicSupport, topicMap));
+      return topicMap;
   }
+
+  private static void configureOwners(JsonTopicMapSupport topicSupport, TopicMapImpl topicMap) {
+    new TopicImpl(topicMap).setSupport(topicSupport);
+    //for (JsonTopicMapSupport nameSupport: topicSupport.nu) 
+    
+  }
+  
   private Json getJson() {
     return this;
   }
@@ -104,8 +121,8 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   }
   
   @SuppressWarnings("unchecked")
-  private TopicMapSupportJson getTopicMapSupportJson(Construct construct) {
-    return ((AbstractConstruct<TopicMapSupportJson>)construct).getSupport();
+  private JsonTopicMapSupport getTopicMapSupportJson(Construct construct) {
+    return ((AbstractConstruct<JsonTopicMapSupport>)construct).getSupport();
   }
   
   private Json getOrCreateArray(String pp) {
@@ -222,7 +239,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   public List<RoleImpl> getRoles() {
     List<RoleImpl> roles = new ArrayList<>();
     for (Json roleJson: nullSafeRoles().asJsonList()) {
-      TopicMapSupportJson roleSupport = (TopicMapSupportJson) roleJson;
+      JsonTopicMapSupport roleSupport = (JsonTopicMapSupport) roleJson;
       roles.add(roleSupport.getOwner());
     }
     return roles;
@@ -246,7 +263,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   public List<NameImpl> getNames() {
     List<NameImpl> names = new ArrayList<>();
     for (Json nameJson: nullSafeNames().asJsonList()) {
-      TopicMapSupportJson nameSupport = (TopicMapSupportJson) nameJson;
+      JsonTopicMapSupport nameSupport = (JsonTopicMapSupport) nameJson;
       names.add(nameSupport.getOwner());
     }
     return names;
@@ -270,7 +287,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   public List<OccurrenceImpl> getOccurrences() {
     List<OccurrenceImpl> occurrences = new ArrayList<>();
     for (Json occurrenceJson: nullSafeOccurrences().asJsonList()) {
-      TopicMapSupportJson occurrenceSupport = (TopicMapSupportJson) occurrenceJson;
+      JsonTopicMapSupport occurrenceSupport = (JsonTopicMapSupport) occurrenceJson;
       occurrences.add(occurrenceSupport.getOwner());
     }
     return occurrences;
@@ -339,14 +356,13 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
     return getOrCreateArray(TOPICS_PP);
   }
 
+  private Stream<JsonTopicMapSupport> nullSafeTopicSupports() {
+    return nullSafeTopics().asJsonList().stream().map(JsonTopicMapSupport.class::cast);
+  }
+  
   @Override
   public List<TopicImpl> getTopics() {
-    List<TopicImpl> topics = new ArrayList<>();
-    for (Json topicJson: nullSafeTopics().asJsonList()) {
-      TopicMapSupportJson topicSupport = (TopicMapSupportJson) topicJson;
-      topics.add(topicSupport.getOwner());
-    }
-    return topics;
+    return nullSafeTopicSupports().map(JsonTopicMapSupport::getOwner).map(TopicImpl.class::cast).collect(Collectors.toList());
   }
 
   @Override
@@ -367,7 +383,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   public List<AssociationImpl> getAssociations() {
     List<AssociationImpl> associations = new ArrayList<>();
     for (Json topicJson: nullSafeAssociations().asJsonList()) {
-      TopicMapSupportJson associationSupport = (TopicMapSupportJson) topicJson;
+      JsonTopicMapSupport associationSupport = (JsonTopicMapSupport) topicJson;
       associations.add(associationSupport.getOwner());
     }
     return associations;
@@ -391,7 +407,7 @@ public class TopicMapSupportJson extends TopicMapJson implements TopicMapSupport
   public List<VariantImpl> getVariants() {
     List<VariantImpl> variants = new ArrayList<>();
     for (Json variantJson: nullSafeVariants().asJsonList()) {
-      TopicMapSupportJson variantSupport = (TopicMapSupportJson) variantJson;
+      JsonTopicMapSupport variantSupport = (JsonTopicMapSupport) variantJson;
       variants.add(variantSupport.getOwner());
     }
     return variants;

@@ -37,37 +37,37 @@ implements TopicMapSystemSupport, Serializable {
   
   @Override
   public AssociationSupport createAssociationSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public NameSupport createNameSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public OccurrenceSupport createOccurrenceSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public RoleSupport createRoleSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public VariantSupport createVariantSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public TopicMapSupport createTopicMapSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override
   public TopicSupport createTopicSupport() {
-    return new TopicMapSupportJson();
+    return new JsonTopicMapSupport();
   }
 
   @Override

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.tmapi.core.FeatureNotRecognizedException;
 import org.tmapi.core.FeatureNotSupportedException;
-import org.tmapi.core.TMAPIException;
 import org.tmapi.core.TopicMapSystemFactory;
 
 
@@ -64,7 +63,7 @@ public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactor
   }
 
   @Override
-  public TopicMapSystemImpl newTopicMapSystem() throws TMAPIException {
+  public TopicMapSystemImpl newTopicMapSystem() {
     return new TopicMapSystemImpl(this, getTopicMapSystemSupport());
   }
 

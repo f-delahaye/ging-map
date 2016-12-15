@@ -15,16 +15,6 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory {
   public static final String HG_STORAGE_CLOSE_ON_EXIT_PROPERTY = HG_STORAGE_BASE_PROPERTY + "close-on-exit";
   
   public HGTopicMapSystemFactory() {
-// According to specs, HGEnvironment already registers a shutdown hook.    
-//    Runtime.getRuntime().addShutdownHook(new Thread() {
-//      public void run() {
-//        HyperGraph graph = getHypergraphInstance();
-//        if (graph != null) {
-//          graph.close();
-//        }
-//      }
-//    });
-    
     features.put(AUTOMERGE, Boolean.FALSE);
     features.put(MODEL, Boolean.FALSE);
     features.put(MERGE, Boolean.FALSE);
@@ -34,7 +24,17 @@ public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory {
     
     setProperty(HG_STORAGE_CLOSE_ON_EXIT_PROPERTY, "true");
   }
+  
+  public HGTopicMapSystemFactory withStoragePath(String storagePath) {
+    setProperty(HG_STORAGE_PATH_PROPERTY, storagePath);
+    return this;
+  }
 
+  public HGTopicMapSystemFactory withCloseOnExit(boolean closeOnExit) {
+    setProperty(HG_STORAGE_CLOSE_ON_EXIT_PROPERTY, Boolean.toString(closeOnExit));
+    return this;
+  }
+  
   @Override
   protected TopicMapSystemSupport getTopicMapSystemSupport() {
     return new HGTopicMapSystemSupport(getStoragePath(), Boolean.valueOf((String)getProperty(HG_STORAGE_CLOSE_ON_EXIT_PROPERTY)));
