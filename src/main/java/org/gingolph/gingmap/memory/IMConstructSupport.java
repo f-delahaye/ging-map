@@ -8,7 +8,16 @@ import org.tmapi.core.Locator;
 
 public class IMConstructSupport implements ConstructSupport {
   private Set<Locator> itemIdentifiers;
+  private String id;
 
+  public String getId() {
+    return id;
+  }
+  
+  public void setId(String id) {
+    this.id = id;
+  }
+    
   @Override
   public final Set<Locator> getItemIdentifiers() {
     return itemIdentifiers;

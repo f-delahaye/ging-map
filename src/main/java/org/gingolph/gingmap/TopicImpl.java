@@ -384,7 +384,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(rolesPlayed);
   }
 
-  private List<RoleImpl> getNullSafeRolePlayedImpls() {
+  public List<RoleImpl> getNullSafeRolePlayedImpls() {
     final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
     return rolesPlayed == null?Collections.emptyList():rolesPlayed;
   }
@@ -469,18 +469,18 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
     final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
-    SAMEquality equalityForMege = getTopicMap().getEqualityForMerge();
+    SAMEquality equalityForMerge = getTopicMap().getEqualityForMerge();
     
     // and work off otherTopic's actual data to do the actual merging.
     otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
       Optional<NameImpl> equivalentName = 
-          getNames().stream().map(name -> (NameImpl)name).filter(name -> equalityForMege.equals(name, otherName)).findAny();
+          getNames().stream().map(name -> (NameImpl)name).filter(name -> equalityForMerge.equals(name, otherName)).findAny();
       NameImpl mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
       mergee.importIn(otherName, merge);
     });
     otherOccurrences.stream().map(otherOccurrence -> (OccurrenceImpl)otherOccurrence).forEach(otherOccurrence -> {
       Optional<OccurrenceImpl> equivalentOccurrence = 
-          getOccurrences().stream().map(occurrence -> (OccurrenceImpl)occurrence).filter(occurrence -> equalityForMege.equals(occurrence, otherOccurrence)).findAny();
+          getOccurrences().stream().map(occurrence -> (OccurrenceImpl)occurrence).filter(occurrence -> equalityForMerge.equals(occurrence, otherOccurrence)).findAny();
       OccurrenceImpl mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
       mergee.importIn(otherOccurrence, merge);
     });
@@ -500,7 +500,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
         // otherRole.setPlayer(this); not needed because player is manged by TopicSupport so switching the support also changed the player
         AssociationImpl otherAssociation = otherRole.getParent();
         
-        Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> getTopicMap().getEqualityForMerge().associationEquals(candidateAssociation, otherAssociation, false)).findAny();
+        Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> equalityForMerge.associationEquals(candidateAssociation, otherAssociation, false)).findAny();
         if (equivalentAssociation.isPresent()) {
           getTopicMap().removeAssociation(otherAssociation);
           // should we import otherAssociation's item identifiers and all the roles' item identifiers too?

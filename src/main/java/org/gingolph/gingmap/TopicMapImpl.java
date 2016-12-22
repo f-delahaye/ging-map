@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.gingolph.gingmap.equality.Equality;
 import org.gingolph.gingmap.equality.SAMEquality;
@@ -73,7 +75,11 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   @Override
   public Set<Topic> getTopics() {
-    return new UnmodifiableCollectionSet<>(support.getTopics());
+    return new UnmodifiableCollectionSet<>(getNullSafeTopicImpls());
+  }
+
+  private List<TopicImpl> getNullSafeTopicImpls() {
+    return support.getTopics();
   }
 
   @Override
@@ -182,7 +188,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   protected void customRemove() {
-    Collection<Association> associations = new ArrayList<>(support.getAssociations());
+    Collection<Association> associations = new ArrayList<>(getNullSafeAssociationImpls());
     for (Association association : associations) {
       association.remove();
     }
@@ -195,7 +201,11 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public Set<Association> getAssociations() {
-    return new UnmodifiableCollectionSet<>(support.getAssociations());
+    return new UnmodifiableCollectionSet<>(getNullSafeAssociationImpls());
+  }
+
+  private List<AssociationImpl> getNullSafeAssociationImpls() {
+    return support.getAssociations();
   }
 
   @Override
@@ -213,6 +223,10 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     if (scope == null) {
       throw new ModelConstraintException(this, "Null scope is not allowed");
     }
+    return doCreateAssociation(type, scope);
+  }
+
+  private AssociationImpl doCreateAssociation(Topic type, Collection<Topic> scope) {
     AssociationImpl association = new AssociationImpl(this);
     association.setSupport(createAssociationSupport());
     support.addAssociation(association);
@@ -239,16 +253,30 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     if (other == this) {
       return;
     }
-    final Collection<Topic> otherTopics = new ArrayList<>(other.getTopics());
-    otherTopics.stream().map(otherTopic -> (TopicImpl)otherTopic).forEach(otherTopic -> {
-      Optional<TopicImpl> sameTopic =
-          getTopics().stream().map(topic-> (TopicImpl)topic).filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
-      TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic();
-      mergee.importIn(otherTopic, false);
-    });
-
+    TopicMapImpl otherImpl = (TopicMapImpl)other;
+    final Stream<AssociationImpl> otherAssociations = otherImpl.getNullSafeAssociationImpls().stream();
+    otherAssociations.forEach(this::mergeAssociationIn);
+    
+    final Stream<TopicImpl> otherTopics = otherImpl.getNullSafeTopicImpls().stream();
+    // We filter out topics with rolesPlayed because those have been handled above.
+//    otherTopics.filter(topic -> topic.getNullSafeRolePlayedImpls().isEmpty()).forEach(this::mergeTopicIn);
+    otherTopics.forEach(this::mergeTopicIn);
   }
 
+  private void mergeTopicIn(TopicImpl otherTopic) {
+    Optional<TopicImpl> sameTopic = getNullSafeTopicImpls().stream().filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
+    TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic();
+    mergee.importIn(otherTopic, false);
+  }
+
+  private void mergeAssociationIn(AssociationImpl otherAssociation) {
+    Optional<AssociationImpl> sameAssociation = getNullSafeAssociationImpls().stream().filter(association -> getEqualityForMerge().equals( association, otherAssociation)).findAny();
+    if (!sameAssociation.isPresent()) {
+      AssociationImpl mergee = doCreateAssociation(otherAssociation.getType(), otherAssociation.getScope());
+      otherAssociation.getNullSafeRoleImpls().stream().forEach(otherRole -> mergee.createRole(otherRole.getType(), otherRole.getPlayer()));
+    } // By definition of getEqualityForMerge(), sameAssociation.get() has the same type, scope and roles than otherAssociation 
+  }
+  
   @Override
   public <I extends Index> I getIndex(Class<I> type) {
     I index = type.cast(indexes.get(type));

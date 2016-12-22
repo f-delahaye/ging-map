@@ -64,6 +64,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
     HyperGraph graph = getGraph();
     HGHandle associationHandle = add(graph, association);
     HGTMUtil.setTopicMapOf(hyperGraph, associationHandle, getHandle(graph, this));
+    association.getSupport().setId(associationHandle.getPersistent().toString());
   }
 
   @Override
@@ -71,6 +72,7 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
     HyperGraph graph = getGraph();
     HGHandle topicHandle = add(graph, topic);
     HGTMUtil.setTopicMapOf(hyperGraph, topicHandle, getHandle(graph, this));
+    topic.getSupport().setId(topicHandle.getPersistent().toString());
   }
 
   @Override

@@ -51,12 +51,13 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   private static final long serialVersionUID = 1L;
   
   private static final String BASE_LOCATOR_PP = "locator";
+  private static final String ID_PP = "id";
   private static final String SCOPE_PP = "scope";
   private static final String TYPES_PP = "types";
-  private static final String TYPE_PP = "type";
-  private static final String ITEM_IDENTIFIERS_PP = "item.identifiers";
-  private static final String SUBJECT_IDENTIFIERS_PP = "subject.identifiers";
-  private static final String SUBJECT_LOCATORS_PP = "subject.locators";
+  private static final String TYPE_ID_PP = "typeId";
+  private static final String ITEM_IDENTIFIERS_PP = "itemIdentifiers";
+  private static final String SUBJECT_IDENTIFIERS_PP = "subjectIdentifiers";
+  private static final String SUBJECT_LOCATORS_PP = "subjectLocators";
   private static final String TOPICS_PP = "topics";
   private static final String ASSOCIATIONS_PP = "associations";  
   private static final String ROLES_PP = "roles";
@@ -67,8 +68,8 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   private static final String VARIANTS_PP = "variants";
   private static final String DATATYPE_PP = "datatype";
   private static final String VALUE_PP = "value";
-  private static final String PLAYER_PP = "player";
-  private static final String ROLES_PLAYED_PP = "roles.played";
+  private static final String PLAYER_ID_PP = "playerId";
+  private static final String ROLES_PLAYED_PP = "rolesPlayed";
   
   static AtomicLong counter = new AtomicLong();
   
@@ -97,14 +98,19 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
       // we start off with the root object which we assume is the topicMap itself.
       topicMap.setSupport(topicMapSupport);
       // calling TopicImpl.setSupport will in turn call Support.notifyOwner(topic) which is what we expect.
-      topicMapSupport.nullSafeTopicSupports().forEach(topicSupport -> configureOwners(topicSupport, topicMap));
+      topicMapSupport.nullSafeTopicSupports().forEach(topicSupport -> populateTopic(topicSupport, topicMap));
+      topicMapSupport.nullSafeAssociationSupports().forEach(associationSupport -> populateAssociation(associationSupport, topicMap));
       return topicMap;
   }
 
-  private static void configureOwners(JsonTopicMapSupport topicSupport, TopicMapImpl topicMap) {
+  private static void populateAssociation(JsonTopicMapSupport associationSupport, TopicMapImpl topicMap) {
+    AssociationImpl associationImpl = new AssociationImpl(topicMap);
+    associationImpl.setSupport(associationSupport);
+    associationSupport.nullSafeRoleSupports().forEach(roleSupport -> new RoleImpl(topicMap, associationImpl).setSupport(roleSupport));
+  }
+
+  private static void populateTopic(JsonTopicMapSupport topicSupport, TopicMapImpl topicMap) {
     new TopicImpl(topicMap).setSupport(topicSupport);
-    //for (JsonTopicMapSupport nameSupport: topicSupport.nu) 
-    
   }
   
   private Json getJson() {
@@ -133,6 +139,15 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
     }
     return array;
     
+  }
+  
+  public String getId() {
+    Json id = at(ID_PP);
+    return id == null? null : id.asString();
+  }
+  
+  public void setId(String id) {
+    set(ID_PP, id);
   }
   
   private Json nullSafeScope() {
@@ -235,14 +250,13 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
     return getOrCreateArray(ROLES_PP);
   }
 
+  private Stream<JsonTopicMapSupport> nullSafeRoleSupports() {
+    return nullSafeRoles().asJsonList().stream().map(JsonTopicMapSupport.class::cast);
+  }
+    
   @Override
   public List<RoleImpl> getRoles() {
-    List<RoleImpl> roles = new ArrayList<>();
-    for (Json roleJson: nullSafeRoles().asJsonList()) {
-      JsonTopicMapSupport roleSupport = (JsonTopicMapSupport) roleJson;
-      roles.add(roleSupport.getOwner());
-    }
-    return roles;
+    return nullSafeRoleSupports().map(JsonTopicMapSupport::getOwner).map(RoleImpl.class::cast).collect(Collectors.toList());    
   }
 
   @Override
@@ -343,13 +357,13 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   
   @Override
   public TopicImpl getType() {
-    Json typeId = at(TYPE_PP);
+    Json typeId = at(TYPE_ID_PP);
     return typeId == null?null:(TopicImpl) getTopicMap().getConstructById(typeId.asString());
   }
   
   @Override
   public void setType(TopicImpl type) {
-    set(TYPE_PP, type.getId());
+    set(TYPE_ID_PP, type.getId());
   }
   
   private Json nullSafeTopics() {
@@ -379,14 +393,13 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
     return getOrCreateArray(ASSOCIATIONS_PP);
   }
 
+  private Stream<JsonTopicMapSupport> nullSafeAssociationSupports() {
+    return nullSafeAssociations().asJsonList().stream().map(JsonTopicMapSupport.class::cast);
+  }
+    
   @Override
   public List<AssociationImpl> getAssociations() {
-    List<AssociationImpl> associations = new ArrayList<>();
-    for (Json topicJson: nullSafeAssociations().asJsonList()) {
-      JsonTopicMapSupport associationSupport = (JsonTopicMapSupport) topicJson;
-      associations.add(associationSupport.getOwner());
-    }
-    return associations;
+    return nullSafeAssociationSupports().map(JsonTopicMapSupport::getOwner).map(AssociationImpl.class::cast).collect(Collectors.toList());    
   }
 
   @Override
@@ -510,13 +523,13 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
 
   @Override
   public TopicImpl getPlayer() {
-    Json playerId = at(PLAYER_PP);
+    Json playerId = at(PLAYER_ID_PP);
     return playerId == null ? null : (TopicImpl) getTopicMap().getConstructById(playerId.asString());
   }
   
   @Override
   public void setPlayer(TopicImpl player) {
-    set(PLAYER_PP, player.getId());
+    set(PLAYER_ID_PP, player.getId());
   }
   
   private Json nullSafeRolesPlayed() {
