@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.gingolph.gingmap.equality.Equality;
@@ -16,6 +17,7 @@ import org.gingolph.gingmap.equality.SAMEquality;
 import org.gingolph.gingmap.equality.TMAPIEquality;
 import org.gingolph.gingmap.event.TopicMapEventListener;
 import org.gingolph.gingmap.index.IdentifierIndex;
+import org.gingolph.gingmap.processing.TopicMapMerger;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
@@ -75,11 +77,15 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   
   @Override
   public Set<Topic> getTopics() {
-    return new UnmodifiableCollectionSet<>(getNullSafeTopicImpls());
+    return new UnmodifiableCollectionSet<>(nullSafeTopics());
   }
 
-  private List<TopicImpl> getNullSafeTopicImpls() {
+  private List<TopicImpl> nullSafeTopics() {
     return support.getTopics();
+  }
+  
+  public Stream<TopicImpl> topics() {
+    return nullSafeTopics().stream();
   }
 
   @Override
@@ -168,9 +174,23 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
   }
 
   @Override
-  public Topic createTopic() {
-    Topic topic = doCreateTopic();
+  public TopicImpl createTopic() {
+    TopicImpl topic = doCreateTopic();
     topic.addItemIdentifier(createLocator("internal-" + topic.getId()));
+    return topic;
+  }
+  
+  /**
+   * Creates a topic with all the locators of the supplied topic.
+   * 
+   * This method is not part of the TM API but is very useful for creating a topic from an existing topic (typically for merging purposes) as it guarantees the topic created will have at least one identifier.
+   * 
+   * Please note that unlike the other createxxx methods from TMAPI, this one does not actually check for an existing topic with one of the supplied locators.
+   * @return
+   */
+  public TopicImpl createTopicFrom(TopicImpl other) {
+    TopicImpl topic = doCreateTopic();
+    topic.copyLocators(other);
     return topic;
   }
 
@@ -188,7 +208,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   protected void customRemove() {
-    Collection<Association> associations = new ArrayList<>(getNullSafeAssociationImpls());
+    Collection<Association> associations = associations().collect(Collectors.toList());
     for (Association association : associations) {
       association.remove();
     }
@@ -201,11 +221,11 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   @Override
   public Set<Association> getAssociations() {
-    return new UnmodifiableCollectionSet<>(getNullSafeAssociationImpls());
+    return new UnmodifiableCollectionSet<>(support.getAssociations());
   }
 
-  private List<AssociationImpl> getNullSafeAssociationImpls() {
-    return support.getAssociations();
+  public Stream<AssociationImpl> associations() {
+    return support.getAssociations().stream();
   }
 
   @Override
@@ -254,23 +274,24 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
       return;
     }
     TopicMapImpl otherImpl = (TopicMapImpl)other;
-    final Stream<AssociationImpl> otherAssociations = otherImpl.getNullSafeAssociationImpls().stream();
-    otherAssociations.forEach(this::mergeAssociationIn);
-    
-    final Stream<TopicImpl> otherTopics = otherImpl.getNullSafeTopicImpls().stream();
-    // We filter out topics with rolesPlayed because those have been handled above.
-//    otherTopics.filter(topic -> topic.getNullSafeRolePlayedImpls().isEmpty()).forEach(this::mergeTopicIn);
-    otherTopics.forEach(this::mergeTopicIn);
+//    final Stream<AssociationImpl> otherAssociations = otherImpl.associations();
+//    otherAssociations.forEach(this::mergeAssociationIn);
+//    
+//    final Stream<TopicImpl> otherTopics = otherImpl.topics();
+//    // We filter out topics with rolesPlayed because those have been handled above.
+////    otherTopics.filter(topic -> topic.getNullSafeRolePlayedImpls().isEmpty()).forEach(this::mergeTopicIn);
+//    otherTopics.forEach(this::mergeTopicIn);
+    new TopicMapMerger(this, EQUALITY_FOR_MERGE).mergeIn(otherImpl);
   }
 
   private void mergeTopicIn(TopicImpl otherTopic) {
-    Optional<TopicImpl> sameTopic = getNullSafeTopicImpls().stream().filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
+    Optional<TopicImpl> sameTopic = topics().filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
     TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic();
     mergee.importIn(otherTopic, false);
   }
 
   private void mergeAssociationIn(AssociationImpl otherAssociation) {
-    Optional<AssociationImpl> sameAssociation = getNullSafeAssociationImpls().stream().filter(association -> getEqualityForMerge().equals( association, otherAssociation)).findAny();
+    Optional<AssociationImpl> sameAssociation = associations().filter(association -> getEqualityForMerge().equals( association, otherAssociation)).findAny();
     if (!sameAssociation.isPresent()) {
       AssociationImpl mergee = doCreateAssociation(otherAssociation.getType(), otherAssociation.getScope());
       otherAssociation.getNullSafeRoleImpls().stream().forEach(otherRole -> mergee.createRole(otherRole.getType(), otherRole.getPlayer()));

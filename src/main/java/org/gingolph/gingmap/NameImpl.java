@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.tmapi.core.Locator;
 import org.tmapi.core.ModelConstraintException;
@@ -44,13 +45,13 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
 
   @Override
   public Set<Variant> getVariants() {
-    List<VariantImpl> variants = getNullSafeVariantImpls();
-    return variants.isEmpty()? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
+    List<VariantImpl> variants = support.getVariants();
+    return variants == null || variants.isEmpty()? Collections.emptySet() : new UnmodifiableCollectionSet<>(variants);
   }
 
-  public List<VariantImpl> getNullSafeVariantImpls() {
+  public Stream<VariantImpl> variants() {
     List<VariantImpl> variants = support.getVariants();
-    return variants == null?Collections.emptyList():variants;
+    return variants == null?Stream.empty():variants.stream();
   }
 
   @Override
@@ -91,12 +92,12 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public Variant createVariant(String value, Locator dataType, Collection<Topic> scope)
+  public VariantImpl createVariant(String value, Locator dataType, Collection<Topic> scope)
       throws ModelConstraintException {
     return createVariant(dataType, value, scope);
   }
 
-  private Variant createVariant(Locator datatype, Object value, Collection<Topic> scope)
+  private VariantImpl createVariant(Locator datatype, Object value, Collection<Topic> scope)
       throws ModelConstraintException {
     if (scope == null) {
       throw new ModelConstraintException(this, "Null scope not allowed");

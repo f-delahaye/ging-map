@@ -35,9 +35,9 @@ public final class TypeInstanceIndexImpl extends ClassifiedItemsIndexImpl<TypedC
     super(equality);
     topics.forEach(topic -> {
       registerItem(topic, topicsByTypes);
-      topic.getNullSafeOccurrenceImpls()
+      topic.occurrences()
           .forEach(occurrence -> registerItem(occurrence, occurrencesByTypes));
-      topic.getNullSafeNameImpls().forEach(name -> registerItem(name, namesByTypes));
+      topic.names().forEach(name -> registerItem(name, namesByTypes));
     });
     associations.forEach(association -> {
       registerItem(association, associationsByTypes);

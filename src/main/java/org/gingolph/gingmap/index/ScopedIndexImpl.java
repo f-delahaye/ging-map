@@ -31,10 +31,10 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
     super(equality);
     associations.forEach(association -> registerItem(association, this.scopedAndUnscopedAssociations));
     topics.forEach(topic -> {
-      topic.getNullSafeOccurrenceImpls().forEach(occurrence -> registerItem(occurrence, this.occurrencesByThemes));
-      topic.getNullSafeNameImpls().forEach(name -> {
+      topic.occurrences().forEach(occurrence -> registerItem(occurrence, this.occurrencesByThemes));
+      topic.names().forEach(name -> {
         registerItem(name, namesByThemes);
-        name.getNullSafeVariantImpls().forEach(variant -> registerItem(variant, this.variantsByThemes));
+        name.variants().forEach(variant -> registerItem(variant, this.variantsByThemes));
       });
     });
   }
@@ -155,7 +155,7 @@ public class ScopedIndexImpl extends ClassifiedItemsIndexImpl<Scoped> implements
       }
     }
     if (scoped instanceof NameImpl) {
-      ((NameImpl)scoped).getNullSafeVariantImpls().forEach(variant -> onThemeChanged(variant, themeToAdd, themeToRemove));
+      ((NameImpl)scoped).variants().forEach(variant -> onThemeChanged(variant, themeToAdd, themeToRemove));
     }
   }
 

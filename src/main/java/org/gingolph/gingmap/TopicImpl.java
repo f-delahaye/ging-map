@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.gingolph.gingmap.equality.SAMEquality;
 import org.tmapi.core.Construct;
@@ -230,13 +231,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Name> getNames() {
-    List<NameImpl> names = getNullSafeNameImpls();    
-    return names.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(names);
+    List<NameImpl> names = support.getNames();    
+    return names == null || names.size() == 0 ? Collections.emptySet() : new UnmodifiableCollectionSet<>(names);
   }
 
-  public List<NameImpl> getNullSafeNameImpls() {
+  public Stream<NameImpl> names() {
     List<NameImpl> names = support.getNames();
-    return names == null ? Collections.emptyList():names;
+    return names == null ? Stream.empty():names.stream();
   }
 
   @Override
@@ -244,7 +245,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null not allowed");
     }
-    final List<NameImpl> names = getNullSafeNameImpls().stream().filter(name -> name.getType().equals(type)).collect(Collectors.toList());
+    final List<NameImpl> names = names().filter(name -> name.getType().equals(type)).collect(Collectors.toList());
     return new UnmodifiableCollectionSet<>(names);
   }
 
@@ -297,13 +298,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Occurrence> getOccurrences() {
-    List<OccurrenceImpl> occurrences = getNullSafeOccurrenceImpls();
-    return occurrences.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(occurrences);
+    List<OccurrenceImpl> occurrences = support.getOccurrences();
+    return occurrences == null || occurrences.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(occurrences);
   }
 
-  public List<OccurrenceImpl> getNullSafeOccurrenceImpls() {
+  public Stream<OccurrenceImpl> occurrences() {
     List<OccurrenceImpl> occurrences = support.getOccurrences();
-    return occurrences == null?Collections.emptyList() : occurrences;
+    return occurrences == null?Stream.empty() : occurrences.stream();
   }
 
   @Override
@@ -311,7 +312,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (type == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    return new UnmodifiableCollectionSet<>(getNullSafeOccurrenceImpls().stream().filter(occurrence -> occurrence.getType().equals(type)).collect(Collectors.toList()));
+    return new UnmodifiableCollectionSet<>(occurrences().filter(occurrence -> occurrence.getType().equals(type)).collect(Collectors.toList()));
   }
 
   @Override
@@ -457,30 +458,27 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     // Store properties of other BEFORE we change its delegate.
     TopicSupport otherTopicData = otherTopic.support;
 
-    otherTopic.getSubjectIdentifiers().forEach(identifier -> importSubjectIdentifier(identifier));
-    otherTopic.getSubjectLocators().forEach(locator -> importSubjectLocator(locator));
-    otherTopic.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));
+    copyLocators(otherTopic);
     final Collection<Topic> otherTypes = new ArrayList<>(otherTopic.getTypes());
 
     otherTypes.removeAll(getTypes());
     otherTypes.forEach(otherType -> addType(otherType));
 
-    final Collection<Name> otherNames = new ArrayList<>(otherTopic.getNames());
-    final Collection<Occurrence> otherOccurrences = new ArrayList<>(otherTopic.getOccurrences());
+    final Collection<NameImpl> otherNames = otherTopic.names().collect(Collectors.toList());
+    final Collection<OccurrenceImpl> otherOccurrences = otherTopic.occurrences().collect(Collectors.toList());
     final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
 
     SAMEquality equalityForMerge = getTopicMap().getEqualityForMerge();
     
     // and work off otherTopic's actual data to do the actual merging.
     otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
-      Optional<NameImpl> equivalentName = 
-          getNames().stream().map(name -> (NameImpl)name).filter(name -> equalityForMerge.equals(name, otherName)).findAny();
+      Optional<NameImpl> equivalentName = names().filter(name -> equalityForMerge.equals(name, otherName)).findAny();
       NameImpl mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
       mergee.importIn(otherName, merge);
     });
-    otherOccurrences.stream().map(otherOccurrence -> (OccurrenceImpl)otherOccurrence).forEach(otherOccurrence -> {
+    otherOccurrences.stream().forEach(otherOccurrence -> {
       Optional<OccurrenceImpl> equivalentOccurrence = 
-          getOccurrences().stream().map(occurrence -> (OccurrenceImpl)occurrence).filter(occurrence -> equalityForMerge.equals(occurrence, otherOccurrence)).findAny();
+          occurrences().filter(occurrence -> equalityForMerge.equals(occurrence, otherOccurrence)).findAny();
       OccurrenceImpl mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
       mergee.importIn(otherOccurrence, merge);
     });
@@ -517,6 +515,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
       getParent().removeTopic(otherTopic);
     }
     
+  }
+
+  public void copyLocators(TopicImpl otherTopic) {
+    otherTopic.getSubjectIdentifiers().forEach(this::importSubjectIdentifier);
+    otherTopic.getSubjectLocators().forEach(this::importSubjectLocator);
+    otherTopic.getItemIdentifiers().forEach(this::importItemIdentifier);
   }
 
   @Override

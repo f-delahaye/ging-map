@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Implementation of Set which does NOT check for duplicates.
  * 
- *  To honour the Set contract, this class does <b>NOT</> support add(), and <b>MUST</> backed by a List which does not contain duplicates.
+ *  To honor the Set contract, this class does <b>NOT</> support add(), and <b>MUST</> backed by a List which does not contain duplicates.
  * 
  * This guarantees this Set will never contain duplicates.
  * 
