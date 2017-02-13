@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -282,20 +281,6 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 ////    otherTopics.filter(topic -> topic.getNullSafeRolePlayedImpls().isEmpty()).forEach(this::mergeTopicIn);
 //    otherTopics.forEach(this::mergeTopicIn);
     new TopicMapMerger(this, EQUALITY_FOR_MERGE).mergeIn(otherImpl);
-  }
-
-  private void mergeTopicIn(TopicImpl otherTopic) {
-    Optional<TopicImpl> sameTopic = topics().filter(topic -> getEqualityForMerge().equals( topic, otherTopic)).findAny();
-    TopicImpl mergee = sameTopic.isPresent() ? sameTopic.get() : doCreateTopic();
-    mergee.importIn(otherTopic, false);
-  }
-
-  private void mergeAssociationIn(AssociationImpl otherAssociation) {
-    Optional<AssociationImpl> sameAssociation = associations().filter(association -> getEqualityForMerge().equals( association, otherAssociation)).findAny();
-    if (!sameAssociation.isPresent()) {
-      AssociationImpl mergee = doCreateAssociation(otherAssociation.getType(), otherAssociation.getScope());
-      otherAssociation.getNullSafeRoleImpls().stream().forEach(otherRole -> mergee.createRole(otherRole.getType(), otherRole.getPlayer()));
-    } // By definition of getEqualityForMerge(), sameAssociation.get() has the same type, scope and roles than otherAssociation 
   }
   
   @Override

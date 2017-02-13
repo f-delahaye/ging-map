@@ -76,6 +76,9 @@ public class AssociationImpl extends ScopedTopicMapItem<TopicMapImpl, Associatio
 
   void removeRole(RoleImpl role) {
     support.removeRole(role);
+    if (getNullSafeRoleImpls().isEmpty()) {
+      this.remove();
+    }
   }
 
   @Override

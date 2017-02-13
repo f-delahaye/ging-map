@@ -55,7 +55,7 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
     }
   }
 
-  protected void importItemIdentifier(Locator identifier) {
+  public void importItemIdentifier(Locator identifier) {
     support.addItemIdentifier(identifier);
     getTopicMap().notifyListeners(
         (TopicMapEventListener listener) -> listener.onItemIdentifierAdded(this, identifier));
@@ -87,6 +87,9 @@ public abstract class AbstractConstruct<S extends ConstructSupport> extends Topi
     }
     if (obj.getClass() != getClass()) {
       return false;
+    }
+    if (((AbstractConstruct<?>)obj).getId().equals(getId())) {
+      return true;
     }
     return equalsFromEquality(obj);
   }

@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.gingolph.gingmap.equality.SAMEquality;
+import org.gingolph.gingmap.processing.TopicMerger;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -127,10 +126,10 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     }
 
     Collection<Name> names = new ArrayList<>(getNames());
-    names.forEach(name -> name.remove());
+    names.forEach(Name::remove);
 
     Collection<Occurrence> occurrences = new ArrayList<>(getOccurrences());
-    occurrences.forEach(occurrence -> occurrence.remove());
+    occurrences.forEach(Occurrence::remove);
 
     getParent().removeTopic(this);
   }
@@ -381,13 +380,13 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
 
   @Override
   public Set<Role> getRolesPlayed() {
-    final List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls();
-    return rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(rolesPlayed);
+    final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
+    return rolesPlayed == null || rolesPlayed.isEmpty() ? Collections.emptySet() : new UnmodifiableCollectionSet<>(rolesPlayed);
   }
 
-  public List<RoleImpl> getNullSafeRolePlayedImpls() {
+  public Stream<RoleImpl> rolesPlayed() {
     final List<RoleImpl> rolesPlayed = support.getRolesPlayed();
-    return rolesPlayed == null?Collections.emptyList():rolesPlayed;
+    return rolesPlayed == null?Stream.empty():rolesPlayed.stream();
   }
 
   @Override
@@ -395,7 +394,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (roleType == null) {
       throw new IllegalArgumentException("Null type not allowed");
     }
-    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType)).collect(Collectors.toList());
+    List<RoleImpl> rolesPlayed = rolesPlayed().filter(role -> role.getType().equals(roleType)).collect(Collectors.toList());
     return new UnmodifiableCollectionSet<>(rolesPlayed); 
   }
 
@@ -407,7 +406,7 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     if (associationType == null) {
       throw new IllegalArgumentException("Null association type not allowed");
     }
-    List<RoleImpl> rolesPlayed = getNullSafeRolePlayedImpls().stream().filter(role -> role.getType().equals(roleType) && role.getParent().getType().equals(associationType)).collect(Collectors.toList());
+    List<RoleImpl> rolesPlayed = rolesPlayed().filter(role -> role.getType().equals(roleType) && role.getParent().getType().equals(associationType)).collect(Collectors.toList());
     return new UnmodifiableCollectionSet<>(rolesPlayed);    
   }
 
@@ -449,73 +448,11 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
         throw new ModelConstraintException(this, "Different reified not allowed");
     }
     if (!this.equals(other)) {
-      importIn(other, true);
+      //importIn(other, true);
+      new TopicMerger(this, getTopicMap().getEqualityForMerge()).mergeIn((TopicImpl)other);
     }
   }
 
-  protected void importIn(Topic other, boolean merge) {
-    TopicImpl otherTopic = (TopicImpl) other;
-    // Store properties of other BEFORE we change its delegate.
-    TopicSupport otherTopicData = otherTopic.support;
-
-    copyLocators(otherTopic);
-    final Collection<Topic> otherTypes = new ArrayList<>(otherTopic.getTypes());
-
-    otherTypes.removeAll(getTypes());
-    otherTypes.forEach(otherType -> addType(otherType));
-
-    final Collection<NameImpl> otherNames = otherTopic.names().collect(Collectors.toList());
-    final Collection<OccurrenceImpl> otherOccurrences = otherTopic.occurrences().collect(Collectors.toList());
-    final Collection<RoleImpl> otherRolesPlayed = otherTopicData.getRolesPlayed();
-
-    SAMEquality equalityForMerge = getTopicMap().getEqualityForMerge();
-    
-    // and work off otherTopic's actual data to do the actual merging.
-    otherNames.stream().map(otherName -> (NameImpl)otherName).forEach(otherName -> {
-      Optional<NameImpl> equivalentName = names().filter(name -> equalityForMerge.equals(name, otherName)).findAny();
-      NameImpl mergee = equivalentName.orElseGet(() -> createName(otherName.getType(), otherName.getValue(), otherName.getScope()));
-      mergee.importIn(otherName, merge);
-    });
-    otherOccurrences.stream().forEach(otherOccurrence -> {
-      Optional<OccurrenceImpl> equivalentOccurrence = 
-          occurrences().filter(occurrence -> equalityForMerge.equals(occurrence, otherOccurrence)).findAny();
-      OccurrenceImpl mergee = equivalentOccurrence.orElseGet(() -> createOccurrence(otherOccurrence.getType(), otherOccurrence.getValue(),otherOccurrence.getScope()));
-      mergee.importIn(otherOccurrence, merge);
-    });
-
-
-    TopicSupport otherTopicSupport = otherTopic.support;
-    if (merge) {
-//      getParent().removeTopic(otherTopic);
-      // Change otherTopic's data so from now on it will be the same as topic ...
-      // (e.g. 2 names whose types are resp. this and other will be deemed identical which is what
-      // we want)
-      otherTopic.support = this.support;
-    }
-
-    if (otherRolesPlayed != null) {
-      for (RoleImpl otherRole: otherRolesPlayed) {
-        // otherRole.setPlayer(this); not needed because player is manged by TopicSupport so switching the support also changed the player
-        AssociationImpl otherAssociation = otherRole.getParent();
-        
-        Optional<AssociationImpl> equivalentAssociation = getNullSafeRolePlayedImpls().stream().map(role -> role.getParent()).filter(candidateAssociation -> equalityForMerge.associationEquals(candidateAssociation, otherAssociation, false)).findAny();
-        if (equivalentAssociation.isPresent()) {
-          getTopicMap().removeAssociation(otherAssociation);
-          // should we import otherAssociation's item identifiers and all the roles' item identifiers too?
-        } else {
-          otherRole.setPlayer(this);
-        }
-      };
-    }
-    
-    if (merge) {
-      // revert back to the original support so we can remove otherTopic stuff (if we keep otherTopic.support set to this.support we'll actually delete this!!)
-      // Other alternatives would include changing all references to otherTopic by this (in themes, types, ...) which would avoid setting the support back and forth...
-      otherTopic.support = otherTopicSupport;
-      getParent().removeTopic(otherTopic);
-    }
-    
-  }
 
   public void copyLocators(TopicImpl otherTopic) {
     otherTopic.getSubjectIdentifiers().forEach(this::importSubjectIdentifier);

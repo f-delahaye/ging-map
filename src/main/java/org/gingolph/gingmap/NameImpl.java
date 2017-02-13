@@ -164,7 +164,7 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
   }
 
   @Override
-  public Topic getReifier() {
+  public TopicImpl getReifier() {
     return support.getReifier();
   }
 
@@ -193,21 +193,6 @@ public class NameImpl extends ScopedTopicMapItem<TopicImpl, NameSupport>
   protected int hashCodeFromEquality() {
     return getTopicMap().getEquality().hashCode(this);
   }  
-    
-  void importIn(Name otherName, boolean merge) {
-    Collection<Variant> otherVariants = otherName.getVariants();
-    otherVariants.forEach(otherVariant -> createVariant(otherVariant.getValue(),
-        otherVariant.getDatatype(), otherVariant.getScope()));
-    otherName.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));
-    if (getReifier() == null) {
-      setReifier(otherName.getReifier());
-    } else if (otherName.getReifier() != null) {
-      ((TopicImpl) getReifier()).importIn(otherName.getReifier(), true);
-    }
-    if (merge) {
-      otherName.remove();
-    }
-  }
   
   @Override
   public String toString() {

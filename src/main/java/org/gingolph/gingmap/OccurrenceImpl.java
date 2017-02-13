@@ -86,13 +86,4 @@ public class OccurrenceImpl extends AbstractDatatypeAware<TopicImpl, OccurrenceS
   protected int hashCodeFromEquality() {
     return getTopicMap().getEquality().hashCode(this);
   }  
-  
-    
-  void importIn(Occurrence otherOccurrence, boolean merge) {
-    if (otherOccurrence.getReifier() != null) {
-      setReifier(otherOccurrence.getReifier());
-    }
-    otherOccurrence.getItemIdentifiers().forEach(identifier -> importItemIdentifier(identifier));
-    otherOccurrence.remove();
-  }
 }
