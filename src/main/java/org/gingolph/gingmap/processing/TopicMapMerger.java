@@ -64,14 +64,15 @@ public class TopicMapMerger implements TopicMapVisitor{
     if (existingDestTopic.isPresent()) {
       destTopic = existingDestTopic.get();
       destTopic.copyLocators(sourceTopic);
-    } else {
+    } else {      
       destTopic = dest.createTopicFrom(sourceTopic);
+      destTopic.getSupport().setId(sourceTopic.getId());
     }
     sourceIdToDestTopic.put(sourceId, destTopic);
   }
   
   private TopicImpl getDestTopic(Topic sourceTopic) {
-    return sourceIdToDestTopic.get(sourceTopic.getId());
+    return sourceTopic == null ? null : sourceIdToDestTopic.get(sourceTopic.getId());
   }
   
   private Stream<TopicImpl> getDestTopics(Collection<Topic> sourceTopics) {
@@ -93,6 +94,7 @@ public class TopicMapMerger implements TopicMapVisitor{
   @Override
   public void onAssociation(AssociationImpl association) {
     AssociationImpl destAssociation = dest.createAssociation(getDestTopic(association.getType()), getDestScope(association));
+    destAssociation.getSupport().setId(association.getId());
     currentConstruct.get().association = destAssociation;
   }
 
