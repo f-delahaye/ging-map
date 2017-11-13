@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.gingolph.gingmap.support.VariantSupport;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Topic;
 import org.tmapi.core.Variant;

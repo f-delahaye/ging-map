@@ -1,6 +1,6 @@
 package org.gingolph.gingmap;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
 import org.gingolph.gingmap.json.JsonTopicMapSystemFactory;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -13,6 +13,6 @@ public class JsonSAMEqualityTests {
   @BeforeClass
   public static void before() {
     System.setProperty("org.tmapi.core.TopicMapSystemFactory", JsonTopicMapSystemFactory.class.getName());
-    System.setProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.SAM_EQUALITY);
+    System.setProperty(AbstractGingMapSystemFactory.EQUALITY_PROPERTY, AbstractGingMapSystemFactory.SAM_EQUALITY);
   }
 }

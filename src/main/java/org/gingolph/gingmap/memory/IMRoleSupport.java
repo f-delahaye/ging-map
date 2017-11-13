@@ -1,8 +1,8 @@
 package org.gingolph.gingmap.memory;
 
 import org.gingolph.gingmap.RoleImpl;
-import org.gingolph.gingmap.RoleSupport;
 import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.RoleSupport;
 
 
 public class IMRoleSupport extends IMConstructSupport implements RoleSupport {

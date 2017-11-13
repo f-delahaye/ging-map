@@ -1,13 +1,15 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
-import java.util.List;
-
-import org.tmapi.core.Association;
-import org.tmapi.core.Topic;
+import org.gingolph.gingmap.AbstractConstruct;
+import org.gingolph.gingmap.AssociationImpl;
+import org.gingolph.gingmap.LocatorImpl;
+import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.TopicMapImpl;
+import org.gingolph.gingmap.support.spi.TopicMapInterface;
 import org.tmapi.index.Index;
 
 
-public interface TopicMapSupport extends ConstructSupport {
+public interface TopicMapSupport extends ConstructSupport, TopicMapInterface<TopicImpl, AssociationImpl> {
 
   /**
    * Callback method invoked by TopicMapImpl.setSupport.
@@ -20,17 +22,7 @@ public interface TopicMapSupport extends ConstructSupport {
    */  
   void setOwner(TopicMapImpl owner);
   
-  List<TopicImpl> getTopics();
-
-  void addTopic(TopicImpl topic);
-
-  void removeTopic(Topic topic);
-
-  List<AssociationImpl> getAssociations();
-
-  void addAssociation(AssociationImpl association);
-
-  void removeAssociation(Association association);
+  void removeAssociation(AssociationImpl association);
 
   <I extends Index> I getIndex(Class<I> type);
 

@@ -1,7 +1,9 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
 import java.util.Set;
 
+import org.gingolph.gingmap.LocatorImpl;
+import org.gingolph.gingmap.TopicMapImpl;
 import org.tmapi.core.Locator;
 import org.tmapi.core.TopicMap;
 

@@ -1,17 +1,17 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
-import java.util.List;
 import java.util.Set;
 
-import org.gingolph.gingmap.equality.Equality;
+import org.gingolph.gingmap.NameImpl;
+import org.gingolph.gingmap.OccurrenceImpl;
+import org.gingolph.gingmap.RoleImpl;
+import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.spi.TopicInterface;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
-import org.tmapi.core.Role;
-import org.tmapi.core.Topic;
 
 
-public interface TopicSupport extends ConstructSupport {
+public interface TopicSupport extends ConstructSupport, TopicInterface<TopicImpl, RoleImpl, NameImpl, OccurrenceImpl> {
 
   /**
    * Callback method invoked by TopicImpl.setSupport.
@@ -37,35 +37,7 @@ public interface TopicSupport extends ConstructSupport {
 
   void removeSubjectLocator(Locator locator);
 
-
-  void addName(NameImpl name);
-
-  List<NameImpl> getNames();
-
-  void removeName(NameImpl name);
-
-
-  void addOccurrence(OccurrenceImpl occurrence);
-
-  List<OccurrenceImpl> getOccurrences();
-
-  void removeOccurrence(Occurrence occurrence);
-
-
-  void addRolePlayed(RoleImpl role);
-
-  List<RoleImpl> getRolesPlayed();
-
-  void removeRolePlayed(Role role);
-
-
-  void addType(TopicImpl type, Equality equality);
-
-  Set<TopicImpl> getTypes();
-
-  boolean removeType(Topic type);
-
-
+  
   Reifiable getReified();
 
   void setReified(Reifiable reified);

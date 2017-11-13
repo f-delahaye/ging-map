@@ -17,6 +17,14 @@ import org.gingolph.gingmap.equality.TMAPIEquality;
 import org.gingolph.gingmap.event.TopicMapEventListener;
 import org.gingolph.gingmap.index.IdentifierIndex;
 import org.gingolph.gingmap.processing.TopicMapMerger;
+import org.gingolph.gingmap.support.AssociationSupport;
+import org.gingolph.gingmap.support.ConstructSupportFactory;
+import org.gingolph.gingmap.support.NameSupport;
+import org.gingolph.gingmap.support.OccurrenceSupport;
+import org.gingolph.gingmap.support.RoleSupport;
+import org.gingolph.gingmap.support.TopicMapSupport;
+import org.gingolph.gingmap.support.TopicSupport;
+import org.gingolph.gingmap.support.VariantSupport;
 import org.tmapi.core.Association;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
@@ -34,21 +42,21 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
 
   transient Collection<TopicMapEventListener> listeners = new ArrayList<>();
 
-  TopicMapSystemImpl topicMapSystem;
+  GingMapSystemImpl topicMapSystem;
   private final boolean autoMerge;
   private String id;
   private final ConstructSupportFactory supportFactory;
   private final transient Map<Class<?>, Index> indexes = new LinkedHashMap<>();  
   private final Equality equality;
   
-  public TopicMapImpl(TopicMapSystemImpl topicMapSystem, boolean autoMerge,
+  public TopicMapImpl(GingMapSystemImpl topicMapSystem, boolean autoMerge,
       ConstructSupportFactory supportFactory) {
     super();
     this.topicMapSystem = topicMapSystem;
     this.autoMerge = autoMerge;
     this.supportFactory = supportFactory;
-    String userSpecifiedEquality = topicMapSystem.getProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.TMAPI_EQUALITY);    
-    equality = AbstractTopicMapSystemFactory.SAM_EQUALITY.equals(userSpecifiedEquality)? new SAMEquality():new TMAPIEquality();
+    String userSpecifiedEquality = topicMapSystem.getProperty(AbstractGingMapSystemFactory.EQUALITY_PROPERTY, AbstractGingMapSystemFactory.TMAPI_EQUALITY);    
+    equality = AbstractGingMapSystemFactory.SAM_EQUALITY.equals(userSpecifiedEquality)? new SAMEquality():new TMAPIEquality();
   }
 
   @Override
@@ -201,7 +209,7 @@ public class TopicMapImpl extends AbstractConstruct<TopicMapSupport> implements 
     return topic;
   }
 
-  void removeTopic(Topic topic) {
+  void removeTopic(TopicImpl topic) {
     support.removeTopic(topic);
   }
 

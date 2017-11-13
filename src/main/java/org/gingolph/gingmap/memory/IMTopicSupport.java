@@ -9,8 +9,7 @@ import org.gingolph.gingmap.NameImpl;
 import org.gingolph.gingmap.OccurrenceImpl;
 import org.gingolph.gingmap.RoleImpl;
 import org.gingolph.gingmap.TopicImpl;
-import org.gingolph.gingmap.TopicSupport;
-import org.gingolph.gingmap.equality.Equality;
+import org.gingolph.gingmap.support.TopicSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
@@ -104,7 +103,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public void removeOccurrence(Occurrence occurrence) {
+  public void removeOccurrence(OccurrenceImpl occurrence) {
     if (occurrences != null) {
       occurrences.remove(occurrence);
     }
@@ -124,7 +123,7 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public void removeRolePlayed(Role role) {
+  public void removeRolePlayed(RoleImpl role) {
     if (roles != null) {
       roles.remove(role);
     }
@@ -136,15 +135,15 @@ public class IMTopicSupport extends IMConstructSupport implements TopicSupport {
   }
 
   @Override
-  public void addType(TopicImpl type, Equality equality) {
+  public void addType(TopicImpl type) {
     if (types == null) {
-      types = equality.newSet();
+      types = type.getTopicMap().getEquality().newSet();
     }
     types.add(type);
   }
 
   @Override
-  public boolean removeType(Topic type) {
+  public boolean removeType(TopicImpl type) {
     if (types != null) {
       types.remove(type);
       return true;

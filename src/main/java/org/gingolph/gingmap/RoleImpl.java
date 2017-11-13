@@ -1,5 +1,6 @@
 package org.gingolph.gingmap;
 
+import org.gingolph.gingmap.support.RoleSupport;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;

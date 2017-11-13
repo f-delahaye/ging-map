@@ -1,5 +1,6 @@
 package org.gingolph.gingmap;
 
+import org.gingolph.gingmap.support.ConstructSupport;
 import org.tmapi.core.Construct;
 
 public abstract class TopicMapItem<P extends Construct, S extends ConstructSupport>

@@ -4,9 +4,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gingolph.gingmap.AbstractConstruct;
-import org.gingolph.gingmap.ScopedSupport;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.equality.Equality;
+import org.gingolph.gingmap.support.ScopedSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;
 import org.hypergraphdb.HyperGraph;

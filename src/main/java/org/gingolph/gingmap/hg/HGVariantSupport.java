@@ -3,7 +3,7 @@ package org.gingolph.gingmap.hg;
 import org.gingolph.gingmap.NameImpl;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.VariantImpl;
-import org.gingolph.gingmap.VariantSupport;
+import org.gingolph.gingmap.support.VariantSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.AtomReference;

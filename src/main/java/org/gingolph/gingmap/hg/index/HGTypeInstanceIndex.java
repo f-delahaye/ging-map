@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gingolph.gingmap.TopicImpl;
-import org.gingolph.gingmap.TopicSupport;
-import org.gingolph.gingmap.TypedSupport;
 import org.gingolph.gingmap.equality.Equality;
 import org.gingolph.gingmap.hg.HGAssociationSupport;
 import org.gingolph.gingmap.hg.HGConstructSupport;
@@ -19,6 +17,8 @@ import org.gingolph.gingmap.hg.HGOccurrenceSupport;
 import org.gingolph.gingmap.hg.HGRoleSupport;
 import org.gingolph.gingmap.hg.HGTM;
 import org.gingolph.gingmap.hg.HGTopicSupport;
+import org.gingolph.gingmap.support.TopicSupport;
+import org.gingolph.gingmap.support.TypedSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HGQuery.hg;

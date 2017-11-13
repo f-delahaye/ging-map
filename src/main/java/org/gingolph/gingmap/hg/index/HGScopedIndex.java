@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import org.gingolph.gingmap.ScopedTopicMapItem;
 import org.gingolph.gingmap.TopicImpl;
-import org.gingolph.gingmap.TopicSupport;
 import org.gingolph.gingmap.UnmodifiableCollectionSet;
 import org.gingolph.gingmap.equality.Equality;
 import org.gingolph.gingmap.hg.HGAssociationSupport;
@@ -21,6 +20,7 @@ import org.gingolph.gingmap.hg.HGScopedSupport;
 import org.gingolph.gingmap.hg.HGTM;
 import org.gingolph.gingmap.hg.HGTopicSupport;
 import org.gingolph.gingmap.hg.HGVariantSupport;
+import org.gingolph.gingmap.support.TopicSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HGQuery.hg;

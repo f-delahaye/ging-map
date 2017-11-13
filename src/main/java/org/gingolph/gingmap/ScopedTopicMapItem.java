@@ -1,5 +1,6 @@
 package org.gingolph.gingmap;
 
+import org.gingolph.gingmap.support.ConstructSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Scoped;
 

@@ -2,7 +2,7 @@ package org.gingolph.gingmap.memory;
 
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.VariantImpl;
-import org.gingolph.gingmap.VariantSupport;
+import org.gingolph.gingmap.support.VariantSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.Topic;
 

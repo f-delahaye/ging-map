@@ -10,30 +10,28 @@ import java.util.stream.Stream;
 
 import org.gingolph.gingmap.AbstractConstruct;
 import org.gingolph.gingmap.AssociationImpl;
-import org.gingolph.gingmap.AssociationSupport;
 import org.gingolph.gingmap.LocatorImpl;
 import org.gingolph.gingmap.NameImpl;
-import org.gingolph.gingmap.NameSupport;
 import org.gingolph.gingmap.OccurrenceImpl;
-import org.gingolph.gingmap.OccurrenceSupport;
 import org.gingolph.gingmap.RoleImpl;
-import org.gingolph.gingmap.RoleSupport;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.TopicMapImpl;
-import org.gingolph.gingmap.TopicMapSupport;
-import org.gingolph.gingmap.TopicMapSystemImpl;
-import org.gingolph.gingmap.TopicSupport;
+import org.gingolph.gingmap.GingMapSystemImpl;
 import org.gingolph.gingmap.VariantImpl;
-import org.gingolph.gingmap.VariantSupport;
 import org.gingolph.gingmap.equality.Equality;
 import org.gingolph.gingmap.index.IdentifierIndex;
 import org.gingolph.gingmap.index.LiteralIndexImpl;
 import org.gingolph.gingmap.index.ScopedIndexImpl;
 import org.gingolph.gingmap.index.TypeInstanceIndexImpl;
-import org.tmapi.core.Association;
+import org.gingolph.gingmap.support.AssociationSupport;
+import org.gingolph.gingmap.support.NameSupport;
+import org.gingolph.gingmap.support.OccurrenceSupport;
+import org.gingolph.gingmap.support.RoleSupport;
+import org.gingolph.gingmap.support.TopicMapSupport;
+import org.gingolph.gingmap.support.TopicSupport;
+import org.gingolph.gingmap.support.VariantSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.Locator;
-import org.tmapi.core.Occurrence;
 import org.tmapi.core.Reifiable;
 import org.tmapi.core.Role;
 import org.tmapi.core.Topic;
@@ -91,7 +89,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
     super(json);
   }  
   
-  public static TopicMapImpl read(String jsonAsString, TopicMapSystemImpl topicMapSystem) {
+  public static TopicMapImpl read(String jsonAsString, GingMapSystemImpl topicMapSystem) {
       JsonTopicMapSupport topicMapSupport = (JsonTopicMapSupport) Json.read(jsonAsString);
       TopicMapImpl topicMap = topicMapSystem.createTopicMap(topicMapSupport);      
       // if this json was created from a jsonstring, the owners have not been set, so we need to browse the json object and populate those now.
@@ -265,7 +263,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void removeRole(Role role) {
+  public void removeRole(RoleImpl role) {
     nullSafeRoles().remove(getTopicMapSupportJson(role));
   }
   
@@ -313,7 +311,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void removeOccurrence(Occurrence occurrence) {
+  public void removeOccurrence(OccurrenceImpl occurrence) {
     nullSafeOccurrences().remove(getTopicMapSupportJson(occurrence));
   }
   
@@ -345,12 +343,12 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public final void addType(TopicImpl type, Equality equality) {
+  public final void addType(TopicImpl type) {
     nullSafeTypes().add(type.getId());
   }
 
   @Override
-  public final boolean removeType(Topic type) {
+  public final boolean removeType(TopicImpl type) {
     nullSafeTypes().remove(type.getId());  
     return true;
   }  
@@ -385,7 +383,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void removeTopic(Topic topic) {
+  public void removeTopic(TopicImpl topic) {
     nullSafeTopics().remove(getTopicMapSupportJson(topic));
   }
 
@@ -408,7 +406,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public void removeAssociation(Association association) {
+  public void removeAssociation(AssociationImpl association) {
     nullSafeAssociations().remove(getTopicMapSupportJson(association));
   }
 
@@ -552,7 +550,7 @@ public class JsonTopicMapSupport extends TopicMapJson implements TopicMapSupport
   }
 
   @Override
-  public final void removeRolePlayed(Role role) {
+  public final void removeRolePlayed(RoleImpl role) {
     nullSafeRolesPlayed().remove(role.getId());  
   }
 

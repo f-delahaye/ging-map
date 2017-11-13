@@ -3,6 +3,7 @@ package org.gingolph.gingmap;
 import java.util.Collection;
 import java.util.Set;
 
+import org.gingolph.gingmap.support.OccurrenceSupport;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Occurrence;
 import org.tmapi.core.Topic;

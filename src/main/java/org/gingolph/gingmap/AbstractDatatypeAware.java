@@ -2,6 +2,8 @@ package org.gingolph.gingmap;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import org.gingolph.gingmap.support.DatatypeAwareSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.DatatypeAware;
 import org.tmapi.core.Locator;

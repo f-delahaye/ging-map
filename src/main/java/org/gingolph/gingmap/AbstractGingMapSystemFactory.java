@@ -3,12 +3,13 @@ package org.gingolph.gingmap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
 import org.tmapi.core.FeatureNotRecognizedException;
 import org.tmapi.core.FeatureNotSupportedException;
 import org.tmapi.core.TopicMapSystemFactory;
 
 
-public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactory {
+public abstract class AbstractGingMapSystemFactory extends TopicMapSystemFactory {
 
   protected final Map<String, Object> properties = new LinkedHashMap<>();
   protected final Map<String, Boolean> features = new LinkedHashMap<>();
@@ -30,7 +31,7 @@ public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactor
   public static final String SAM_EQUALITY = "sam";
   public static final String TMAPI_EQUALITY = "tmapi";
 
-  public AbstractTopicMapSystemFactory() {}
+  public AbstractGingMapSystemFactory() {}
 
   @Override
   public boolean hasFeature(String featureName) {
@@ -63,8 +64,8 @@ public abstract class AbstractTopicMapSystemFactory extends TopicMapSystemFactor
   }
 
   @Override
-  public TopicMapSystemImpl newTopicMapSystem() {
-    return new TopicMapSystemImpl(this, getTopicMapSystemSupport());
+  public GingMapSystemImpl newTopicMapSystem() {
+    return new GingMapSystemImpl(this, getTopicMapSystemSupport());
   }
 
   protected abstract TopicMapSystemSupport getTopicMapSystemSupport();

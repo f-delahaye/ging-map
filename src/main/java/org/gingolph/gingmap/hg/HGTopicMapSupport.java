@@ -3,18 +3,18 @@ package org.gingolph.gingmap.hg;
 import java.util.List;
 
 import org.gingolph.gingmap.AbstractConstruct;
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
 import org.gingolph.gingmap.AssociationImpl;
 import org.gingolph.gingmap.LocatorImpl;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.TopicMapImpl;
-import org.gingolph.gingmap.TopicMapSupport;
-import org.gingolph.gingmap.TopicMapSystemImpl;
-import org.gingolph.gingmap.TopicMapSystemSupport;
+import org.gingolph.gingmap.GingMapSystemImpl;
 import org.gingolph.gingmap.hg.index.HGLiteralIndex;
 import org.gingolph.gingmap.hg.index.HGScopedIndex;
 import org.gingolph.gingmap.hg.index.HGTypeInstanceIndex;
 import org.gingolph.gingmap.index.IdentifierIndex;
+import org.gingolph.gingmap.support.TopicMapSupport;
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HyperGraph;
 import org.hypergraphdb.annotation.AtomReference;
@@ -50,11 +50,11 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
 	  HGTopicMapSystemFactory factory = new HGTopicMapSystemFactory();
     boolean autoMerge;
     try {
-      autoMerge = factory.getFeature(AbstractTopicMapSystemFactory.AUTOMERGE);
+      autoMerge = factory.getFeature(AbstractGingMapSystemFactory.AUTOMERGE);
     } catch (FeatureNotRecognizedException ex) {
       autoMerge = false;
     }
-    TopicMapImpl topicMap = new TopicMapImpl(new TopicMapSystemImpl(factory, parent), autoMerge, parent);
+    TopicMapImpl topicMap = new TopicMapImpl(new GingMapSystemImpl(factory, parent), autoMerge, parent);
     topicMap.setSupport(this);
     return topicMap;
   }
@@ -122,12 +122,12 @@ public class HGTopicMapSupport extends HGConstructSupport<TopicMapImpl> implemen
   }
 
   @Override
-  public void removeTopic(Topic topic) {
+  public void removeTopic(TopicImpl topic) {
     remove(getGraph(), topic);
   }
 
   @Override
-  public void removeAssociation(Association association) {
+  public void removeAssociation(AssociationImpl association) {
     remove(getGraph(), association);
   }
 

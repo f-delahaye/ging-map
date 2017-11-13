@@ -2,8 +2,8 @@ package org.gingolph.gingmap.hg;
 
 import org.gingolph.gingmap.AssociationImpl;
 import org.gingolph.gingmap.RoleImpl;
-import org.gingolph.gingmap.RoleSupport;
 import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.RoleSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;

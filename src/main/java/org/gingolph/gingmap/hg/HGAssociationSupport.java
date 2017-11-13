@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.gingolph.gingmap.AssociationImpl;
-import org.gingolph.gingmap.AssociationSupport;
 import org.gingolph.gingmap.RoleImpl;
 import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.AssociationSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGLink;
 import org.hypergraphdb.HyperGraph;
@@ -41,7 +41,7 @@ public class HGAssociationSupport extends HGScopedSupport<AssociationImpl>
   }
 
   @Override
-  public void removeRole(Role role) {
+  public void removeRole(RoleImpl role) {
     HyperGraph graph = getGraph();
     final HGHandle roleHandle = getHandle(graph, role);
     if (roleHandle != null) {

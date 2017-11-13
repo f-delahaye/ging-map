@@ -3,7 +3,7 @@ package org.gingolph.gingmap.memory;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.gingolph.gingmap.ConstructSupport;
+import org.gingolph.gingmap.support.ConstructSupport;
 import org.tmapi.core.Locator;
 
 public class IMConstructSupport implements ConstructSupport {

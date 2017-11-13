@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.gingolph.gingmap.processing.TopicMerger;
+import org.gingolph.gingmap.support.TopicSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;
@@ -370,12 +371,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
     return occurrence;
   }
 
-  protected void removeOccurrence(Occurrence occurrence) {
+  protected void removeOccurrence(OccurrenceImpl occurrence) {
     support.removeOccurrence(occurrence);
   }
 
   void removeRolePlayed(Role role) {
-    support.removeRolePlayed(role);
+    support.removeRolePlayed((RoleImpl)role);
   }
 
   @Override
@@ -426,12 +427,12 @@ public class TopicImpl extends TopicMapItem<TopicMapImpl, TopicSupport>
   }
 
   protected void doAddType(Topic type) {
-    support.addType((TopicImpl)type, getTopicMap().getEquality());
+    support.addType((TopicImpl)type);
   }
 
   @Override
   public void removeType(Topic type) {
-    if (support.removeType(type)) {
+    if (support.removeType((TopicImpl)type)) {
       getTopicMap().notifyListeners(listener -> listener.onTypeChanged(this, null, type));
     }
   }

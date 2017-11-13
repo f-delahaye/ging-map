@@ -1,6 +1,6 @@
 package org.gingolph.gingmap;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
 import org.gingolph.gingmap.memory.IMTopicMapSystemFactory;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -13,6 +13,6 @@ public class InMemoryTMAPIEqualityTests {
   @BeforeClass
   public static void before() {
     System.setProperty("org.tmapi.core.TopicMapSystemFactory", IMTopicMapSystemFactory.class.getName());
-    System.setProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.TMAPI_EQUALITY);
+    System.setProperty(AbstractGingMapSystemFactory.EQUALITY_PROPERTY, AbstractGingMapSystemFactory.TMAPI_EQUALITY);
   }
 }

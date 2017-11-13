@@ -2,7 +2,7 @@ package org.gingolph.gingmap;
 
 import java.io.File;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
 import org.gingolph.gingmap.hg.HGTopicMapSystemFactory;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ public class HGSAMEqualityTests {
   @BeforeClass
   public static void before() {
     System.setProperty("org.tmapi.core.TopicMapSystemFactory", HGTopicMapSystemFactory.class.getName());
-    System.setProperty(AbstractTopicMapSystemFactory.EQUALITY_PROPERTY, AbstractTopicMapSystemFactory.SAM_EQUALITY);
+    System.setProperty(AbstractGingMapSystemFactory.EQUALITY_PROPERTY, AbstractGingMapSystemFactory.SAM_EQUALITY);
     String pathToStorageFile = "test-suite";
     File path = new File(pathToStorageFile);
     if (!path.exists()) {

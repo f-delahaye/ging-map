@@ -1,5 +1,7 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
+import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.VariantImpl;
 import org.tmapi.core.Topic;
 
 

@@ -1,9 +1,9 @@
 package org.gingolph.gingmap.memory;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
-import org.gingolph.gingmap.TopicMapSystemSupport;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
 
-public class IMTopicMapSystemFactory extends AbstractTopicMapSystemFactory {
+public class IMTopicMapSystemFactory extends AbstractGingMapSystemFactory {
 
   public IMTopicMapSystemFactory() {
     features.put(AUTOMERGE, Boolean.FALSE);

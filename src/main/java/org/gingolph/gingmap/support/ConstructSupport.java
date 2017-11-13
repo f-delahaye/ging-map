@@ -1,4 +1,4 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
 import java.util.Set;
 

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.gingolph.gingmap.NameImpl;
-import org.gingolph.gingmap.NameSupport;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.VariantImpl;
+import org.gingolph.gingmap.support.NameSupport;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.annotation.HGIgnore;
 import org.hypergraphdb.atom.HGRel;

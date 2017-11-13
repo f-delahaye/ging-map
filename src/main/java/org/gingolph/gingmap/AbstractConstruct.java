@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.gingolph.gingmap.event.TopicMapEventListener;
 import org.gingolph.gingmap.event.TopicMapEventListenerSupport;
+import org.gingolph.gingmap.support.ConstructSupport;
 import org.tmapi.core.Construct;
 import org.tmapi.core.IdentityConstraintException;
 import org.tmapi.core.Locator;

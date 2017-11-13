@@ -5,21 +5,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
-import org.gingolph.gingmap.AssociationSupport;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
 import org.gingolph.gingmap.LocatorImpl;
-import org.gingolph.gingmap.NameSupport;
-import org.gingolph.gingmap.OccurrenceSupport;
-import org.gingolph.gingmap.RoleSupport;
 import org.gingolph.gingmap.TopicMapImpl;
-import org.gingolph.gingmap.TopicMapSupport;
-import org.gingolph.gingmap.TopicMapSystemSupport;
-import org.gingolph.gingmap.TopicSupport;
-import org.gingolph.gingmap.VariantSupport;
+import org.gingolph.gingmap.support.AssociationSupport;
+import org.gingolph.gingmap.support.NameSupport;
+import org.gingolph.gingmap.support.OccurrenceSupport;
+import org.gingolph.gingmap.support.RoleSupport;
+import org.gingolph.gingmap.support.TopicMapSupport;
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
+import org.gingolph.gingmap.support.TopicSupport;
+import org.gingolph.gingmap.support.VariantSupport;
 import org.tmapi.core.Locator;
 import org.tmapi.core.TopicMap;
 
-public class JsonTopicMapSystemFactory extends AbstractTopicMapSystemFactory
+public class JsonTopicMapSystemFactory extends AbstractGingMapSystemFactory
 implements TopicMapSystemSupport, Serializable {
 
   private static final long serialVersionUID = 1L;

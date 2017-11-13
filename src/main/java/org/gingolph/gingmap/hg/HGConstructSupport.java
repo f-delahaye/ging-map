@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.gingolph.gingmap.AbstractConstruct;
-import org.gingolph.gingmap.ConstructSupport;
 import org.gingolph.gingmap.TopicMapImpl;
+import org.gingolph.gingmap.support.ConstructSupport;
 import org.hypergraphdb.HGGraphHolder;
 import org.hypergraphdb.HGHandle;
 import org.hypergraphdb.HGQuery.hg;

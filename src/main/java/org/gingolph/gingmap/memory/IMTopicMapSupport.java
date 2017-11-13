@@ -9,11 +9,11 @@ import org.gingolph.gingmap.AssociationImpl;
 import org.gingolph.gingmap.LocatorImpl;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.TopicMapImpl;
-import org.gingolph.gingmap.TopicMapSupport;
 import org.gingolph.gingmap.index.IdentifierIndex;
 import org.gingolph.gingmap.index.LiteralIndexImpl;
 import org.gingolph.gingmap.index.ScopedIndexImpl;
 import org.gingolph.gingmap.index.TypeInstanceIndexImpl;
+import org.gingolph.gingmap.support.TopicMapSupport;
 import org.tmapi.core.Association;
 import org.tmapi.core.Topic;
 import org.tmapi.index.Index;
@@ -49,7 +49,7 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public void removeTopic(Topic topic) {
+  public void removeTopic(TopicImpl topic) {
     topics.remove(topic);
   }
 
@@ -64,7 +64,7 @@ public class IMTopicMapSupport extends IMConstructSupport implements TopicMapSup
   }
 
   @Override
-  public void removeAssociation(Association association) {
+  public void removeAssociation(AssociationImpl association) {
     associations.remove(association);
   }
 

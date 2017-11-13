@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gingolph.gingmap.NameImpl;
-import org.gingolph.gingmap.NameSupport;
 import org.gingolph.gingmap.TopicImpl;
 import org.gingolph.gingmap.VariantImpl;
+import org.gingolph.gingmap.support.NameSupport;
 import org.tmapi.core.Variant;
 
 public class IMNameSupport extends IMScopedSupport implements NameSupport {

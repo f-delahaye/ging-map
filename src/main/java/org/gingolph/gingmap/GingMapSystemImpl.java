@@ -3,6 +3,8 @@ package org.gingolph.gingmap;
 import java.util.Collections;
 import java.util.Set;
 
+import org.gingolph.gingmap.support.TopicMapSupport;
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
 import org.tmapi.core.FeatureNotRecognizedException;
 import org.tmapi.core.Locator;
 import org.tmapi.core.MalformedIRIException;
@@ -12,12 +14,12 @@ import org.tmapi.core.TopicMapExistsException;
 import org.tmapi.core.TopicMapSystem;
 import org.tmapi.core.TopicMapSystemFactory;
 
-public class TopicMapSystemImpl implements TopicMapSystem {
+public class GingMapSystemImpl implements TopicMapSystem {
 
   private final TopicMapSystemSupport support;
   private TopicMapSystemFactory factory;
 
-  public TopicMapSystemImpl(TopicMapSystemFactory factory, TopicMapSystemSupport support) {
+  public GingMapSystemImpl(TopicMapSystemFactory factory, TopicMapSystemSupport support) {
     this.factory = factory;
     this.support = support;
   }
@@ -83,7 +85,7 @@ public class TopicMapSystemImpl implements TopicMapSystem {
 
   public boolean isAutoMerge() {
     try {
-      return getFeature(AbstractTopicMapSystemFactory.AUTOMERGE);
+      return getFeature(AbstractGingMapSystemFactory.AUTOMERGE);
     } catch (FeatureNotRecognizedException ex) {
       throw new TMAPIRuntimeException(
           "As per specification, the automerge feature should be supported");

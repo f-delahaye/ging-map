@@ -1,4 +1,7 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
+
+import org.gingolph.gingmap.OccurrenceImpl;
+import org.gingolph.gingmap.TopicImpl;
 
 public interface OccurrenceSupport
     extends ConstructSupport, ScopedSupport, TypedSupport, DatatypeAwareSupport {

@@ -1,8 +1,8 @@
 package org.gingolph.gingmap.memory;
 
 import org.gingolph.gingmap.OccurrenceImpl;
-import org.gingolph.gingmap.OccurrenceSupport;
 import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.OccurrenceSupport;
 import org.tmapi.core.Locator;
 
 

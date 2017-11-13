@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gingolph.gingmap.AssociationImpl;
-import org.gingolph.gingmap.AssociationSupport;
 import org.gingolph.gingmap.RoleImpl;
 import org.gingolph.gingmap.TopicImpl;
-import org.tmapi.core.Role;
+import org.gingolph.gingmap.support.AssociationSupport;
 
 
 public class IMAssociationSupport extends IMScopedSupport implements AssociationSupport {
@@ -36,7 +35,7 @@ public class IMAssociationSupport extends IMScopedSupport implements Association
   }
 
   @Override
-  public void removeRole(Role role) {
+  public void removeRole(RoleImpl role) {
     this.roles.remove(role);
   }
 

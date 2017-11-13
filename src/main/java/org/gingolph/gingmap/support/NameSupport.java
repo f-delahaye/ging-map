@@ -1,7 +1,10 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
 import java.util.List;
 
+import org.gingolph.gingmap.NameImpl;
+import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.VariantImpl;
 import org.tmapi.core.Variant;
 
 

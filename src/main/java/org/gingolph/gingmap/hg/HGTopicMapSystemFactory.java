@@ -1,10 +1,10 @@
 package org.gingolph.gingmap.hg;
 
-import org.gingolph.gingmap.AbstractTopicMapSystemFactory;
-import org.gingolph.gingmap.TopicMapSystemSupport;
+import org.gingolph.gingmap.AbstractGingMapSystemFactory;
+import org.gingolph.gingmap.support.TopicMapSystemSupport;
 
 
-public class HGTopicMapSystemFactory extends AbstractTopicMapSystemFactory {
+public class HGTopicMapSystemFactory extends AbstractGingMapSystemFactory {
 
   protected static final String HG_BASE_URL = GINGOLPH_BASE_URL + "hg.";
   protected static final String HG_STORAGE_BASE_PROPERTY = HG_BASE_URL + "storage.";

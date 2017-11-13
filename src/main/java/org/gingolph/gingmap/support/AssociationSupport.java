@@ -1,11 +1,13 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
 
-import java.util.List;
-
+import org.gingolph.gingmap.AssociationImpl;
+import org.gingolph.gingmap.RoleImpl;
+import org.gingolph.gingmap.TopicImpl;
+import org.gingolph.gingmap.support.spi.AssociationInterface;
 import org.tmapi.core.Role;
 
 
-public interface AssociationSupport extends ConstructSupport, ScopedSupport, TypedSupport {
+public interface AssociationSupport extends ConstructSupport, ScopedSupport, TypedSupport, AssociationInterface<TopicImpl, RoleImpl> {
 
   /**
    * Callback method invoked by AssociationImpl.setSupport.
@@ -20,15 +22,7 @@ public interface AssociationSupport extends ConstructSupport, ScopedSupport, Typ
   
   TopicImpl getReifier();
 
-  List<RoleImpl> getRoles();
-
-  TopicImpl getType();
-
   void setReifier(TopicImpl reifier);
-
-  void addRole(RoleImpl role);
-
-  void removeRole(Role role);
 
   void setType(TopicImpl type);
 

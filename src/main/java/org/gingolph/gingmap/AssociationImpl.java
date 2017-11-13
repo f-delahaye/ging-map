@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gingolph.gingmap.support.AssociationSupport;
 import org.tmapi.core.Association;
 import org.tmapi.core.ModelConstraintException;
 import org.tmapi.core.Role;

@@ -1,4 +1,7 @@
-package org.gingolph.gingmap;
+package org.gingolph.gingmap.support;
+
+import org.gingolph.gingmap.RoleImpl;
+import org.gingolph.gingmap.TopicImpl;
 
 public interface RoleSupport extends ConstructSupport, TypedSupport {
 
